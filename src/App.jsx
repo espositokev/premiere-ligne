@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import AppLayout from './components/layout/AppLayout'
 
 import RootRedirect from './pages/RootRedirect'
+import DebugLogout from './pages/DebugLogout'
 import LoginPage from './pages/auth/LoginPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
@@ -38,6 +39,7 @@ export default function App() {
 
           {/* Racine → redirection selon rôle */}
           <Route path="/" element={<RootRedirect />} />
+          <Route path="/debug-logout" element={<DebugLogout />} />
 
           {/* Pages avec layout (sidebar) */}
           <Route element={<AppLayout />}>
