@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('[Auth] onAuthStateChange', event, session?.user?.id ?? 'no user')
         setUser(session?.user ?? null)
         if (session?.user) {
           await fetchProfile(session.user.id)
@@ -24,15 +25,20 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function fetchProfile(userId) {
+    console.log('[Auth] fetchProfile start', userId)
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*, structures(name, ville)')
         .eq('id', userId)
         .single()
+      console.log('[Auth] fetchProfile result', { data, error })
       setProfile(data)
+    } catch (err) {
+      console.error('[Auth] fetchProfile exception', err)
     } finally {
       setLoading(false)
+      console.log('[Auth] loading = false')
     }
   }
 
