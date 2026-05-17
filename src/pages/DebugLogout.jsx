@@ -1,19 +1,15 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
-
 export default function DebugLogout() {
-  const navigate = useNavigate()
+  // Clear all Supabase auth keys from localStorage
+  Object.keys(localStorage)
+    .filter(k => k.startsWith('sb-'))
+    .forEach(k => localStorage.removeItem(k))
+  localStorage.clear()
 
-  useEffect(() => {
-    supabase.auth.signOut().then(() => {
-      navigate('/login', { replace: true })
-    })
-  }, [])
+  // Clear all cookies
+  document.cookie.split(';').forEach(c => {
+    document.cookie = c.trim().split('=')[0] + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/'
+  })
 
-  return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
-      <p style={{ color: 'var(--mu)', fontSize: 14 }}>Déconnexion en cours…</p>
-    </div>
-  )
+  window.location.replace('/login')
+  return null
 }
