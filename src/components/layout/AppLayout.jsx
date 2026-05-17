@@ -8,8 +8,8 @@ export default function AppLayout() {
   if (loading) return <LoadingScreen />
   if (!user) return <Navigate to="/login" replace />
 
-  // If no structure yet → onboarding
-  if (profile && !profile.structure_id) return <Navigate to="/onboarding" replace />
+  // If no structure yet (or no profile row) → onboarding
+  if (!profile || !profile.structure_id) return <Navigate to="/onboarding" replace />
 
   return (
     <div style={{ display: 'flex', height: '100vh', background: 'var(--bg)', overflow: 'hidden' }}>
