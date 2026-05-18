@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext(null)
@@ -7,18 +7,29 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  // Ref pour éviter de refetcher le profil du même utilisateur déjà chargé
+  const loadedUserIdRef = useRef(null)
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('[Auth] onAuthStateChange', event, session?.user?.id ?? 'no user')
-        // TOKEN_REFRESHED ne change pas le profil — on ignore pour éviter
-        // que le timeout efface le profil et déclenche une redirection /onboarding
+
+        // TOKEN_REFRESHED ne change pas le profil — ignorer complètement
         if (event === 'TOKEN_REFRESHED') return
+
+        const userId = session?.user?.id ?? null
         setUser(session?.user ?? null)
-        if (session?.user) {
-          await fetchProfile(session.user.id)
+
+        if (userId) {
+          // Même utilisateur déjà chargé → pas besoin de refetcher
+          if (userId === loadedUserIdRef.current) {
+            setLoading(false)
+            return
+          }
+          await fetchProfile(userId)
         } else {
+          loadedUserIdRef.current = null
           setProfile(null)
           setLoading(false)
         }
@@ -29,16 +40,31 @@ export function AuthProvider({ children }) {
 
   async function fetchProfile(userId) {
     console.log('[Auth] fetchProfile start', userId)
-    const timeout = new Promise(resolve => setTimeout(() => resolve({ data: null, error: 'timeout' }), 5000))
+
+    const tryFetch = () => Promise.race([
+      supabase.from('profiles').select('*, structures(name, ville)').eq('id', userId).single(),
+      new Promise(resolve => setTimeout(() => resolve({ data: null, error: 'timeout' }), 10000)),
+    ])
+
     try {
-      const { data, error } = await Promise.race([
-        supabase.from('profiles').select('*, structures(name, ville)').eq('id', userId).single(),
-        timeout,
-      ])
+      let { data, error } = await tryFetch()
+
+      // Réessayer une fois si timeout
+      if (error === 'timeout') {
+        console.log('[Auth] fetchProfile timeout — retry...')
+        ;({ data, error } = await tryFetch())
+      }
+
       console.log('[Auth] fetchProfile result', { data, error })
-      // Sur timeout, on conserve le profil existant plutôt que de l'effacer
-      if (error === 'timeout') return
+
+      // Double timeout : conserver le profil existant, ne pas rediriger
+      if (error === 'timeout') {
+        console.log('[Auth] fetchProfile double timeout — profil existant conservé')
+        return
+      }
+
       setProfile(data)
+      loadedUserIdRef.current = data ? userId : null
     } catch (err) {
       console.error('[Auth] fetchProfile exception', err)
     } finally {
