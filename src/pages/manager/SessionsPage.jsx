@@ -71,6 +71,16 @@ export default function SessionsPage() {
   async function createSession() {
     if (!form.vendeurId || !form.scheduledDate) return
     setSaving(true)
+    console.log('[createSession] payload:', {
+      structure_id: profile.structure_id,
+      vendeur_id: form.vendeurId,
+      dojo_id: form.dojoId || null,
+      sous_comp_id: form.sousCompId || null,
+      scheduled_date: form.scheduledDate,
+      notes: form.notes || null,
+      objectif: form.objectif || null,
+      status: 'planned',
+    })
     const { data, error } = await supabase.from('coaching_sessions').insert({
       structure_id: profile.structure_id,
       vendeur_id: form.vendeurId,
@@ -81,6 +91,9 @@ export default function SessionsPage() {
       objectif: form.objectif || null,
       status: 'planned',
     }).select('*, profiles!vendeur_id(id, full_name, poste), dojos!dojo_id(title), sous_competences!sous_comp_id(id, title)').single()
+
+    console.log('[createSession] data:', data)
+    console.log('[createSession] error:', error)
 
     if (!error && data) {
       setSessions(prev => [data, ...prev].sort((a, b) =>
