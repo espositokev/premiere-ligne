@@ -78,17 +78,13 @@ export default function ParametresPage() {
     setInviting(true)
     setInviteMsg('')
 
-    // Récupérer explicitement le JWT pour le passer dans le header
-    const { data: { session } } = await supabase.auth.getSession()
     const { data: fnData, error } = await supabase.functions.invoke('invite-vendeur', {
       body: {
         email: inviteForm.email,
         full_name: inviteForm.fullName,
         poste: inviteForm.poste || 'Commercial',
+        structure_id: profile.structure_id,
         redirect_to: `${window.location.origin}/invitation`,
-      },
-      headers: {
-        Authorization: `Bearer ${session?.access_token}`,
       },
     })
 
