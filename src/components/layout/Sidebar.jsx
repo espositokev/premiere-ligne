@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import { supabase } from '../../lib/supabase'
 import { Logo } from '../Logo'
 import { Avatar } from '../Avatar'
 import {
@@ -62,10 +63,22 @@ export function Sidebar() {
   const isManager = profile?.role === 'manager'
   const defaultView = isManager ? 'manager' : 'vendeur'
   const [viewRole, setViewRole] = useState(defaultView)
+  const [structureName, setStructureName] = useState('')
 
   const nav = viewRole === 'manager' ? MANAGER_NAV : VENDEUR_NAV
-  const structureName = profile?.structures?.name || 'Ma structure'
-  const structureInitials = structureName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+  const structureInitials = structureName
+    ? structureName.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    : '?'
+
+  useEffect(() => {
+    if (!profile?.structure_id) return
+    supabase
+      .from('structures')
+      .select('name')
+      .eq('id', profile.structure_id)
+      .single()
+      .then(({ data }) => { if (data?.name) setStructureName(data.name) })
+  }, [profile?.structure_id])
 
   function handleNav(path) {
     navigate(path)
@@ -92,14 +105,13 @@ export function Sidebar() {
       <div style={{ padding: '16px 14px 12px', borderBottom: '1px solid var(--ln)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
           <Logo variant="transparent" />
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fi)', lineHeight: 1.25 }}>
-            PREMIÈRE LIGNE
-            <small style={{ fontSize: 10, fontWeight: 400, color: 'var(--mu)', display: 'block' }}>
-              {structureName}
-            </small>
-            <small style={{ fontSize: 10, fontWeight: 400, fontStyle: 'italic', color: '#8A8D88', display: 'block', marginTop: 1 }}>
+          <div style={{ lineHeight: 1.3 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#0B3D2E' }}>
+              PREMIÈRE LIGNE
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 600, fontStyle: 'italic', color: '#0B3D2E', opacity: 0.7 }}>
               On forme là où ça se joue
-            </small>
+            </div>
           </div>
         </div>
         <div style={{
