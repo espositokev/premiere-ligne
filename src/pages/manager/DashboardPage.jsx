@@ -10,7 +10,7 @@ export default function DashboardPage() {
   const { profile } = useAuth()
   const navigate = useNavigate()
   const [team, setTeam] = useState([])
-  const [stats, setStats] = useState({ dojos: 0, score: 0, engagement: 0, defis: 0 })
+  const [stats, setStats] = useState({ dojos: 0, score: 0, actifs: 0, defis: 0 })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -36,12 +36,18 @@ export default function DashboardPage() {
     // Charger les dojos validés et l'éval pour chaque vendeur
     if (vendeurs && vendeurs.length > 0) {
       const ids = vendeurs.map(v => v.id)
-      const [{ data: vDojos }, { data: evals }, { data: activePlans }] = await Promise.all([
+      const firstOfMonth = new Date()
+      firstOfMonth.setDate(1)
+      firstOfMonth.setHours(0, 0, 0, 0)
+      const [{ data: vDojos }, { data: evals }, { data: activePlans }, { data: actifsData }] = await Promise.all([
         supabase.from('vendeur_dojos').select('vendeur_id, dojo_id, status, dojos(title)')
           .in('vendeur_id', ids).eq('status', 'assigned'),
         supabase.from('evaluations').select('vendeur_id, score').in('vendeur_id', ids),
         supabase.from('plans').select('vendeur_id, id').in('vendeur_id', ids).eq('status', 'active'),
+        supabase.from('vendeur_dojos').select('vendeur_id').in('vendeur_id', ids)
+          .gte('created_at', firstOfMonth.toISOString()),
       ])
+      const actifsCount = new Set(actifsData?.map(d => d.vendeur_id) || []).size
 
       const enriched = vendeurs.map(v => {
         const myEvals = evals?.filter(e => e.vendeur_id === v.id) || []
@@ -60,11 +66,10 @@ export default function DashboardPage() {
         .in('vendeur_id', ids).eq('status', 'validated')
       const scoreVals = enriched.filter(v => v.avgScore).map(v => parseFloat(v.avgScore))
       const avgGlobal = scoreVals.length ? (scoreVals.reduce((a, b) => a + b, 0) / scoreVals.length).toFixed(1) : 0
-      const streakActifs = enriched.filter(v => v.streak > 0).length
       setStats({
         dojos: allValidated.count || 0,
         score: avgGlobal,
-        engagement: vendeurs.length > 0 ? Math.round((streakActifs / vendeurs.length) * 100) : 0,
+        actifs: actifsCount,
         defis: 0,
       })
     }
@@ -121,7 +126,7 @@ export default function DashboardPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 22 }}>
           <StatCard gradient label="Dojos validés" value={stats.dojos} delta="+8 ce mois" dark />
           <StatCard label="Score moyen" value={`${stats.score}/5`} delta="+0.4 vs M-1" deltaUp />
-          <StatCard gradient2 label="Engagement" value={`${stats.engagement}%`} delta="Streaks actifs" dark />
+          <StatCard gradient2 label="Vendeurs actifs" value={stats.actifs} delta="Ce mois" dark />
           <StatCard label="Défis relevés" value={stats.defis} delta="Cette semaine" deltaUp />
         </div>
 
