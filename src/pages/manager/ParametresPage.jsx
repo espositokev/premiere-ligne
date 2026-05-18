@@ -78,42 +78,22 @@ export default function ParametresPage() {
     setInviting(true)
     setInviteMsg('')
 
-    // Sauvegarder la session manager avant que signUp ne la remplace
-    const { data: { session: managerSession } } = await supabase.auth.getSession()
-
-    const { data, error } = await supabase.auth.signUp({
-      email: inviteForm.email,
-      password: Math.random().toString(36).slice(-12) + 'A1!',
-      options: {
-        emailRedirectTo: `${window.location.origin}/invitation`,
-        data: {
-          full_name: inviteForm.fullName,
-          role: 'vendeur',
-        },
+    const { error } = await supabase.functions.invoke('invite-vendeur', {
+      body: {
+        email: inviteForm.email,
+        full_name: inviteForm.fullName,
+        poste: inviteForm.poste || 'Commercial',
+        redirect_to: `${window.location.origin}/invitation`,
       },
     })
 
     if (error) {
       setInviteMsg('Erreur : ' + error.message)
       setInviting(false)
-      // Restaurer la session manager même en cas d'erreur
-      if (managerSession) await supabase.auth.setSession(managerSession)
       return
     }
 
-    if (data?.user) {
-      await supabase.from('profiles').update({
-        structure_id: profile.structure_id,
-        poste: inviteForm.poste || 'Commercial',
-        full_name: inviteForm.fullName,
-        role: 'vendeur',
-      }).eq('id', data.user.id)
-    }
-
-    // Restaurer la session manager pour ne pas être déconnecté
-    if (managerSession) await supabase.auth.setSession(managerSession)
-
-    setInviteMsg(`✅ Compte créé ! ${inviteForm.email} va recevoir un email d'activation pour définir son mot de passe.`)
+    setInviteMsg(`✅ Invitation envoyée à ${inviteForm.email} — il va recevoir un email pour activer son compte.`)
     setInviting(false)
     setInviteForm({ email: '', fullName: '', poste: '' })
     load()
