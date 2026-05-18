@@ -5,8 +5,8 @@ import { supabase } from '../../lib/supabase'
 import { Logo } from '../Logo'
 import { Avatar } from '../Avatar'
 import {
-  IconLayoutDashboard, IconUsers, IconGridDots, IconTarget,
-  IconBolt, IconTrophy, IconSettings, IconHome, IconBook2,
+  IconLayoutDashboard, IconUsers, IconGridDots, IconCalendar,
+  IconBolt, IconTrophy, IconSettings, IconHome, IconTarget,
   IconMedal, IconChevronDown,
 } from '@tabler/icons-react'
 
@@ -16,8 +16,8 @@ const MANAGER_NAV = [
     items: [
       { icon: IconLayoutDashboard, label: 'Dashboard', path: '/dashboard' },
       { icon: IconUsers, label: 'Mon équipe', path: '/equipe' },
-      { icon: IconGridDots, label: 'Matrice & Dojos', path: '/matrice' },
-      { icon: IconTarget, label: 'Plans de montée', path: '/plans' },
+      { icon: IconGridDots, label: 'Matrice & Évals', path: '/matrice' },
+      { icon: IconCalendar, label: 'Sessions de coaching', path: '/sessions' },
     ],
   },
   {
@@ -41,8 +41,7 @@ const VENDEUR_NAV = [
     items: [
       { icon: IconHome, label: 'Accueil', path: '/mon-espace' },
       { icon: IconGridDots, label: 'Mon évaluation', path: '/mon-evaluation' },
-      { icon: IconTarget, label: 'Mon plan', path: '/mon-plan' },
-      { icon: IconBook2, label: 'Mes Dojos', path: '/mes-dojos' },
+      { icon: IconTarget, label: 'Mes sessions', path: '/mon-plan' },
       { icon: IconMedal, label: 'Badges', path: '/mes-badges' },
     ],
   },

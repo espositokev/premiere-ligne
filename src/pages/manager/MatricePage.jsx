@@ -22,6 +22,7 @@ export default function MatricePage() {
   const [vendeurDojos, setVendeurDojos] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [lastEvalDate, setLastEvalDate] = useState(null)
   const [modal, setModal] = useState(null) // { sousCompId, dojoId, dojoTitle, vendeurName }
   const [modalDate, setModalDate] = useState('')
   const [modalNotes, setModalNotes] = useState('')
@@ -63,8 +64,15 @@ export default function MatricePage() {
       supabase.from('vendeur_dojos').select('*, dojos(title, competence_id)').eq('vendeur_id', selectedId),
     ])
     const evalMap = {}
-    evals?.forEach(e => { evalMap[e.sous_competence_id] = e.score })
+    let maxEvalDate = null
+    evals?.forEach(e => {
+      evalMap[e.sous_competence_id] = e.score
+      if (e.evaluated_at && (!maxEvalDate || new Date(e.evaluated_at) > new Date(maxEvalDate))) {
+        maxEvalDate = e.evaluated_at
+      }
+    })
     setEvaluations(evalMap)
+    setLastEvalDate(maxEvalDate)
     setVendeurDojos(vd || [])
   }
 
@@ -155,7 +163,7 @@ export default function MatricePage() {
   if (!loading && competences.length === 0) {
     return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <PageHeader profile={profile} vendeurs={vendeurs} selectedId={selectedId} setSelectedId={setSelectedId} saving={saving} saveAll={saveAll} />
+        <PageHeader profile={profile} vendeurs={vendeurs} selectedId={selectedId} setSelectedId={setSelectedId} saving={saving} saveAll={saveAll} lastEvalDate={lastEvalDate} />
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
           <div style={{ textAlign: 'center', maxWidth: 360 }}>
             <div style={{ fontSize: 40, marginBottom: 16 }}>📋</div>
@@ -176,7 +184,7 @@ export default function MatricePage() {
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <PageHeader profile={profile} vendeurs={vendeurs} selectedId={selectedId} setSelectedId={setSelectedId} saving={saving} saveAll={saveAll} />
+      <PageHeader profile={profile} vendeurs={vendeurs} selectedId={selectedId} setSelectedId={setSelectedId} saving={saving} saveAll={saveAll} lastEvalDate={lastEvalDate} />
       <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
         {/* Légende */}
         <div style={{ background: '#fff', borderRadius: 12, padding: '10px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', boxShadow: 'var(--sh)' }}>
@@ -363,12 +371,24 @@ export default function MatricePage() {
   )
 }
 
-function PageHeader({ profile, vendeurs, selectedId, setSelectedId, saving, saveAll }) {
+function PageHeader({ profile, vendeurs, selectedId, setSelectedId, saving, saveAll, lastEvalDate }) {
+  const threeMonthsAgo = new Date()
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+  const needsRenewal = !lastEvalDate || new Date(lastEvalDate) < threeMonthsAgo
   return (
     <div style={{ padding: '18px 24px 14px', background: '#fff', borderBottom: '1px solid var(--ln)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, boxShadow: '0 1px 4px rgba(7,40,32,.04)' }}>
       <div>
-        <div style={{ fontSize: 19, fontWeight: 600, color: 'var(--fi)' }}>Matrice & Dojos</div>
-        <div style={{ fontSize: 12, color: 'var(--mu)', marginTop: 2 }}>Évaluation + Dojos par sous-compétence</div>
+        <div style={{ fontSize: 19, fontWeight: 600, color: 'var(--fi)' }}>Matrice & Évaluations</div>
+        <div style={{ fontSize: 12, color: 'var(--mu)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 8 }}>
+          {selectedId && lastEvalDate
+            ? `Dernière éval : ${new Date(lastEvalDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`
+            : selectedId ? 'Jamais évalué' : 'Évaluation par sous-compétence'}
+          {selectedId && needsRenewal && (
+            <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: '#FEE2E2', color: '#991B1B' }}>
+              À renouveler
+            </span>
+          )}
+        </div>
       </div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         {vendeurs.length > 0 && (

@@ -3,15 +3,20 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { Avatar } from '../../components/Avatar'
-import { SCORE_STYLES, SCORE_LABELS, formatDate } from '../../lib/utils'
-import { IconPlus, IconFlame, IconArrowRight } from '@tabler/icons-react'
+import { formatDate } from '../../lib/utils'
+import {
+  IconPlus, IconAlertTriangle, IconCalendar,
+  IconArrowRight, IconUsers, IconMedal, IconTarget,
+} from '@tabler/icons-react'
 
 export default function DashboardPage() {
   const { profile } = useAuth()
   const navigate = useNavigate()
-  const [team, setTeam] = useState([])
-  const [stats, setStats] = useState({ dojos: 0, score: 0, actifs: 0, defis: 0 })
   const [loading, setLoading] = useState(true)
+  const [alertes, setAlertes] = useState([])
+  const [topComps, setTopComps] = useState([])
+  const [nextSessions, setNextSessions] = useState([])
+  const [resume, setResume] = useState({ vendeurs: 0, sessionsMois: 0, badgesTotal: 0 })
 
   useEffect(() => {
     if (!profile?.structure_id) return
@@ -20,83 +25,106 @@ export default function DashboardPage() {
 
   async function loadData() {
     const structureId = profile.structure_id
+    const today = new Date().toISOString().split('T')[0]
+    const firstOfMonth = new Date()
+    firstOfMonth.setDate(1)
+    firstOfMonth.setHours(0, 0, 0, 0)
+    const threeMonthsAgo = new Date()
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
 
-    const [{ data: vendeurs }, { data: dojoStats }, { data: evalStats }] = await Promise.all([
-      supabase.from('profiles')
-        .select('id, full_name, poste, streak, xp_total')
+    const { data: vendeurs } = await supabase.from('profiles')
+      .select('id, full_name, poste')
+      .eq('structure_id', structureId)
+      .eq('role', 'vendeur')
+
+    if (!vendeurs?.length) {
+      setResume({ vendeurs: 0, sessionsMois: 0, badgesTotal: 0 })
+      setLoading(false)
+      return
+    }
+    const ids = vendeurs.map(v => v.id)
+
+    const [
+      { data: evalData },
+      { data: sessions },
+      { data: valSessions },
+      { data: bdgData },
+      { data: compData },
+    ] = await Promise.all([
+      supabase.from('evaluations')
+        .select('vendeur_id, sous_competence_id, score, evaluated_at')
+        .in('vendeur_id', ids),
+      supabase.from('coaching_sessions')
+        .select('id, scheduled_date, profiles!vendeur_id(full_name), dojos!dojo_id(title)')
         .eq('structure_id', structureId)
-        .eq('role', 'vendeur'),
-      supabase.from('vendeur_dojos')
-        .select('vendeur_id', { count: 'exact' })
+        .eq('status', 'planned')
+        .gte('scheduled_date', today)
+        .order('scheduled_date')
+        .limit(3),
+      supabase.from('coaching_sessions')
+        .select('id')
+        .eq('structure_id', structureId)
         .eq('status', 'validated')
-        .in('vendeur_id', []),
-      supabase.from('evaluations').select('score, vendeur_id'),
+        .gte('validated_at', firstOfMonth.toISOString()),
+      supabase.from('vendeur_badges')
+        .select('id')
+        .in('vendeur_id', ids),
+      supabase.from('competences')
+        .select('id, title, sous_competences(id)')
+        .eq('structure_id', structureId)
+        .order('numero'),
     ])
 
-    // Charger les dojos validés et l'éval pour chaque vendeur
-    if (vendeurs && vendeurs.length > 0) {
-      const ids = vendeurs.map(v => v.id)
-      const firstOfMonth = new Date()
-      firstOfMonth.setDate(1)
-      firstOfMonth.setHours(0, 0, 0, 0)
-      const [{ data: vDojos }, { data: evals }, { data: activePlans }, { data: actifsData }] = await Promise.all([
-        supabase.from('vendeur_dojos').select('vendeur_id, dojo_id, status, dojos(title)')
-          .in('vendeur_id', ids).eq('status', 'assigned'),
-        supabase.from('evaluations').select('vendeur_id, score').in('vendeur_id', ids),
-        supabase.from('plans').select('vendeur_id, id').in('vendeur_id', ids).eq('status', 'active'),
-        supabase.from('vendeur_dojos').select('vendeur_id').in('vendeur_id', ids)
-          .gte('created_at', firstOfMonth.toISOString()),
-      ])
-      const actifsCount = new Set(actifsData?.map(d => d.vendeur_id) || []).size
-
-      const enriched = vendeurs.map(v => {
-        const myEvals = evals?.filter(e => e.vendeur_id === v.id) || []
-        const avgScore = myEvals.length
-          ? (myEvals.reduce((s, e) => s + e.score, 0) / myEvals.length).toFixed(1)
-          : null
-        const currentDojo = vDojos?.find(d => d.vendeur_id === v.id)
-        const hasPlan = activePlans?.some(p => p.vendeur_id === v.id)
-        return { ...v, avgScore, currentDojo, hasPlan }
+    // Alertes : vendeurs sans éval ou dernière éval > 3 mois
+    const lastEvalByVendeur = {}
+    evalData?.forEach(e => {
+      const prev = lastEvalByVendeur[e.vendeur_id]
+      if (!prev || new Date(e.evaluated_at) > new Date(prev)) {
+        lastEvalByVendeur[e.vendeur_id] = e.evaluated_at
+      }
+    })
+    const alertVendeurs = vendeurs
+      .filter(v => {
+        const last = lastEvalByVendeur[v.id]
+        return !last || new Date(last) < threeMonthsAgo
       })
-      setTeam(enriched)
+      .map(v => ({ ...v, lastEval: lastEvalByVendeur[v.id] || null }))
 
-      // Stats globales
-      const allValidated = await supabase.from('vendeur_dojos')
-        .select('id', { count: 'exact' })
-        .in('vendeur_id', ids).eq('status', 'validated')
-      const scoreVals = enriched.filter(v => v.avgScore).map(v => parseFloat(v.avgScore))
-      const avgGlobal = scoreVals.length ? (scoreVals.reduce((a, b) => a + b, 0) / scoreVals.length).toFixed(1) : 0
-      setStats({
-        dojos: allValidated.count || 0,
-        score: avgGlobal,
-        actifs: actifsCount,
-        defis: 0,
+    // Top compétences à travailler (scores moyens les plus bas)
+    const scToComp = {}
+    compData?.forEach(comp => {
+      comp.sous_competences?.forEach(sc => {
+        scToComp[sc.id] = { id: comp.id, title: comp.title }
       })
-    }
+    })
+    const compScores = {}
+    evalData?.forEach(e => {
+      const comp = scToComp[e.sous_competence_id]
+      if (!comp || !e.score) return
+      if (!compScores[comp.id]) compScores[comp.id] = { title: comp.title, scores: [] }
+      compScores[comp.id].scores.push(e.score)
+    })
+    const topCompsData = Object.values(compScores)
+      .map(c => ({
+        title: c.title,
+        avg: (c.scores.reduce((a, b) => a + b, 0) / c.scores.length).toFixed(1),
+      }))
+      .sort((a, b) => parseFloat(a.avg) - parseFloat(b.avg))
+      .slice(0, 3)
+
+    setAlertes(alertVendeurs)
+    setTopComps(topCompsData)
+    setNextSessions(sessions || [])
+    setResume({
+      vendeurs: vendeurs.length,
+      sessionsMois: valSessions?.length || 0,
+      badgesTotal: bdgData?.length || 0,
+    })
     setLoading(false)
   }
 
-  const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
   const firstName = profile?.full_name?.split(' ')[0] || ''
-  const structureName = profile?.structures?.name || ''
-
-  function getStatus(score) {
-    if (!score) return { label: 'Sans éval.', bg: 'var(--bg)', color: 'var(--mu)' }
-    const s = parseFloat(score)
-    if (s >= 4.2) return { label: 'Top', bg: '#D4FF3A', color: '#072820' }
-    if (s >= 3) return { label: 'En prog.', bg: '#DCFCE7', color: '#166534' }
-    if (s >= 2) return { label: 'À suivre', bg: '#FEF9C3', color: '#854D0E' }
-    return { label: 'Attention', bg: '#FEE2E2', color: '#991B1B' }
-  }
-
-  function getBarColor(score) {
-    if (!score) return 'var(--ln)'
-    const s = parseFloat(score)
-    if (s >= 4) return 'linear-gradient(90deg,#16A34A,#22C55E)'
-    if (s >= 3) return 'linear-gradient(90deg,var(--forest),var(--fl))'
-    if (s >= 2) return 'linear-gradient(90deg,#D97706,#FBBF24)'
-    return 'linear-gradient(90deg,#DC2626,#EF4444)'
-  }
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -112,141 +140,207 @@ export default function DashboardPage() {
             Bonjour, {firstName} 👋
           </div>
           <div style={{ fontSize: 12, color: 'var(--mu)', marginTop: 2, textTransform: 'capitalize' }}>
-            {today} — {structureName}
+            {today}
           </div>
         </div>
-        <button onClick={() => navigate('/plans')} style={btnPrimaryStyle}>
-          <IconPlus size={15} /> Nouveau plan
+        <button onClick={() => navigate('/sessions')} style={btnPrimary}>
+          <IconPlus size={15} /> Nouvelle session
         </button>
       </div>
 
-      {/* Body */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
-        {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 22 }}>
-          <StatCard gradient label="Dojos validés" value={stats.dojos} delta="+8 ce mois" dark />
-          <StatCard label="Score moyen" value={`${stats.score}/5`} delta="+0.4 vs M-1" deltaUp />
-          <StatCard gradient2 label="Vendeurs actifs" value={stats.actifs} delta="Ce mois" dark />
-          <StatCard label="Défis relevés" value={stats.defis} delta="Cette semaine" deltaUp />
-        </div>
+        {loading && <div style={{ textAlign: 'center', padding: 60, color: 'var(--mu)' }}>Chargement…</div>}
 
-        {/* Section équipe */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--fi)' }}>Mon équipe</div>
-          <button onClick={() => navigate('/equipe')} style={btnGhostSmStyle}>
-            Voir tout <IconArrowRight size={13} />
-          </button>
-        </div>
-
-        <div style={{ background: '#fff', borderRadius: 14, boxShadow: 'var(--sh)', overflow: 'hidden', marginBottom: 22 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr 1.3fr .8fr 110px', padding: '10px 18px', fontSize: 10, fontWeight: 600, color: 'var(--mu)', letterSpacing: '.5px', textTransform: 'uppercase', borderBottom: '1px solid var(--ln)', background: 'var(--bg)' }}>
-            <span>Commercial</span><span>Score /5</span><span>Dojo en cours</span><span>Streak</span><span>Statut</span>
-          </div>
-
-          {loading && (
-            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--mu)', fontSize: 13 }}>
-              Chargement…
+        {!loading && (
+          <>
+            {/* Résumé chiffré */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 20 }}>
+              <StatCard icon={IconUsers} label="Vendeurs" value={resume.vendeurs} />
+              <StatCard icon={IconCalendar} label="Sessions validées" value={resume.sessionsMois} sub="Ce mois" gradient />
+              <StatCard icon={IconMedal} label="Badges débloqués" value={resume.badgesTotal} sub="Total équipe" />
             </div>
-          )}
 
-          {!loading && team.length === 0 && (
-            <div style={{ padding: '32px 24px', textAlign: 'center' }}>
-              <div style={{ fontSize: 24, marginBottom: 8 }}>👥</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--fi)', marginBottom: 4 }}>
-                Aucun vendeur dans l'équipe
-              </div>
-              <div style={{ fontSize: 12, color: 'var(--mu)', marginBottom: 16 }}>
-                Invitez vos vendeurs depuis les Paramètres
-              </div>
-              <button onClick={() => navigate('/parametres')} style={btnPrimaryStyle}>
-                Aller aux Paramètres
-              </button>
-            </div>
-          )}
-
-          {team.map((v, i) => {
-            const status = getStatus(v.avgScore)
-            const pct = v.avgScore ? Math.round((parseFloat(v.avgScore) / 5) * 100) : 0
-            return (
-              <div
-                key={v.id}
-                onClick={() => navigate('/matrice', { state: { vendeurId: v.id } })}
-                style={{
-                  display: 'grid', gridTemplateColumns: '2fr 1.1fr 1.3fr .8fr 110px',
-                  padding: '12px 18px', borderBottom: i < team.length - 1 ? '1px solid var(--ln)' : 'none',
-                  alignItems: 'center', cursor: 'pointer', transition: 'background .12s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            {/* Alertes évaluations */}
+            {alertes.length > 0 && (
+              <Section
+                title="Évaluations à renouveler"
+                icon={<IconAlertTriangle size={16} color="#DC2626" />}
+                titleColor="#DC2626"
+                action={{ label: 'Aller à la matrice', onClick: () => navigate('/matrice') }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Avatar name={v.full_name} id={v.id} size={32} />
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fi)' }}>{v.full_name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--mu)' }}>{v.poste || 'Commercial'}</div>
-                  </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {alertes.map(v => (
+                    <div
+                      key={v.id}
+                      onClick={() => navigate('/matrice', { state: { vendeurId: v.id } })}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '10px 14px', borderRadius: 9,
+                        background: '#FEF2F2', border: '1px solid #FECACA', cursor: 'pointer',
+                      }}
+                    >
+                      <Avatar name={v.full_name} id={v.id} size={28} />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fi)' }}>{v.full_name}</div>
+                        <div style={{ fontSize: 11, color: '#DC2626' }}>
+                          {v.lastEval
+                            ? `Dernière éval : ${formatDate(v.lastEval)} — Plus de 3 mois`
+                            : 'Jamais évalué'}
+                        </div>
+                      </div>
+                      <span style={{
+                        fontSize: 10, fontWeight: 700, padding: '3px 8px',
+                        borderRadius: 20, background: '#FEE2E2', color: '#991B1B',
+                      }}>
+                        À renouveler
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ flex: 1, height: 6, background: 'var(--ln)', borderRadius: 10, overflow: 'hidden' }}>
-                    <div style={{ width: `${pct}%`, height: '100%', borderRadius: 10, background: getBarColor(v.avgScore) }} />
-                  </div>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--fi)', minWidth: 26, textAlign: 'right' }}>
-                    {v.avgScore || '—'}
+              </Section>
+            )}
+
+            {/* Top compétences à travailler */}
+            {topComps.length > 0 && (
+              <Section
+                title="Compétences prioritaires à travailler"
+                icon={<IconTarget size={16} color="var(--forest)" />}
+                action={{ label: 'Voir la matrice', onClick: () => navigate('/matrice') }}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {topComps.map((c, i) => {
+                    const avg = parseFloat(c.avg)
+                    const pct = Math.round((avg / 5) * 100)
+                    const color = avg < 2 ? '#DC2626' : avg < 3 ? '#D97706' : '#2563EB'
+                    return (
+                      <div key={c.title} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 9, background: 'var(--bg)' }}>
+                        <div style={{
+                          width: 22, height: 22, borderRadius: 6, background: 'var(--forest)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 11, fontWeight: 700, color: 'var(--fluo)', flexShrink: 0,
+                        }}>
+                          {i + 1}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fi)', marginBottom: 4 }}>{c.title}</div>
+                          <div style={{ height: 4, background: 'var(--ln)', borderRadius: 10, overflow: 'hidden' }}>
+                            <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 10 }} />
+                          </div>
+                        </div>
+                        <span style={{ fontSize: 12, fontWeight: 700, color, minWidth: 30, textAlign: 'right' }}>{c.avg}/5</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </Section>
+            )}
+
+            {/* Prochaines sessions */}
+            <Section
+              title="Prochaines sessions de coaching"
+              icon={<IconCalendar size={16} color="var(--forest)" />}
+              action={{ label: 'Toutes les sessions', onClick: () => navigate('/sessions') }}
+            >
+              {nextSessions.length === 0 ? (
+                <div style={{ padding: '12px 0', textAlign: 'center', fontSize: 13, color: 'var(--mu)' }}>
+                  Aucune session planifiée —{' '}
+                  <span
+                    style={{ color: 'var(--forest)', cursor: 'pointer', fontWeight: 600 }}
+                    onClick={() => navigate('/sessions')}
+                  >
+                    en programmer une
                   </span>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--fi)' }}>
-                  {v.currentDojo?.dojos?.title || '—'}
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {nextSessions.map(s => (
+                    <div
+                      key={s.id}
+                      onClick={() => navigate('/sessions')}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '10px 12px', borderRadius: 9, background: 'var(--bg)', cursor: 'pointer',
+                      }}
+                    >
+                      <div style={{ width: 38, textAlign: 'center', flexShrink: 0 }}>
+                        <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--forest)', lineHeight: 1 }}>
+                          {new Date(s.scheduled_date + 'T00:00:00').getDate()}
+                        </div>
+                        <div style={{ fontSize: 10, color: 'var(--mu)', textTransform: 'uppercase' }}>
+                          {new Date(s.scheduled_date + 'T00:00:00').toLocaleDateString('fr-FR', { month: 'short' })}
+                        </div>
+                      </div>
+                      <div style={{ width: 1, height: 30, background: 'var(--ln)', flexShrink: 0 }} />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fi)' }}>
+                          {s.profiles?.full_name}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--mu)' }}>
+                          {s.dojos?.title || 'Session de coaching'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 500, color: 'var(--mu)' }}>
-                  <IconFlame size={15} color="#F97316" />{v.streak || 0}j
-                </div>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', padding: '3px 9px',
-                  borderRadius: 20, fontSize: 11, fontWeight: 600,
-                  background: status.bg, color: status.color,
-                }}>
-                  {status.label}
-                </span>
-              </div>
-            )
-          })}
-        </div>
+              )}
+            </Section>
+          </>
+        )}
       </div>
     </div>
   )
 }
 
-function StatCard({ label, value, delta, deltaUp, dark, gradient, gradient2 }) {
-  const bg = gradient
-    ? 'linear-gradient(135deg,#0B3D2E,#1a5c42)'
-    : gradient2
-    ? 'linear-gradient(135deg,#072820,#0B3D2E)'
-    : '#fff'
-  const isDark = dark || gradient || gradient2
+function StatCard({ icon: Icon, label, value, sub, gradient }) {
+  const dark = !!gradient
   return (
-    <div style={{ borderRadius: 14, padding: '16px 18px', boxShadow: 'var(--sh)', background: bg }}>
-      <div style={{ fontSize: 11, fontWeight: 500, marginBottom: 8, color: isDark ? 'rgba(255,255,255,.6)' : 'var(--mu)' }}>
-        {label}
+    <div style={{
+      borderRadius: 14, padding: '16px 18px', boxShadow: 'var(--sh)',
+      background: dark ? 'linear-gradient(135deg,#0B3D2E,#1a5c42)' : '#fff',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+        <Icon size={15} color={dark ? 'rgba(255,255,255,.55)' : 'var(--mu)'} />
+        <span style={{ fontSize: 11, fontWeight: 500, color: dark ? 'rgba(255,255,255,.55)' : 'var(--mu)' }}>{label}</span>
       </div>
-      <div style={{ fontSize: 28, fontWeight: 700, lineHeight: 1, color: isDark ? (gradient2 ? '#D4FF3A' : '#fff') : 'var(--fi)' }}>
+      <div style={{ fontSize: 30, fontWeight: 700, lineHeight: 1, color: dark ? '#D4FF3A' : 'var(--fi)' }}>
         {value}
       </div>
-      <div style={{ fontSize: 11, marginTop: 5, color: isDark ? 'rgba(255,255,255,.5)' : deltaUp ? '#22C55E' : 'var(--mu)' }}>
-        {delta}
-      </div>
+      {sub && <div style={{ fontSize: 11, marginTop: 5, color: dark ? 'rgba(255,255,255,.45)' : 'var(--mu)' }}>{sub}</div>}
     </div>
   )
 }
 
-const btnPrimaryStyle = {
+function Section({ title, icon, titleColor, action, children }) {
+  return (
+    <div style={{ background: '#fff', borderRadius: 14, boxShadow: 'var(--sh)', overflow: 'hidden', marginBottom: 16 }}>
+      <div style={{
+        padding: '12px 16px', borderBottom: '1px solid var(--ln)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {icon}
+          <span style={{ fontSize: 14, fontWeight: 600, color: titleColor || 'var(--fi)' }}>{title}</span>
+        </div>
+        {action && (
+          <button
+            onClick={action.onClick}
+            style={{
+              background: 'none', border: 'none', fontSize: 12, color: 'var(--forest)',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 500,
+            }}
+          >
+            {action.label} <IconArrowRight size={13} />
+          </button>
+        )}
+      </div>
+      <div style={{ padding: '12px 16px' }}>{children}</div>
+    </div>
+  )
+}
+
+const btnPrimary = {
   background: 'var(--forest)', color: 'var(--fluo)', border: 'none',
   padding: '9px 17px', borderRadius: 9, fontSize: 13, fontWeight: 600,
   cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
   boxShadow: '0 2px 8px rgba(11,61,46,.2)',
-}
-
-const btnGhostSmStyle = {
-  background: '#fff', color: 'var(--fi)', border: '1px solid var(--ln)',
-  padding: '6px 12px', borderRadius: 8, fontSize: 12, cursor: 'pointer',
-  display: 'inline-flex', alignItems: 'center', gap: 6,
 }

@@ -14,7 +14,7 @@ import Onboarding from './pages/Onboarding'
 import DashboardPage from './pages/manager/DashboardPage'
 import EquipePage from './pages/manager/EquipePage'
 import MatricePage from './pages/manager/MatricePage'
-import PlansPage from './pages/manager/PlansPage'
+import SessionsPage from './pages/manager/SessionsPage'
 import DefisPage from './pages/manager/DefisPage'
 import ClassementPage from './pages/manager/ClassementPage'
 import ParametresPage from './pages/manager/ParametresPage'
@@ -23,7 +23,6 @@ import ParametresPage from './pages/manager/ParametresPage'
 import VendeurHomePage from './pages/vendeur/VendeurHomePage'
 import VendeurEvalPage from './pages/vendeur/VendeurEvalPage'
 import VendeurPlanPage from './pages/vendeur/VendeurPlanPage'
-import VendeurDojosPage from './pages/vendeur/VendeurDojosPage'
 import VendeurBadgesPage from './pages/vendeur/VendeurBadgesPage'
 import VendeurClassementPage from './pages/vendeur/VendeurClassementPage'
 
@@ -49,7 +48,8 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/equipe" element={<EquipePage />} />
             <Route path="/matrice" element={<MatricePage />} />
-            <Route path="/plans" element={<PlansPage />} />
+            <Route path="/sessions" element={<SessionsPage />} />
+            <Route path="/plans" element={<Navigate to="/sessions" replace />} />
             <Route path="/defis" element={<DefisPage />} />
             <Route path="/classement" element={<ClassementPage />} />
             <Route path="/parametres" element={<ParametresPage />} />
@@ -58,7 +58,7 @@ export default function App() {
             <Route path="/mon-espace" element={<VendeurHomePage />} />
             <Route path="/mon-evaluation" element={<VendeurEvalPage />} />
             <Route path="/mon-plan" element={<VendeurPlanPage />} />
-            <Route path="/mes-dojos" element={<VendeurDojosPage />} />
+            <Route path="/mes-dojos" element={<Navigate to="/mon-plan" replace />} />
             <Route path="/mes-badges" element={<VendeurBadgesPage />} />
             <Route path="/classement-equipe" element={<VendeurClassementPage />} />
             <Route path="/defi-semaine" element={<VendeurClassementPage />} />
