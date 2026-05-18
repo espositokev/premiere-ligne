@@ -78,21 +78,25 @@ export default function ParametresPage() {
     setInviting(true)
     setInviteMsg('')
 
-    const { data: fnData, error } = await supabase.functions.invoke('invite-vendeur', {
-      body: {
+    const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL || 'https://wfpzwrgkttmsgrzujshr.supabase.co'}/functions/v1/invite-vendeur`
+
+    const res = await fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         email: inviteForm.email,
         full_name: inviteForm.fullName,
         poste: inviteForm.poste || 'Commercial',
         structure_id: profile.structure_id,
         redirect_to: `${window.location.origin}/invitation`,
-      },
+      }),
     })
 
-    console.log('[Invite] résultat Edge Function', { fnData, error })
-    console.log('[Invite] error détail', JSON.stringify(error))
+    const fnData = await res.json()
+    console.log('[Invite] résultat Edge Function', res.status, fnData)
 
-    if (error) {
-      setInviteMsg('Erreur : ' + error.message)
+    if (!res.ok) {
+      setInviteMsg('Erreur : ' + (fnData?.error || res.statusText))
       setInviting(false)
       return
     }
