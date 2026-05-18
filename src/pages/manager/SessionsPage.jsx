@@ -242,7 +242,7 @@ export default function SessionsPage() {
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
                     {s.dojos?.titre && (
                       <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#DBEAFE', color: '#1E40AF', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        <IconBook2 size={10} />{s.dojos.title}
+                        <IconBook2 size={10} />{s.dojos.titre}
                       </span>
                     )}
                     {s.sous_competences?.title && (

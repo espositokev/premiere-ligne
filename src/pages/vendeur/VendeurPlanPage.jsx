@@ -15,7 +15,7 @@ export default function VendeurPlanPage() {
   async function load() {
     const [{ data: s }, { data: mgr }] = await Promise.all([
       supabase.from('coaching_sessions')
-        .select('id, scheduled_date, status, notes, objectif, objectif_atteint, validated_at, dojos!dojo_id(titre), sous_competences!sous_comp_id(title)')
+        .select('*, dojos!dojo_id(titre), sous_competences!sous_comp_id(title)')
         .eq('vendeur_id', profile.id)
         .order('scheduled_date', { ascending: false }),
       supabase.from('profiles')
