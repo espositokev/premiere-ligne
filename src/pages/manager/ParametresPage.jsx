@@ -78,7 +78,7 @@ export default function ParametresPage() {
     setInviting(true)
     setInviteMsg('')
 
-    const { error } = await supabase.functions.invoke('invite-vendeur', {
+    const { data: fnData, error } = await supabase.functions.invoke('invite-vendeur', {
       body: {
         email: inviteForm.email,
         full_name: inviteForm.fullName,
@@ -86,6 +86,9 @@ export default function ParametresPage() {
         redirect_to: `${window.location.origin}/invitation`,
       },
     })
+
+    console.log('[Invite] résultat Edge Function', { fnData, error })
+    console.log('[Invite] error détail', JSON.stringify(error))
 
     if (error) {
       setInviteMsg('Erreur : ' + error.message)

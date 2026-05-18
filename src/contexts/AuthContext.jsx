@@ -12,6 +12,9 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('[Auth] onAuthStateChange', event, session?.user?.id ?? 'no user')
+        // TOKEN_REFRESHED ne change pas le profil — on ignore pour éviter
+        // que le timeout efface le profil et déclenche une redirection /onboarding
+        if (event === 'TOKEN_REFRESHED') return
         setUser(session?.user ?? null)
         if (session?.user) {
           await fetchProfile(session.user.id)
@@ -33,10 +36,11 @@ export function AuthProvider({ children }) {
         timeout,
       ])
       console.log('[Auth] fetchProfile result', { data, error })
+      // Sur timeout, on conserve le profil existant plutôt que de l'effacer
+      if (error === 'timeout') return
       setProfile(data)
     } catch (err) {
       console.error('[Auth] fetchProfile exception', err)
-      setProfile(null)
     } finally {
       setLoading(false)
       console.log('[Auth] loading = false')
