@@ -23,6 +23,7 @@ export default function MatricePage() {
   const [evals, setEvals]         = useState({})
   const [teamScores, setTeamScores] = useState({})
   const [lastEvalDate, setLastEvalDate] = useState(null)
+  const [structureName, setStructureName] = useState('')
   const [openBlocks, setOpenBlocks] = useState({})
   const [loadingInit, setLoadingInit]     = useState(true)
   const [loadingVendeur, setLoadingVendeur] = useState(false)
@@ -31,12 +32,14 @@ export default function MatricePage() {
   useEffect(() => { if (selectedId) loadVendeur(selectedId) }, [selectedId])
 
   async function init() {
-    const [{ data: v }, { data: c }, { data: sc }] = await Promise.all([
+    const [{ data: v }, { data: c }, { data: sc }, { data: struct }] = await Promise.all([
       supabase.from('profiles').select('id, full_name').eq('structure_id', profile.structure_id).eq('role', 'vendeur'),
       supabase.from('competences').select('*').eq('structure_id', profile.structure_id).order('numero'),
       supabase.from('sous_competences').select('*, competences(structure_id)'),
+      supabase.from('structures').select('name').eq('id', profile.structure_id).single(),
     ])
     setVendeurs(v || [])
+    setStructureName(struct?.name || '')
     if (!selectedId && v?.length) setSelectedId(v[0].id)
     const compIds = (c || []).map(x => x.id)
     const enriched = (c || []).map(comp => ({
@@ -74,6 +77,7 @@ export default function MatricePage() {
     ids.forEach(id => { map[id] = {} })
     data?.forEach(e => { if (map[e.vendeur_id]) map[e.vendeur_id][e.sous_competence_id] = Math.min(3, e.score || 0) })
     setTeamScores(map)
+    return map
   }
 
   async function handleScore(scId, score) {
@@ -113,90 +117,228 @@ export default function MatricePage() {
 
   // ── Print helpers ──────────────────────────────────────────────────────────
 
+  function levelOf(avg) {
+    if (avg >= 2.5) return SCORES[3]
+    if (avg >= 1.5) return SCORES[2]
+    if (avg > 0)   return SCORES[1]
+    return SCORES[0]
+  }
+
   function printIndividuel() {
     const vendeur = vendeurs.find(v => v.id === selectedId)
+    if (!vendeur) return
     const today = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-    const rows = comps.map(comp => {
-      const { avg } = compStats(comp)
-      return `<div style="margin-bottom:20px;page-break-inside:avoid">
-        <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#0B3D2E;border-radius:6px;margin-bottom:8px">
-          <div style="width:22px;height:22px;background:#D4FF3A;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#0B3D2E;flex-shrink:0">${String(comp.numero).padStart(2, '0')}</div>
-          <span style="font-weight:600;color:#fff;flex:1;font-size:13px">${comp.title}</span>
-          <span style="font-size:12px;font-weight:700;color:#D4FF3A">Moy: ${avg > 0 ? avg.toFixed(1) : '—'}/3</span>
+
+    const compBlocks = comps.map(comp => {
+      const validScores = comp.sous.map(sc => evals[sc.id]?.score || 0).filter(s => s > 0)
+      const avg = validScores.length ? validScores.reduce((a, b) => a + b, 0) / validScores.length : 0
+      const pct = Math.round((avg / 3) * 100)
+      const lvl = levelOf(avg)
+
+      const scRows = comp.sous.map(sc => {
+        const ev = evals[sc.id] || { score: 0, is_priority: false }
+        const slvl = SCORES[ev.score] || SCORES[0]
+        return `<div class="sc-row">
+          <div class="sc-name">${ev.is_priority ? '<span style="color:#F59E0B;margin-right:4px">★</span>' : ''}${sc.title}</div>
+          <span class="sc-badge" style="background:${slvl.bg};color:${slvl.color}">${ev.score === 0 ? '— Non évalué' : `${ev.score} — ${slvl.label}`}</span>
+        </div>`
+      }).join('')
+
+      return `<div class="comp-block">
+        <div class="comp-hdr">
+          <div class="cbadge">${String(comp.numero).padStart(2, '0')}</div>
+          <div class="comp-name">${comp.title}</div>
+          ${avg > 0 ? `<span class="comp-avg-badge" style="background:rgba(212,255,58,.18);color:#D4FF3A">${avg.toFixed(1)}/3</span>` : `<span style="font-size:11px;color:rgba(255,255,255,.35)">—</span>`}
         </div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead><tr style="background:#f5f5f5">
-            <th style="padding:6px 10px;text-align:left;font-weight:600;color:#555">Sous-compétence</th>
-            <th style="padding:6px 10px;text-align:center;font-weight:600;color:#555;width:150px">Niveau</th>
-            <th style="padding:6px 10px;text-align:center;font-weight:600;color:#555;width:70px">Priorité</th>
-          </tr></thead>
-          <tbody>
-            ${comp.sous.map((sc, i) => {
-              const ev = evals[sc.id] || { score: 0, is_priority: false }
-              const lvl = SCORES[ev.score] || SCORES[0]
-              return `<tr style="border-bottom:1px solid #eee;background:${i % 2 === 0 ? '#fff' : '#fafafa'}">
-                <td style="padding:6px 10px;color:#333">${sc.title}</td>
-                <td style="padding:6px 10px;text-align:center"><span style="padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${lvl.bg};color:${lvl.color}">${ev.score === 0 ? '—' : ev.score} ${lvl.label}</span></td>
-                <td style="padding:6px 10px;text-align:center;color:${ev.is_priority ? '#F59E0B' : '#ccc'};font-size:16px">${ev.is_priority ? '★' : '☆'}</td>
-              </tr>`
-            }).join('')}
-          </tbody>
-        </table>
+        <div class="prog-wrap" style="background:rgba(0,0,0,.1)"><div class="prog-bar" style="width:${pct}%;background:${lvl.bar}"></div></div>
+        ${scRows}
       </div>`
     }).join('')
 
+    const priorityItems = comps.flatMap(c =>
+      c.sous.filter(sc => evals[sc.id]?.is_priority).map(sc => {
+        const ev = evals[sc.id] || { score: 0 }
+        const slvl = SCORES[ev.score] || SCORES[0]
+        return `<div class="prio-item">
+          <div class="prio-star">★</div>
+          <div style="flex:1">
+            <div class="prio-sc">${sc.title}</div>
+            <div class="prio-comp">${c.title}</div>
+          </div>
+          <span class="sc-badge" style="background:${slvl.bg};color:${slvl.color}">${ev.score === 0 ? '— Non évalué' : `${ev.score}/3 — ${slvl.label}`}</span>
+        </div>`
+      })
+    )
+
+    const prioritySection = priorityItems.length ? `
+      <div class="sec-label" style="margin-top:24px">Axes prioritaires</div>
+      ${priorityItems.join('')}
+    ` : ''
+
     openPrint(`
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid #0B3D2E">
-        <div><div style="font-size:18px;font-weight:700;color:#0B3D2E">PREMIÈRE LIGNE</div><div style="font-size:11px;font-style:italic;color:#666">On forme là où ça se joue</div></div>
-        <div style="text-align:right"><div style="font-size:13px;font-weight:600;color:#0B3D2E">Fiche individuelle — ${vendeur?.full_name || ''}</div><div style="font-size:11px;color:#666">Générée le ${today}</div></div>
-      </div>${rows}`, false)
+      <div class="header">
+        <div>
+          <div class="logo-row"><div class="logo-squares"><div class="sq"></div><div class="sq"></div><div class="sq"></div></div><span class="logo-name">PREMIÈRE LIGNE</span></div>
+          <div class="logo-slogan">On forme là où ça se joue</div>
+        </div>
+        <div class="hdr-right">
+          <div class="hdr-title">${vendeur.full_name}</div>
+          <div class="hdr-sub">${structureName ? structureName + ' · ' : ''}Évaluation du ${today}</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="sec-label">Évaluation des compétences</div>
+        ${compBlocks}
+        ${prioritySection}
+      </div>
+      <div class="footer">On forme là où ça se joue — premiereligne-app.fr</div>
+    `, false)
   }
 
   async function printEquipe() {
-    await loadTeam()
+    const teamData = await loadTeam()
     const today = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-    const cols = vendeurs.slice(0, 8)
-    const rows = comps.map(comp => {
-      const teamAvg = (() => {
-        const scores = comp.sous.flatMap(sc => cols.map(v => teamScores[v.id]?.[sc.id] || 0)).filter(s => s > 0)
-        return scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : '—'
-      })()
-      return `<div style="margin-bottom:16px;page-break-inside:avoid">
-        <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:#0B3D2E;border-radius:5px;margin-bottom:6px">
-          <div style="width:20px;height:20px;background:#D4FF3A;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#0B3D2E">${String(comp.numero).padStart(2, '0')}</div>
-          <span style="font-weight:600;color:#fff;flex:1;font-size:12px">${comp.title}</span>
-          <span style="font-size:10px;font-weight:700;color:#D4FF3A">Moy équipe: ${teamAvg}/3</span>
+
+    const vendeurRanked = vendeurs.map(v => {
+      const scores = comps.flatMap(c => c.sous.map(sc => teamData[v.id]?.[sc.id] || 0)).filter(s => s > 0)
+      const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0
+      return { ...v, avg }
+    }).sort((a, b) => b.avg - a.avg)
+
+    const compAvgs = comps.map(comp => {
+      const scores = comp.sous.flatMap(sc => vendeurs.map(v => teamData[v.id]?.[sc.id] || 0)).filter(s => s > 0)
+      const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0
+      return { ...comp, avg }
+    })
+
+    const weakest = compAvgs.filter(c => c.avg > 0).sort((a, b) => a.avg - b.avg).slice(0, 3)
+
+    const medalBgs = ['#FFD700', '#C0C0C0', '#CD7F32']
+    const rankingRows = vendeurRanked.map((v, i) => {
+      const lvl = levelOf(v.avg)
+      const initials = (v.full_name || '?').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+      return `<div class="rank-item">
+        <div class="rank-num" style="background:${i < 3 ? medalBgs[i] : '#eee'};color:${i < 3 ? '#fff' : '#666'}">${i + 1}</div>
+        <div class="rank-avatar">${initials}</div>
+        <div style="flex:1"><div class="rank-name">${v.full_name}</div></div>
+        ${v.avg > 0 ? `<span class="sc-badge" style="background:${lvl.bg};color:${lvl.color}">${v.avg.toFixed(1)}/3</span>` : `<span style="font-size:11px;color:#aaa">Non évalué</span>`}
+      </div>`
+    }).join('')
+
+    const weakCards = weakest.map(c => {
+      const lvl = levelOf(c.avg)
+      const pct = Math.round((c.avg / 3) * 100)
+      return `<div class="weak-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div class="cbadge">${String(c.numero).padStart(2, '0')}</div>
+          <div style="flex:1;font-size:11px;font-weight:600;color:#0B3D2E;line-height:1.3">${c.title}</div>
+          <span class="sc-badge" style="background:${lvl.bg};color:${lvl.color}">${c.avg.toFixed(1)}/3</span>
         </div>
-        <table style="width:100%;border-collapse:collapse;font-size:10px">
-          <thead><tr style="background:#f5f5f5">
-            <th style="padding:5px 8px;text-align:left;font-weight:600;color:#555">Sous-compétence</th>
-            ${cols.map(v => `<th style="padding:5px 8px;text-align:center;font-weight:600;color:#555;width:60px">${v.full_name?.split(' ')[0] || ''}</th>`).join('')}
-          </tr></thead>
-          <tbody>
-            ${comp.sous.map((sc, i) => `<tr style="border-bottom:1px solid #eee;background:${i % 2 === 0 ? '#fff' : '#fafafa'}">
-              <td style="padding:5px 8px;color:#333">${sc.title}</td>
-              ${cols.map(v => { const s = teamScores[v.id]?.[sc.id] || 0; const lvl = SCORES[s] || SCORES[0]; return `<td style="padding:5px 8px;text-align:center;background:${s > 0 ? lvl.bg : 'transparent'};color:${s > 0 ? lvl.color : '#ccc'};font-weight:700">${s === 0 ? '—' : s}</td>` }).join('')}
-            </tr>`).join('')}
-          </tbody>
-        </table>
+        <div style="height:5px;background:#e8e8e8;border-radius:4px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:${lvl.bar};border-radius:4px"></div>
+        </div>
+      </div>`
+    }).join('')
+
+    const vendeurBlocks = vendeurRanked.map(v => {
+      const lvl = levelOf(v.avg)
+      const initials = (v.full_name || '?').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+      const compMinis = comps.map(comp => {
+        const cscores = comp.sous.map(sc => teamData[v.id]?.[sc.id] || 0).filter(s => s > 0)
+        const cavg = cscores.length ? cscores.reduce((a, b) => a + b, 0) / cscores.length : 0
+        const cpct = Math.round((cavg / 3) * 100)
+        const clvl = levelOf(cavg)
+        return `<div class="mini-bar-row">
+          <div class="mini-num">${String(comp.numero).padStart(2, '0')}</div>
+          <div style="flex:1"><div style="height:6px;background:#ebebeb;border-radius:3px;overflow:hidden"><div style="width:${cpct}%;height:100%;background:${clvl.bar};border-radius:3px"></div></div></div>
+          <div class="mini-score" style="color:${cavg > 0 ? clvl.color : '#bbb'}">${cavg > 0 ? cavg.toFixed(1) : '—'}</div>
+        </div>`
+      }).join('')
+
+      return `<div class="vendeur-block">
+        <div class="vendeur-hdr">
+          <div class="rank-avatar" style="background:rgba(212,255,58,.22);color:#D4FF3A">${initials}</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#fff">${v.full_name}</div></div>
+          ${v.avg > 0 ? `<span class="comp-avg-badge" style="background:rgba(212,255,58,.18);color:#D4FF3A">${v.avg.toFixed(1)}/3</span>` : `<span style="font-size:11px;color:rgba(255,255,255,.4)">Non évalué</span>`}
+        </div>
+        <div class="mini-bars-grid">${compMinis}</div>
       </div>`
     }).join('')
 
     openPrint(`
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #0B3D2E">
-        <div><div style="font-size:16px;font-weight:700;color:#0B3D2E">PREMIÈRE LIGNE</div><div style="font-size:10px;font-style:italic;color:#666">On forme là où ça se joue</div></div>
-        <div style="text-align:right"><div style="font-size:12px;font-weight:600;color:#0B3D2E">Fiche équipe — ${vendeurs.length} vendeurs</div><div style="font-size:10px;color:#666">Générée le ${today}</div></div>
-      </div>${rows}`, true)
+      <div class="header">
+        <div>
+          <div class="logo-row"><div class="logo-squares"><div class="sq"></div><div class="sq"></div><div class="sq"></div></div><span class="logo-name">PREMIÈRE LIGNE</span></div>
+          <div class="logo-slogan">On forme là où ça se joue</div>
+        </div>
+        <div class="hdr-right">
+          <div class="hdr-title">Fiche Équipe</div>
+          <div class="hdr-sub">${structureName ? structureName + ' · ' : ''}${vendeurs.length} vendeurs · ${today}</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="sec-label">Classement équipe</div>
+        <div class="ranking-grid">${rankingRows}</div>
+        ${weakest.length ? `<div class="sec-label">Compétences à renforcer</div><div class="weak-grid">${weakCards}</div>` : ''}
+        <div class="sec-label">Détail par vendeur</div>
+        <div class="vendeur-grid">${vendeurBlocks}</div>
+      </div>
+      <div class="footer">On forme là où ça se joue — premiereligne-app.fr</div>
+    `, false)
   }
 
   function openPrint(content, landscape) {
     const win = window.open('', '_blank', 'width=960,height=700')
+    if (!win) return
     win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-      body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:28px;color:#333}
-      @media print{body{padding:12px}@page{margin:1cm${landscape ? ';size:A4 landscape' : ''}}}
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#F4F2EE;color:#1a1a1a;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .header{background:#0B3D2E;padding:26px 36px;display:flex;align-items:center;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .logo-row{display:flex;align-items:center;gap:10px}
+      .logo-squares{display:flex;gap:3px}
+      .sq{width:14px;height:14px;background:#D4FF3A;border-radius:3px}
+      .logo-name{font-size:20px;font-weight:800;color:#fff;letter-spacing:.5px}
+      .logo-slogan{font-size:11px;font-style:italic;color:#D4FF3A;margin-top:5px}
+      .hdr-right{text-align:right}
+      .hdr-title{font-size:22px;font-weight:700;color:#fff}
+      .hdr-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px}
+      .body{padding:22px 36px 16px}
+      .sec-label{font-size:10px;font-weight:700;color:#0B3D2E;text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:10px;margin:18px 0 10px}
+      .sec-label::after{content:'';flex:1;height:2px;background:linear-gradient(to right,#D4FF3A,transparent)}
+      .comp-block{background:#fff;border-radius:8px;margin-bottom:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);page-break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .comp-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#0B3D2E;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .cbadge{width:24px;height:24px;background:#D4FF3A;border-radius:5px;font-size:10px;font-weight:700;color:#0B3D2E;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+      .comp-name{flex:1;font-size:12px;font-weight:600;color:#fff}
+      .comp-avg-badge{padding:2px 9px;border-radius:4px;font-size:11px;font-weight:700}
+      .prog-wrap{height:3px}
+      .prog-bar{height:100%}
+      .sc-row{display:flex;align-items:center;padding:6px 14px;border-bottom:1px solid #f2f2f0;gap:8px}
+      .sc-row:last-child{border-bottom:none}
+      .sc-name{flex:1;font-size:11px;color:#333}
+      .sc-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;white-space:nowrap}
+      .prio-item{display:flex;align-items:center;gap:10px;background:#fff;border-radius:8px;padding:9px 13px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:6px;page-break-inside:avoid}
+      .prio-star{width:26px;height:26px;background:#D4FF3A;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#0B3D2E;flex-shrink:0}
+      .prio-sc{font-size:12px;font-weight:600;color:#0B3D2E}
+      .prio-comp{font-size:10px;color:#888}
+      .footer{text-align:center;padding:14px 36px;color:#bbb;font-size:10px;border-top:1px solid #e0e0e0;margin-top:8px}
+      .ranking-grid{display:flex;flex-direction:column;gap:6px}
+      .rank-item{display:flex;align-items:center;gap:10px;background:#fff;border-radius:8px;padding:9px 13px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+      .rank-num{width:26px;height:26px;border-radius:7px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .rank-avatar{width:28px;height:28px;border-radius:7px;background:#0B3D2E;color:#D4FF3A;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .rank-name{font-size:13px;font-weight:600;color:#1a1a1a}
+      .weak-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+      .weak-card{background:#fff;border-radius:8px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+      .vendeur-grid{display:flex;flex-direction:column;gap:10px}
+      .vendeur-block{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);page-break-inside:avoid}
+      .vendeur-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#0B3D2E;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .mini-bars-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:10px 14px}
+      .mini-bar-row{display:flex;align-items:center;gap:6px}
+      .mini-num{font-size:9px;font-weight:700;color:#0B3D2E;background:#D4FF3A;width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .mini-score{font-size:10px;font-weight:700;min-width:26px;text-align:right;flex-shrink:0}
+      @media print{body{background:#F4F2EE}@page{margin:.7cm;size:A4${landscape ? ' landscape' : ''}}}
     </style></head><body>${content}</body></html>`)
     win.document.close()
-    setTimeout(() => { win.focus(); win.print() }, 400)
+    setTimeout(() => { win.focus(); win.print() }, 500)
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
