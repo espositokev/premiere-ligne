@@ -67,6 +67,7 @@ Deno.serve(async (req) => {
 
     return json({ success: true })
   } catch (err) {
-    return json({ error: 'Exception', detail: err.message }, 500)
+    const msg = err instanceof Error ? err.message : String(err)
+    return json({ error: 'Exception', detail: msg }, 500)
   }
 })
