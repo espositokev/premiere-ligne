@@ -1,5 +1,9 @@
 export function Logo({ size = 32, variant = 'dark' }) {
-  const src = variant === 'light' ? '/logo_icon_white.png' : '/logo_icon_dark.png'
+  const src = variant === 'light'
+    ? '/logo_icon_white.png'
+    : variant === 'transparent'
+    ? '/logo_icon_transparent.svg'
+    : '/logo_icon_dark.png'
   return (
     <img
       src={src}

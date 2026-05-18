@@ -91,7 +91,7 @@ export function Sidebar() {
       {/* Top */}
       <div style={{ padding: '16px 14px 12px', borderBottom: '1px solid var(--ln)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-          <Logo />
+          <Logo variant="transparent" />
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fi)', lineHeight: 1.25 }}>
             PREMIÈRE LIGNE
             <small style={{ fontSize: 10, fontWeight: 400, color: 'var(--mu)', display: 'block' }}>
