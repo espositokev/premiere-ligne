@@ -15,7 +15,7 @@ export default function VendeurPlanPage() {
   async function load() {
     const [{ data: s }, { data: mgr }] = await Promise.all([
       supabase.from('coaching_sessions')
-        .select('id, scheduled_date, status, notes, objectif, objectif_atteint, validated_at, dojos!dojo_id(title), sous_competences!sous_comp_id(title)')
+        .select('id, scheduled_date, status, notes, objectif, objectif_atteint, validated_at, dojos!dojo_id(titre), sous_competences!sous_comp_id(title)')
         .eq('vendeur_id', profile.id)
         .order('scheduled_date', { ascending: false }),
       supabase.from('profiles')
@@ -101,7 +101,7 @@ function SessionCard({ session: s, past }) {
 
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fi)', marginBottom: 3 }}>
-          {s.sous_competences?.title || s.dojos?.title || 'Session de coaching'}
+          {s.sous_competences?.title || s.dojos?.titre || 'Session de coaching'}
         </div>
         {s.notes && <div style={{ fontSize: 11, color: 'var(--mu)' }}>{s.notes}</div>}
         {s.objectif && (

@@ -55,7 +55,7 @@ export default function DashboardPage() {
         .select('vendeur_id, sous_competence_id, score, evaluated_at')
         .in('vendeur_id', ids),
       supabase.from('coaching_sessions')
-        .select('id, scheduled_date, profiles!vendeur_id(full_name), dojos!dojo_id(title)')
+        .select('id, scheduled_date, profiles!vendeur_id(full_name), dojos!dojo_id(titre)')
         .eq('structure_id', structureId)
         .eq('status', 'planned')
         .gte('scheduled_date', today)
@@ -276,7 +276,7 @@ export default function DashboardPage() {
                           {s.profiles?.full_name}
                         </div>
                         <div style={{ fontSize: 11, color: 'var(--mu)' }}>
-                          {s.dojos?.title || 'Session de coaching'}
+                          {s.dojos?.titre || 'Session de coaching'}
                         </div>
                       </div>
                     </div>

@@ -30,7 +30,7 @@ export default function SessionsPage() {
   async function load() {
     const [{ data: s }, { data: v }, { data: d }, { data: c }] = await Promise.all([
       supabase.from('coaching_sessions')
-        .select('*, profiles!vendeur_id(id, full_name, poste), dojos!dojo_id(title), sous_competences!sous_comp_id(id, title)')
+        .select('*, profiles!vendeur_id(id, full_name, poste), dojos!dojo_id(titre), sous_competences!sous_comp_id(id, title)')
         .eq('structure_id', profile.structure_id)
         .order('scheduled_date', { ascending: false }),
       supabase.from('profiles')
@@ -38,7 +38,7 @@ export default function SessionsPage() {
         .eq('structure_id', profile.structure_id)
         .eq('role', 'vendeur'),
       supabase.from('dojos')
-        .select('id, title')
+        .select('id, titre')
         .eq('structure_id', profile.structure_id),
       supabase.from('competences')
         .select('id, title, numero, sous_competences(id, title)')
@@ -90,7 +90,7 @@ export default function SessionsPage() {
       notes: form.notes || null,
       objectif: form.objectif || null,
       status: 'planned',
-    }).select('*, profiles!vendeur_id(id, full_name, poste), dojos!dojo_id(title), sous_competences!sous_comp_id(id, title)').single()
+    }).select('*, profiles!vendeur_id(id, full_name, poste), dojos!dojo_id(titre), sous_competences!sous_comp_id(id, title)').single()
 
     console.log('[createSession] data:', data)
     console.log('[createSession] error:', error)
@@ -253,7 +253,7 @@ export default function SessionsPage() {
                     )}
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                    {s.dojos?.title && (
+                    {s.dojos?.titre && (
                       <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#DBEAFE', color: '#1E40AF', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                         <IconBook2 size={10} />{s.dojos.title}
                       </span>
@@ -348,7 +348,7 @@ export default function SessionsPage() {
               <Field label="Dojo associé">
                 <select value={form.dojoId} onChange={e => set('dojoId', e.target.value)} style={inputStyle}>
                   <option value="">Aucun (optionnel)</option>
-                  {dojos.map(d => <option key={d.id} value={d.id}>{d.title}</option>)}
+                  {dojos.map(d => <option key={d.id} value={d.id}>{d.titre}</option>)}
                 </select>
               </Field>
             )}
