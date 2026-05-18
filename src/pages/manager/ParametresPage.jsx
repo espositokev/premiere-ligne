@@ -82,6 +82,7 @@ export default function ParametresPage() {
       email: inviteForm.email,
       password: Math.random().toString(36).slice(-12) + 'A1!',
       options: {
+        emailRedirectTo: `${window.location.origin}/invitation`,
         data: {
           full_name: inviteForm.fullName,
           role: 'vendeur',

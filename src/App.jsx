@@ -4,6 +4,7 @@ import AppLayout from './components/layout/AppLayout'
 
 import RootRedirect from './pages/RootRedirect'
 import DebugLogout from './pages/DebugLogout'
+import InvitationPage from './pages/InvitationPage'
 import LoginPage from './pages/auth/LoginPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
@@ -40,6 +41,7 @@ export default function App() {
           {/* Racine → redirection selon rôle */}
           <Route path="/" element={<RootRedirect />} />
           <Route path="/debug-logout" element={<DebugLogout />} />
+          <Route path="/invitation" element={<InvitationPage />} />
 
           {/* Pages avec layout (sidebar) */}
           <Route element={<AppLayout />}>
