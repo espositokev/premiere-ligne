@@ -3,6 +3,18 @@ import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext(null)
 
+const CACHE_KEY = (userId) => `pl_profile_${userId}`
+
+function readCache(userId) {
+  try { return JSON.parse(localStorage.getItem(CACHE_KEY(userId))) } catch { return null }
+}
+function writeCache(userId, data) {
+  try { localStorage.setItem(CACHE_KEY(userId), JSON.stringify(data)) } catch {}
+}
+function clearCache(userId) {
+  try { if (userId) localStorage.removeItem(CACHE_KEY(userId)) } catch {}
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null)
   const [profile, setProfile] = useState(null)
@@ -12,32 +24,40 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Seuls ces deux événements nécessitent un chargement de profil
-        if (event !== 'INITIAL_SESSION' && event !== 'SIGNED_IN') {
-          // Déconnexion : on remet tout à zéro
-          if (event === 'SIGNED_OUT') {
-            profileLoaded.current = false
-            setUser(null)
-            setProfile(null)
-            setLoading(false)
-          }
-          return
-        }
-
-        if (!session?.user) {
+        if (event === 'SIGNED_OUT') {
+          clearCache(user?.id)
+          profileLoaded.current = false
           setUser(null)
           setProfile(null)
           setLoading(false)
           return
         }
 
-        // Profil déjà chargé pour cet utilisateur → rien à faire
+        if (event !== 'INITIAL_SESSION' && event !== 'SIGNED_IN') return
+
+        if (!session?.user) {
+          setLoading(false)
+          return
+        }
+
+        // Profil déjà chargé pour cette session
         if (profileLoaded.current) {
           setLoading(false)
           return
         }
 
         setUser(session.user)
+
+        // Lire le cache localStorage en premier — instantané
+        const cached = readCache(session.user.id)
+        if (cached) {
+          setProfile(cached)
+          profileLoaded.current = true
+          setLoading(false)
+          return
+        }
+
+        // Pas de cache → fetch Supabase une seule fois
         await fetchProfile(session.user.id)
       }
     )
@@ -51,12 +71,14 @@ export function AuthProvider({ children }) {
       .eq('id', userId)
       .single()
 
-    if (error) {
-      console.error('[Auth] fetchProfile error', error)
+    if (error) console.error('[Auth] fetchProfile error', error)
+
+    if (data) {
+      writeCache(userId, data)
+      profileLoaded.current = true
     }
 
     setProfile(data ?? null)
-    profileLoaded.current = !!data
     setLoading(false)
   }
 
@@ -65,6 +87,7 @@ export function AuthProvider({ children }) {
   }
 
   async function signOut() {
+    clearCache(user?.id)
     profileLoaded.current = false
     await supabase.auth.signOut()
   }
@@ -79,10 +102,18 @@ export function AuthProvider({ children }) {
     return await supabase.auth.updateUser({ password: newPassword })
   }
 
+  // Appelé explicitement après onboarding ou mise à jour du profil
+  async function fetchProfile_force(userId) {
+    clearCache(userId)
+    profileLoaded.current = false
+    await fetchProfile(userId)
+  }
+
   return (
     <AuthContext.Provider value={{
       user, profile, loading,
-      signIn, signOut, sendPasswordReset, updatePassword, fetchProfile,
+      signIn, signOut, sendPasswordReset, updatePassword,
+      fetchProfile: fetchProfile_force,
     }}>
       {children}
     </AuthContext.Provider>
