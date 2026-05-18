@@ -17,7 +17,15 @@ Deno.serve(async (req) => {
     data: { full_name, role: 'vendeur' },
   })
 
-  if (error) return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
+  // Si l'utilisateur existe déjà → renvoyer un email de réinitialisation mot de passe
+  if (error) {
+    const alreadyExists = error.message?.toLowerCase().includes('already')
+    if (alreadyExists) {
+      await admin.auth.resetPasswordForEmail(email, { redirectTo: redirect_to })
+      return new Response(JSON.stringify({ success: true, resent: true }), { headers: { ...cors, 'Content-Type': 'application/json' } })
+    }
+    return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
+  }
 
   if (data.user) {
     await admin.from('profiles').update({ structure_id, full_name, role: 'vendeur', poste: poste || 'Commercial' }).eq('id', data.user.id)

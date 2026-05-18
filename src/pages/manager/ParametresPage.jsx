@@ -101,7 +101,10 @@ export default function ParametresPage() {
       return
     }
 
-    setInviteMsg(`✅ Invitation envoyée à ${inviteForm.email} — il va recevoir un email pour activer son compte.`)
+    const msg = fnData?.resent
+      ? `✅ Compte déjà existant — un email de connexion a été renvoyé à ${inviteForm.email}.`
+      : `✅ Invitation envoyée à ${inviteForm.email} — il va recevoir un email pour activer son compte.`
+    setInviteMsg(msg)
     setInviting(false)
     setInviteForm({ email: '', fullName: '', poste: '' })
     load()

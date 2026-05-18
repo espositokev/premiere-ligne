@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { Logo } from '../components/Logo'
 
 export default function Onboarding() {
-  const { user, fetchProfile } = useAuth()
+  const { user, setProfile } = useAuth()
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -38,7 +38,11 @@ export default function Onboarding() {
     console.log('[Onboarding] structures result', { data: structure, error: sErr })
     console.log('[Onboarding] error detail', JSON.stringify(sErr))
 
-    if (sErr) { setError('Erreur lors de la création de la structure.'); setLoading(false); return }
+    if (sErr) {
+      setError('Erreur structure : ' + (sErr.message || JSON.stringify(sErr)))
+      setLoading(false)
+      return
+    }
 
     // 2. Mettre à jour le profil manager
     const { error: pErr } = await supabase
@@ -52,9 +56,20 @@ export default function Onboarding() {
       .eq('id', user.id)
 
     console.log('[Onboarding] profiles update result', { error: pErr })
-    if (pErr) { setError('Erreur lors de la mise à jour du profil.'); setLoading(false); return }
+    if (pErr) {
+      setError('Erreur profil : ' + (pErr.message || JSON.stringify(pErr)))
+      setLoading(false)
+      return
+    }
 
-    await fetchProfile(user.id)
+    // Mettre le profil à jour directement dans le state — sans refetch réseau
+    setProfile({
+      id: user.id,
+      structure_id: structure.id,
+      full_name: form.fullName,
+      role: 'manager',
+      poste: form.poste || 'Manager',
+    })
     navigate('/dashboard', { replace: true })
   }
 
