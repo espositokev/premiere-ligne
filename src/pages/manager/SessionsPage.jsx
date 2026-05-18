@@ -19,7 +19,7 @@ export default function SessionsPage() {
   const [filter, setFilter] = useState('all')
 
   const [modal, setModal] = useState(null) // null | 'new' | { type: 'validate', session }
-  const [form, setForm] = useState({ vendeurId: '', dojoId: '', sousCompId: '', scheduledDate: '', notes: '' })
+  const [form, setForm] = useState({ vendeurId: '', dojoId: '', sousCompId: '', scheduledDate: '', notes: '', objectif: '' })
   const [saving, setSaving] = useState(false)
 
   const [valScore, setValScore] = useState(0)
@@ -63,6 +63,7 @@ export default function SessionsPage() {
       sousCompId: '',
       scheduledDate: '',
       notes: '',
+      objectif: '',
     })
     setModal('new')
   }
@@ -77,6 +78,7 @@ export default function SessionsPage() {
       sous_comp_id: form.sousCompId || null,
       scheduled_date: form.scheduledDate,
       notes: form.notes || null,
+      objectif: form.objectif || null,
       status: 'planned',
     }).select('*, profiles!vendeur_id(id, full_name, poste), dojos!dojo_id(title), sous_competences!sous_comp_id(id, title)').single()
 
@@ -116,6 +118,12 @@ export default function SessionsPage() {
     setValUpdating(false)
     setValScore(0)
     setModal(null)
+  }
+
+  async function toggleObjectifAtteint(sessionId, current) {
+    const next = !current
+    setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, objectif_atteint: next } : s))
+    await supabase.from('coaching_sessions').update({ objectif_atteint: next }).eq('id', sessionId)
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -246,14 +254,33 @@ export default function SessionsPage() {
                       <span style={{ fontSize: 11, color: 'var(--mu)', fontStyle: 'italic' }}>{s.notes}</span>
                     )}
                   </div>
+                  {s.objectif && (
+                    <div style={{ fontSize: 11, color: 'var(--mu)', fontStyle: 'italic', marginTop: 5 }}>
+                      🎯 {s.objectif}
+                    </div>
+                  )}
                 </div>
 
                 {/* Status / Action */}
-                <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
                   {isValidated && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#DCFCE7', color: '#166534' }}>
                       <IconCheck size={12} /> Validée
                     </span>
+                  )}
+                  {isValidated && s.objectif && (
+                    <button
+                      onClick={() => toggleObjectifAtteint(s.id, s.objectif_atteint)}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                        padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+                        cursor: 'pointer', border: 'none',
+                        background: s.objectif_atteint ? '#DCFCE7' : '#FEF3C7',
+                        color: s.objectif_atteint ? '#166534' : '#92400E',
+                      }}
+                    >
+                      {s.objectif_atteint ? '✓ Objectif atteint' : '⏳ En attente'}
+                    </button>
                   )}
                   {isUpcoming && (
                     <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--forest)' }}>
@@ -312,12 +339,20 @@ export default function SessionsPage() {
                 </select>
               </Field>
             )}
-            <Field label="Notes / Objectif">
+            <Field label="Notes / Instructions">
               <textarea
                 value={form.notes}
                 onChange={e => set('notes', e.target.value)}
                 placeholder="Ce que le vendeur doit travailler…"
-                style={{ ...inputStyle, resize: 'none', height: 64 }}
+                style={{ ...inputStyle, resize: 'none', height: 56 }}
+              />
+            </Field>
+            <Field label="Objectif post-coaching">
+              <textarea
+                value={form.objectif}
+                onChange={e => set('objectif', e.target.value)}
+                placeholder="Ex : Réaliser 3 découvertes complètes en RDV client"
+                style={{ ...inputStyle, resize: 'none', height: 68 }}
               />
             </Field>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>

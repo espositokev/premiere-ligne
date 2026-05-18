@@ -15,7 +15,7 @@ export default function VendeurPlanPage() {
   async function load() {
     const [{ data: s }, { data: mgr }] = await Promise.all([
       supabase.from('coaching_sessions')
-        .select('id, scheduled_date, status, notes, validated_at, dojos!dojo_id(title), sous_competences!sous_comp_id(title)')
+        .select('id, scheduled_date, status, notes, objectif, objectif_atteint, validated_at, dojos!dojo_id(title), sous_competences!sous_comp_id(title)')
         .eq('vendeur_id', profile.id)
         .order('scheduled_date', { ascending: false }),
       supabase.from('profiles')
@@ -104,6 +104,23 @@ function SessionCard({ session: s, past }) {
           {s.sous_competences?.title || s.dojos?.title || 'Session de coaching'}
         </div>
         {s.notes && <div style={{ fontSize: 11, color: 'var(--mu)' }}>{s.notes}</div>}
+        {s.objectif && (
+          <div style={{ fontSize: 11, color: 'var(--mu)', fontStyle: 'italic', marginTop: 3 }}>
+            🎯 {s.objectif}
+          </div>
+        )}
+        {s.objectif && isValidated && (
+          <div style={{ marginTop: 5 }}>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '2px 9px', borderRadius: 20, fontSize: 10, fontWeight: 600,
+              background: s.objectif_atteint ? '#DCFCE7' : '#FEF3C7',
+              color: s.objectif_atteint ? '#166534' : '#92400E',
+            }}>
+              {s.objectif_atteint ? '✓ Objectif atteint' : '⏳ En attente'}
+            </span>
+          </div>
+        )}
       </div>
 
       <div style={{ flexShrink: 0 }}>
