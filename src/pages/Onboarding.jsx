@@ -28,11 +28,15 @@ export default function Onboarding() {
     setError('')
 
     // 1. Créer la structure
+    console.log('[Onboarding] INSERT structures', { name: form.name, ville: form.ville })
     const { data: structure, error: sErr } = await supabase
       .from('structures')
       .insert({ name: form.name, ville: form.ville })
       .select()
       .single()
+
+    console.log('[Onboarding] structures result', { data: structure, error: sErr })
+    console.log('[Onboarding] error detail', JSON.stringify(sErr))
 
     if (sErr) { setError('Erreur lors de la création de la structure.'); setLoading(false); return }
 
@@ -47,6 +51,7 @@ export default function Onboarding() {
       })
       .eq('id', user.id)
 
+    console.log('[Onboarding] profiles update result', { error: pErr })
     if (pErr) { setError('Erreur lors de la mise à jour du profil.'); setLoading(false); return }
 
     await fetchProfile(user.id)
