@@ -26,16 +26,17 @@ export function AuthProvider({ children }) {
 
   async function fetchProfile(userId) {
     console.log('[Auth] fetchProfile start', userId)
+    const timeout = new Promise(resolve => setTimeout(() => resolve({ data: null, error: 'timeout' }), 5000))
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*, structures(name, ville)')
-        .eq('id', userId)
-        .single()
+      const { data, error } = await Promise.race([
+        supabase.from('profiles').select('*, structures(name, ville)').eq('id', userId).single(),
+        timeout,
+      ])
       console.log('[Auth] fetchProfile result', { data, error })
       setProfile(data)
     } catch (err) {
       console.error('[Auth] fetchProfile exception', err)
+      setProfile(null)
     } finally {
       setLoading(false)
       console.log('[Auth] loading = false')
