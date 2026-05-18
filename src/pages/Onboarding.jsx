@@ -82,10 +82,15 @@ export default function Onboarding() {
         background: '#fff', borderRadius: 20, padding: 40,
         width: 460, boxShadow: 'var(--shm)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, justifyContent: 'center' }}>
-          <Logo />
-          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--fi)', letterSpacing: 0.3 }}>
-            PREMIÈRE LIGNE
+        <div style={{ textAlign: 'center', marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 4 }}>
+            <Logo />
+            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--fi)', letterSpacing: 0.3 }}>
+              PREMIÈRE LIGNE
+            </div>
+          </div>
+          <div style={{ fontSize: 13, fontStyle: 'italic', color: '#8A8D88' }}>
+            On forme là où ça se joue
           </div>
         </div>
 

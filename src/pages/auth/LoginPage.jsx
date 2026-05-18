@@ -47,10 +47,15 @@ export default function LoginPage() {
         boxShadow: 'var(--shm)',
       }}>
         {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32, justifyContent: 'center' }}>
-          <Logo />
-          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--fi)', letterSpacing: 0.3 }}>
-            PREMIÈRE LIGNE
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', marginBottom: 6 }}>
+            <Logo />
+            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--fi)', letterSpacing: 0.3 }}>
+              PREMIÈRE LIGNE
+            </div>
+          </div>
+          <div style={{ fontSize: 14, fontStyle: 'italic', color: '#8A8D88' }}>
+            On forme là où ça se joue
           </div>
         </div>
 

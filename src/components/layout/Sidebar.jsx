@@ -97,6 +97,9 @@ export function Sidebar() {
             <small style={{ fontSize: 10, fontWeight: 400, color: 'var(--mu)', display: 'block' }}>
               {structureName}
             </small>
+            <small style={{ fontSize: 10, fontWeight: 400, fontStyle: 'italic', color: '#8A8D88', display: 'block', marginTop: 1 }}>
+              On forme là où ça se joue
+            </small>
           </div>
         </div>
         <div style={{
