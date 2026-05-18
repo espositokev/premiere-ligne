@@ -3,12 +3,15 @@ import { useAuth } from '../../contexts/AuthContext'
 import { Sidebar } from './Sidebar'
 
 export default function AppLayout() {
-  const { user, profile, loading } = useAuth()
+  const { user, profile, profileLoading, loading } = useAuth()
 
   if (loading) return <LoadingScreen />
   if (!user) return <Navigate to="/login" replace />
 
-  // If no structure yet (or no profile row) → onboarding
+  // Profil en cours de chargement → attendre (non-bloquant côté auth)
+  if (profileLoading) return <LoadingScreen />
+
+  // Profil chargé mais pas de structure → onboarding
   if (!profile || !profile.structure_id) return <Navigate to="/onboarding" replace />
 
   return (
