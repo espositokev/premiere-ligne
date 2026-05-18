@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
     console.log('[Auth] fetchProfile start', userId)
 
     const tryFetch = () => Promise.race([
-      supabase.from('profiles').select('*, structures(name, ville)').eq('id', userId).single(),
+      supabase.from('profiles').select('*').eq('id', userId).single(),
       new Promise(resolve => setTimeout(() => resolve({ data: null, error: 'timeout' }), 10000)),
     ])
 
