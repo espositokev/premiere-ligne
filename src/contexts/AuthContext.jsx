@@ -4,73 +4,60 @@ import { supabase } from '../lib/supabase'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
+  const [user, setUser]       = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
-  // Ref pour éviter de refetcher le profil du même utilisateur déjà chargé
-  const loadedUserIdRef = useRef(null)
+  const profileLoaded = useRef(false)
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('[Auth] onAuthStateChange', event, session?.user?.id ?? 'no user')
-
-        // TOKEN_REFRESHED ne change pas le profil — ignorer complètement
-        if (event === 'TOKEN_REFRESHED') return
-
-        const userId = session?.user?.id ?? null
-        setUser(session?.user ?? null)
-
-        if (userId) {
-          // Même utilisateur déjà chargé → pas besoin de refetcher
-          if (userId === loadedUserIdRef.current) {
+        // Seuls ces deux événements nécessitent un chargement de profil
+        if (event !== 'INITIAL_SESSION' && event !== 'SIGNED_IN') {
+          // Déconnexion : on remet tout à zéro
+          if (event === 'SIGNED_OUT') {
+            profileLoaded.current = false
+            setUser(null)
+            setProfile(null)
             setLoading(false)
-            return
           }
-          await fetchProfile(userId)
-        } else {
-          loadedUserIdRef.current = null
+          return
+        }
+
+        if (!session?.user) {
+          setUser(null)
           setProfile(null)
           setLoading(false)
+          return
         }
+
+        // Profil déjà chargé pour cet utilisateur → rien à faire
+        if (profileLoaded.current) {
+          setLoading(false)
+          return
+        }
+
+        setUser(session.user)
+        await fetchProfile(session.user.id)
       }
     )
     return () => subscription.unsubscribe()
   }, [])
 
   async function fetchProfile(userId) {
-    console.log('[Auth] fetchProfile start', userId)
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
 
-    const tryFetch = () => Promise.race([
-      supabase.from('profiles').select('*').eq('id', userId).single(),
-      new Promise(resolve => setTimeout(() => resolve({ data: null, error: 'timeout' }), 10000)),
-    ])
-
-    try {
-      let { data, error } = await tryFetch()
-
-      // Réessayer une fois si timeout
-      if (error === 'timeout') {
-        console.log('[Auth] fetchProfile timeout — retry...')
-        ;({ data, error } = await tryFetch())
-      }
-
-      console.log('[Auth] fetchProfile result', { data, error })
-
-      // Double timeout : conserver le profil existant, ne pas rediriger
-      if (error === 'timeout') {
-        console.log('[Auth] fetchProfile double timeout — profil existant conservé')
-        return
-      }
-
-      setProfile(data)
-      loadedUserIdRef.current = data ? userId : null
-    } catch (err) {
-      console.error('[Auth] fetchProfile exception', err)
-    } finally {
-      setLoading(false)
-      console.log('[Auth] loading = false')
+    if (error) {
+      console.error('[Auth] fetchProfile error', error)
     }
+
+    setProfile(data ?? null)
+    profileLoaded.current = !!data
+    setLoading(false)
   }
 
   async function signIn(email, password) {
@@ -78,6 +65,7 @@ export function AuthProvider({ children }) {
   }
 
   async function signOut() {
+    profileLoaded.current = false
     await supabase.auth.signOut()
   }
 
