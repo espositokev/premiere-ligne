@@ -80,13 +80,13 @@ export default function BibliothequePage() {
     }
 
     const payload = {
-      titre:        form.titre.trim(),
-      structure_id: profile.structure_id,
+      titre:         form.titre.trim(),
+      structure_id:  profile.structure_id,
+      objectif:      form.objectif.trim() || null,
+      duree:         form.duree.trim() || null,
+      competence_id: form.competenceId || null,
+      fichier_url:   fichier_url || null,
     }
-    if (form.objectif.trim())  payload.objectif      = form.objectif.trim()
-    if (form.duree.trim())     payload.duree         = form.duree.trim()
-    if (form.competenceId)     payload.competence_id = form.competenceId
-    if (fichier_url)           payload.fichier_url   = fichier_url
 
     let dbError
     if (modal?.type === 'edit') {
