@@ -28,9 +28,9 @@ export default function SessionsPage() {
   useEffect(() => { if (profile?.structure_id) load() }, [profile?.structure_id])
 
   async function load() {
-    const [{ data: s }, { data: v }, { data: d }, { data: c }] = await Promise.all([
+    const [{ data: rawSessions }, { data: vendData }, { data: dojoData }, { data: compData }] = await Promise.all([
       supabase.from('coaching_sessions')
-        .select('*, profiles!vendeur_id(id, full_name, poste), dojos!dojo_id(titre), sous_competences!sous_comp_id(id, title)')
+        .select('*')
         .eq('structure_id', profile.structure_id)
         .order('scheduled_date', { ascending: false }),
       supabase.from('profiles')
@@ -41,14 +41,39 @@ export default function SessionsPage() {
         .select('id, titre')
         .eq('structure_id', profile.structure_id),
       supabase.from('competences')
-        .select('id, title, numero, sous_competences(id, title)')
+        .select('id, title, numero')
         .eq('structure_id', profile.structure_id)
         .order('numero'),
     ])
-    setSessions(s || [])
-    setVendeurs(v || [])
-    setDojos(d || [])
-    setComps(c || [])
+
+    const compIds = (compData || []).map(c => c.id)
+    const { data: scData } = compIds.length
+      ? await supabase.from('sous_competences').select('id, title, competence_id').in('competence_id', compIds)
+      : { data: [] }
+
+    const vendeurMap = {}
+    ;(vendData || []).forEach(v => { vendeurMap[v.id] = v })
+    const dojoMap = {}
+    ;(dojoData || []).forEach(d => { dojoMap[d.id] = d })
+    const scMap = {}
+    ;(scData || []).forEach(sc => { scMap[sc.id] = sc })
+
+    const enriched = (rawSessions || []).map(s => ({
+      ...s,
+      profiles: vendeurMap[s.vendeur_id] || null,
+      dojos: s.dojo_id ? (dojoMap[s.dojo_id] || null) : null,
+      sous_competences: s.sous_comp_id ? (scMap[s.sous_comp_id] || null) : null,
+    }))
+
+    const enrichedComps = (compData || []).map(c => ({
+      ...c,
+      sous_competences: (scData || []).filter(sc => sc.competence_id === c.id),
+    }))
+
+    setSessions(enriched)
+    setVendeurs(vendData || [])
+    setDojos(dojoData || [])
+    setComps(enrichedComps)
     setLoading(false)
   }
 
@@ -71,7 +96,7 @@ export default function SessionsPage() {
   async function createSession() {
     if (!form.vendeurId || !form.scheduledDate) return
     setSaving(true)
-    const { data, error } = await supabase.from('coaching_sessions').insert({
+    const { data: inserted, error } = await supabase.from('coaching_sessions').insert({
       structure_id: profile.structure_id,
       vendeur_id: form.vendeurId,
       dojo_id: form.dojoId || null,
@@ -80,10 +105,23 @@ export default function SessionsPage() {
       notes: form.notes || null,
       objectif: form.objectif || null,
       status: 'planned',
-    }).select('*, profiles!vendeur_id(id, full_name, poste), dojos!dojo_id(titre), sous_competences!sous_comp_id(id, title)').single()
+    }).select('*').single()
 
-    if (!error && data) {
-      setSessions(prev => [data, ...prev].sort((a, b) =>
+    if (!error && inserted) {
+      const vendeurMap = {}
+      vendeurs.forEach(v => { vendeurMap[v.id] = v })
+      const dojoMap = {}
+      dojos.forEach(d => { dojoMap[d.id] = d })
+      const scMap = {}
+      comps.forEach(c => c.sous_competences?.forEach(sc => { scMap[sc.id] = sc }))
+
+      const enriched = {
+        ...inserted,
+        profiles: vendeurMap[inserted.vendeur_id] || null,
+        dojos: inserted.dojo_id ? (dojoMap[inserted.dojo_id] || null) : null,
+        sous_competences: inserted.sous_comp_id ? (scMap[inserted.sous_comp_id] || null) : null,
+      }
+      setSessions(prev => [enriched, ...prev].sort((a, b) =>
         new Date(b.scheduled_date) - new Date(a.scheduled_date)
       ))
     }
