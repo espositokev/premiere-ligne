@@ -19,7 +19,7 @@ export default function VendeurEvalPage() {
     const [{ data: comps }, { data: evals }, { data: vd }, { data: mgr }] = await Promise.all([
       supabase.from('competences').select('*, sous_competences(*)').eq('structure_id', profile.structure_id).order('numero'),
       supabase.from('evaluations').select('*').eq('vendeur_id', profile.id),
-      supabase.from('vendeur_dojos').select('*, dojos(title)').eq('vendeur_id', profile.id),
+      supabase.from('vendeur_dojos').select('*, dojos(titre)').eq('vendeur_id', profile.id),
       supabase.from('profiles').select('full_name').eq('structure_id', profile.structure_id).eq('role', 'manager').single(),
     ])
 
@@ -135,7 +135,7 @@ export default function VendeurEvalPage() {
                                 color: vd.status === 'validated' ? '#166534' : 'var(--fluo)',
                               }}>
                                 {vd.status === 'validated' ? <IconCheck size={13} /> : <IconBook2 size={13} />}
-                                {vd.dojos?.title}
+                                {vd.dojos?.titre}
                               </span>
                             ))}
                         </div>
