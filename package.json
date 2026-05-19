@@ -14,7 +14,7 @@
     "start": "serve -s dist -l $PORT"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.105.4",
+    "@supabase/supabase-js": "2.106.0",
     "@tabler/icons-react": "^3.44.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
