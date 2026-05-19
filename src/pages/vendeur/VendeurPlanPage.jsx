@@ -13,9 +13,9 @@ export default function VendeurPlanPage() {
   useEffect(() => { if (profile?.id) load() }, [profile?.id])
 
   async function load() {
-    const [{ data: s }, { data: mgr }] = await Promise.all([
+    const [{ data: rawSessions }, { data: mgr }, { data: dojoData }, { data: scData }] = await Promise.all([
       supabase.from('coaching_sessions')
-        .select('*, dojos!dojo_id(titre), sous_competences!sous_comp_id(title)')
+        .select('*')
         .eq('vendeur_id', profile.id)
         .order('scheduled_date', { ascending: false }),
       supabase.from('profiles')
@@ -23,8 +23,19 @@ export default function VendeurPlanPage() {
         .eq('structure_id', profile.structure_id)
         .eq('role', 'manager')
         .single(),
+      supabase.from('dojos').select('id, titre').eq('structure_id', profile.structure_id),
+      supabase.from('sous_competences').select('id, title'),
     ])
-    setSessions(s || [])
+    const dojoMap = {}
+    ;(dojoData || []).forEach(d => { dojoMap[d.id] = d })
+    const scMap = {}
+    ;(scData || []).forEach(sc => { scMap[sc.id] = sc })
+    const enriched = (rawSessions || []).map(s => ({
+      ...s,
+      dojos: s.dojo_id ? (dojoMap[s.dojo_id] || null) : null,
+      sous_competences: s.sous_comp_id ? (scMap[s.sous_comp_id] || null) : null,
+    }))
+    setSessions(enriched)
     setManagerName(mgr?.full_name || 'votre manager')
     setLoading(false)
   }

@@ -164,6 +164,12 @@ export default function SessionsPage() {
     await supabase.from('coaching_sessions').update({ objectif_atteint: next }).eq('id', sessionId)
   }
 
+  async function toggleDojoRealise(sessionId, current) {
+    const next = !current
+    setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, dojo_realise: next } : s))
+    await supabase.from('coaching_sessions').update({ dojo_realise: next }).eq('id', sessionId)
+  }
+
   const today = new Date().toISOString().split('T')[0]
 
   const filtered = sessions.filter(s => {
@@ -240,10 +246,9 @@ export default function SessionsPage() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {filtered.map(s => {
-            const isUpcoming = s.status === 'planned' && s.scheduled_date >= today
-            const isPastUnval = s.status === 'planned' && s.scheduled_date < today
+            const isPlanned = s.status === 'planned'
             const isValidated = s.status === 'validated'
-            const borderColor = isPastUnval ? '#F59E0B' : isValidated ? '#22C55E' : 'var(--forest)'
+            const borderColor = isValidated ? '#22C55E' : 'var(--forest)'
 
             return (
               <div key={s.id} style={{
@@ -253,7 +258,7 @@ export default function SessionsPage() {
               }}>
                 {/* Date */}
                 <div style={{ width: 44, textAlign: 'center', flexShrink: 0 }}>
-                  <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1, color: isPastUnval ? '#D97706' : isValidated ? '#22C55E' : 'var(--forest)' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1, color: isValidated ? '#22C55E' : 'var(--forest)' }}>
                     {new Date(s.scheduled_date + 'T00:00:00').getDate()}
                   </div>
                   <div style={{ fontSize: 10, color: 'var(--mu)', textTransform: 'uppercase' }}>
@@ -301,41 +306,57 @@ export default function SessionsPage() {
 
                 {/* Status / Action */}
                 <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                  {isPlanned && (
+                    <>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#DBEAFE', color: '#1E40AF' }}>
+                        À venir
+                      </span>
+                      <button
+                        onClick={() => { setModal({ type: 'validate', session: s }); setValScore(0) }}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 5,
+                          padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                          cursor: 'pointer', border: 'none', background: 'var(--forest)', color: 'var(--fluo)',
+                        }}
+                      >
+                        <IconCheck size={14} /> Valider
+                      </button>
+                    </>
+                  )}
                   {isValidated && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#DCFCE7', color: '#166534' }}>
-                      <IconCheck size={12} /> Validée
-                    </span>
-                  )}
-                  {isValidated && s.objectif && (
-                    <button
-                      onClick={() => toggleObjectifAtteint(s.id, s.objectif_atteint)}
-                      style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 4,
-                        padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
-                        cursor: 'pointer', border: 'none',
-                        background: s.objectif_atteint ? '#DCFCE7' : '#FEF3C7',
-                        color: s.objectif_atteint ? '#166534' : '#92400E',
-                      }}
-                    >
-                      {s.objectif_atteint ? '✓ Objectif atteint' : '⏳ En attente'}
-                    </button>
-                  )}
-                  {isUpcoming && (
-                    <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--forest)' }}>
-                      {daysUntil(s.scheduled_date)}
-                    </span>
-                  )}
-                  {isPastUnval && (
-                    <button
-                      onClick={() => { setModal({ type: 'validate', session: s }); setValScore(0) }}
-                      style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 5,
-                        padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-                        cursor: 'pointer', border: 'none', background: 'var(--forest)', color: 'var(--fluo)',
-                      }}
-                    >
-                      <IconCheck size={14} /> Valider
-                    </button>
+                    <>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: '#DCFCE7', color: '#166534' }}>
+                        <IconCheck size={12} /> Réalisée
+                      </span>
+                      {s.dojo_id && (
+                        <button
+                          onClick={() => toggleDojoRealise(s.id, s.dojo_realise)}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 4,
+                            padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+                            cursor: 'pointer', border: 'none',
+                            background: s.dojo_realise ? '#DCFCE7' : 'var(--bg)',
+                            color: s.dojo_realise ? '#166534' : 'var(--mu)',
+                          }}
+                        >
+                          {s.dojo_realise ? '✓ Dojo réalisé' : 'Dojo réalisé ?'}
+                        </button>
+                      )}
+                      {s.objectif && (
+                        <button
+                          onClick={() => toggleObjectifAtteint(s.id, s.objectif_atteint)}
+                          style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 4,
+                            padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+                            cursor: 'pointer', border: 'none',
+                            background: s.objectif_atteint ? '#DCFCE7' : '#FEF3C7',
+                            color: s.objectif_atteint ? '#166534' : '#92400E',
+                          }}
+                        >
+                          {s.objectif_atteint ? '✓ Objectif atteint' : '⏳ En attente'}
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
