@@ -28,7 +28,7 @@ export default function VendeurPlanPage() {
     const [{ data: rawSessions }, { data: mgr }, { data: dojoData }, { data: scData }] = await Promise.all([
       supabase.from('coaching_sessions').select('*').eq('vendeur_id', profile.id).order('scheduled_date', { ascending: false }),
       supabase.from('profiles').select('full_name').eq('structure_id', profile.structure_id).eq('role', 'manager').single(),
-      supabase.from('dojos').select('id, titre').eq('structure_id', profile.structure_id),
+      supabase.from('dojos').select('id, title').eq('structure_id', profile.structure_id),
       supabase.from('sous_competences').select('id, title'),
     ])
     const dojoMap = {}
@@ -122,9 +122,9 @@ function SessionCard({ session: s }) {
 
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 2 }}>
-            {s.dojos?.titre && (
+            {s.dojos?.title && (
               <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#DBEAFE', color: '#1E40AF', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                <IconBook2 size={10} />{s.dojos.titre}
+                <IconBook2 size={10} />{s.dojos.title}
               </span>
             )}
             {s.sous_competences?.title && (
@@ -132,7 +132,7 @@ function SessionCard({ session: s }) {
                 {s.sous_competences.title}
               </span>
             )}
-            {!s.dojos?.titre && !s.sous_competences?.title && (
+            {!s.dojos?.title && !s.sous_competences?.title && (
               <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--fi)' }}>Session de coaching</span>
             )}
           </div>

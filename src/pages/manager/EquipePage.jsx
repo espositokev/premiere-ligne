@@ -23,7 +23,7 @@ export default function EquipePage() {
 
     const ids = vendeurs.map(v => v.id)
     const [{ data: vDojos }, { data: evals }] = await Promise.all([
-      supabase.from('vendeur_dojos').select('vendeur_id, dojos(titre)').in('vendeur_id', ids).eq('status', 'assigned'),
+      supabase.from('vendeur_dojos').select('vendeur_id, dojos(title)').in('vendeur_id', ids).eq('status', 'assigned'),
       supabase.from('evaluations').select('vendeur_id, score').in('vendeur_id', ids),
     ])
 
@@ -131,7 +131,7 @@ export default function EquipePage() {
                   </div>
                   <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--fi)', minWidth: 26, textAlign: 'right' }}>{v.avgScore || '—'}</span>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 500 }}>{v.currentDojo?.dojos?.titre || '—'}</div>
+                <div style={{ fontSize: 12, fontWeight: 500 }}>{v.currentDojo?.dojos?.title || '—'}</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--mu)' }}>
                   <IconFlame size={15} color="#F97316" />{v.streak || 0}j
                 </div>

@@ -44,7 +44,7 @@ export default function SessionsPage() {
     const [{ data: rawSessions }, { data: vendData }, { data: dojoData }, { data: compData }] = await Promise.all([
       supabase.from('coaching_sessions').select('*').eq('structure_id', profile.structure_id).order('scheduled_date', { ascending: false }),
       supabase.from('profiles').select('id, full_name, poste').eq('structure_id', profile.structure_id).eq('role', 'vendeur'),
-      supabase.from('dojos').select('id, titre').eq('structure_id', profile.structure_id),
+      supabase.from('dojos').select('id, title').eq('structure_id', profile.structure_id),
       supabase.from('competences').select('id, title, numero, bloc').eq('structure_id', profile.structure_id).order('numero'),
     ])
     const compIds = (compData || []).map(c => c.id)
@@ -237,9 +237,9 @@ export default function SessionsPage() {
                     {s.profiles?.poste && <span style={{ fontSize: 11, color: 'var(--mu)' }}>· {s.profiles.poste}</span>}
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                    {s.dojos?.titre && (
+                    {s.dojos?.title && (
                       <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: '#DBEAFE', color: '#1E40AF', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        <IconBook2 size={10} />{s.dojos.titre}
+                        <IconBook2 size={10} />{s.dojos.title}
                       </span>
                     )}
                     {s.sous_competences?.title && (
@@ -301,7 +301,7 @@ export default function SessionsPage() {
               <Field label="Dojo associé">
                 <select value={form.dojoId} onChange={e => setField('dojoId', e.target.value)} style={inputStyle}>
                   <option value="">Aucun (optionnel)</option>
-                  {dojos.map(d => <option key={d.id} value={d.id}>{d.titre}</option>)}
+                  {dojos.map(d => <option key={d.id} value={d.id}>{d.title}</option>)}
                 </select>
               </Field>
             )}
@@ -374,13 +374,13 @@ function DetailModal({ session: s, commentaire, setCommentaire, savingComment, u
         <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {/* Infos */}
-          {(s.sous_competences?.title || s.dojos?.titre || s.objectif || s.notes) && (
+          {(s.sous_competences?.title || s.dojos?.title || s.objectif || s.notes) && (
             <div style={{ background: 'var(--bg)', borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
               {s.sous_competences?.title && (
                 <InfoRow label="Compétence" value={s.sous_competences.title} bold />
               )}
-              {s.dojos?.titre && (
-                <InfoRow label="Dojo" value={s.dojos.titre} bold />
+              {s.dojos?.title && (
+                <InfoRow label="Dojo" value={s.dojos.title} bold />
               )}
               {s.objectif && (
                 <InfoRow label="Objectif" value={s.objectif} />

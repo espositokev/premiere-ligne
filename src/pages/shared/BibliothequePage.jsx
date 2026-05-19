@@ -16,7 +16,7 @@ export default function BibliothequePage() {
   const [loading,  setLoading]  = useState(true)
 
   const [modal,    setModal]    = useState(null) // null | 'add' | { type:'edit', dojo }
-  const [form,     setForm]     = useState({ titre: '', objectif: '', duree: '', competenceId: '' })
+  const [form,     setForm]     = useState({ title: '', objectif: '', duree: '', competenceId: '' })
   const [file,     setFile]     = useState(null)
   const [saving,   setSaving]   = useState(false)
 
@@ -46,19 +46,19 @@ export default function BibliothequePage() {
   }
 
   function openAdd(defaultCompId = '') {
-    setForm({ titre: '', objectif: '', duree: '', competenceId: defaultCompId })
+    setForm({ title: '', objectif: '', duree: '', competenceId: defaultCompId })
     setFile(null)
     setModal('add')
   }
 
   function openEdit(dojo) {
-    setForm({ titre: dojo.titre, objectif: dojo.objectif || '', duree: dojo.duree || '', competenceId: dojo.competence_id || '' })
+    setForm({ title: dojo.title, objectif: dojo.objectif || '', duree: dojo.duree || '', competenceId: dojo.competence_id || '' })
     setFile(null)
     setModal({ type: 'edit', dojo })
   }
 
   async function handleSave() {
-    if (!form.titre.trim()) return
+    if (!form.title.trim()) return
     setSaving(true)
 
     let fichier_url = modal?.dojo?.fichier_url || null
@@ -80,7 +80,7 @@ export default function BibliothequePage() {
     }
 
     const payload = {
-      titre:         form.titre.trim(),
+      title:         form.title.trim(),
       structure_id:  profile.structure_id,
       objectif:      form.objectif.trim() || null,
       duree:         form.duree.trim() || null,
@@ -110,7 +110,7 @@ export default function BibliothequePage() {
   }
 
   async function handleDelete(dojo) {
-    if (!confirm(`Supprimer le dojo "${dojo.titre}" ?`)) return
+    if (!confirm(`Supprimer le dojo "${dojo.title}" ?`)) return
     if (dojo.fichier_url) {
       const parts = dojo.fichier_url.split('/dojos-pptx/')
       if (parts.length === 2) {
@@ -237,8 +237,8 @@ export default function BibliothequePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <Field label="Titre *">
                 <input
-                  value={form.titre}
-                  onChange={e => setForm(p => ({ ...p, titre: e.target.value }))}
+                  value={form.title}
+                  onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
                   placeholder="Ex : Méthode CAB — argumentation produit"
                   style={inputStyle}
                   autoFocus
@@ -300,8 +300,8 @@ export default function BibliothequePage() {
                 <button onClick={() => setModal(null)} style={btnGhost}>Annuler</button>
                 <button
                   onClick={handleSave}
-                  disabled={saving || !form.titre.trim() || !form.competenceId}
-                  style={{ ...btnPrimary, opacity: (!form.titre.trim() || !form.competenceId) ? 0.5 : 1 }}
+                  disabled={saving || !form.title.trim() || !form.competenceId}
+                  style={{ ...btnPrimary, opacity: (!form.title.trim() || !form.competenceId) ? 0.5 : 1 }}
                 >
                   {saving ? 'Enregistrement…' : modal === 'add' ? 'Créer le dojo' : 'Sauvegarder'}
                 </button>
@@ -322,7 +322,7 @@ function DojoCard({ dojo, isAdmin, isManager, onEdit, onDelete }) {
       border: '1px solid var(--ln)',
     }}>
       <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--fi)', lineHeight: 1.35 }}>
-        {dojo.titre}
+        {dojo.title}
       </div>
 
       {dojo.objectif && (

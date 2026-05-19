@@ -28,7 +28,7 @@ export default function VendeurHomePage() {
         .select('sous_competence_id, score')
         .eq('vendeur_id', profile.id),
       supabase.from('coaching_sessions')
-        .select('id, scheduled_date, notes, dojos!dojo_id(titre), sous_competences!sous_comp_id(title)')
+        .select('id, scheduled_date, notes, dojos!dojo_id(title), sous_competences!sous_comp_id(title)')
         .eq('vendeur_id', profile.id)
         .eq('status', 'planned')
         .gte('scheduled_date', today)
@@ -148,7 +148,7 @@ export default function VendeurHomePage() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--fi)' }}>
-                          {s.sous_competences?.title || s.dojos?.titre || 'Session de coaching'}
+                          {s.sous_competences?.title || s.dojos?.title || 'Session de coaching'}
                         </div>
                         {s.notes && <div style={{ fontSize: 11, color: 'var(--mu)' }}>{s.notes}</div>}
                       </div>

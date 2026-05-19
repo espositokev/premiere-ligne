@@ -19,7 +19,7 @@ export default function PlansPage() {
     const ids = vendeurs.map(v => v.id)
 
     const { data } = await supabase.from('plans')
-      .select('*, profiles!vendeur_id(full_name, id), plan_dojos(*, dojos(titre))')
+      .select('*, profiles!vendeur_id(full_name, id), plan_dojos(*, dojos(title))')
       .in('vendeur_id', ids).order('created_at', { ascending: false })
     setPlans(data || [])
     setLoading(false)
@@ -101,7 +101,7 @@ export default function PlansPage() {
                         {status === 'done' && <IconCheck size={10} />}
                       </div>
                       <div style={{ flex: 1, fontSize: 12, fontWeight: 600, color: status === 'current' ? 'var(--forest)' : 'var(--fi)' }}>
-                        {pd.dojos?.titre}
+                        {pd.dojos?.title}
                       </div>
                       <div style={{ fontSize: 11, color: status === 'current' ? 'var(--forest)' : 'var(--mu)', fontWeight: status === 'current' ? 700 : 400 }}>
                         {pd.status === 'done' ? `Validé — ${formatDate(pd.updated_at)}` : pd.target_date ? `${formatDate(pd.target_date)} — ${daysUntil(pd.target_date)}` : 'À planifier'}

@@ -15,7 +15,7 @@ export default function VendeurDojosPage() {
   async function load() {
     const [{ data }, { data: mgr }] = await Promise.all([
       supabase.from('vendeur_dojos')
-        .select('*, dojos(titre, competences(title))')
+        .select('*, dojos(title, competences(title))')
         .eq('vendeur_id', profile.id)
         .order('assigned_at', { ascending: false }),
       supabase.from('profiles').select('full_name').eq('structure_id', profile.structure_id).eq('role', 'manager').single(),
@@ -56,7 +56,7 @@ export default function VendeurDojosPage() {
                 <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 11px', borderRadius: 9, background: '#fff', border: '1.5px solid var(--forest)', boxShadow: '0 2px 8px rgba(11,61,46,.08)' }}>
                   <div style={{ width: 20, height: 20, borderRadius: '50%', border: '1.5px solid var(--forest)', flexShrink: 0 }} />
                   <div style={{ flex: 1, fontSize: 12, fontWeight: 600, color: 'var(--forest)' }}>
-                    {d.dojos?.titre}
+                    {d.dojos?.title}
                     {d.dojos?.competences?.title && (
                       <span style={{ fontSize: 10, color: 'var(--mu)', fontWeight: 400, marginLeft: 6 }}>· {d.dojos.competences.title}</span>
                     )}
@@ -82,7 +82,7 @@ export default function VendeurDojosPage() {
                     <IconCheck size={10} color="var(--fluo)" />
                   </div>
                   <div style={{ flex: 1, fontSize: 12, fontWeight: 600, color: 'var(--fi)' }}>
-                    {d.dojos?.titre}
+                    {d.dojos?.title}
                     {d.dojos?.competences?.title && (
                       <span style={{ fontSize: 10, color: 'var(--mu)', fontWeight: 400, marginLeft: 6 }}>· {d.dojos.competences.title}</span>
                     )}
