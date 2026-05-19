@@ -67,7 +67,15 @@ export default function VendeurEvalPage() {
           </div>
         )}
 
-        {competences.map(comp => {
+        {[
+          { bloc: 'tunnel_vente',  label: 'BLOC 1 — TUNNEL DE VENTE' },
+          { bloc: 'transversales', label: 'BLOC 2 — COMPÉTENCES TRANSVERSALES' },
+        ].flatMap(({ bloc, label }) => [
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 12px' }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--forest)', letterSpacing: '1.2px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{label}</span>
+            <div style={{ flex: 1, height: 1, background: 'var(--forest)', opacity: .2 }} />
+          </div>,
+          ...competences.filter(c => c.bloc === bloc).map(comp => {
           const isOpen = openBlocks[comp.id]
           const scoredSous = comp.sous.filter(s => evaluations[s.id] > 0)
 
@@ -146,7 +154,8 @@ export default function VendeurEvalPage() {
               )}
             </div>
           )
-        })}
+        }),
+        ])}
       </div>
     </div>
   )

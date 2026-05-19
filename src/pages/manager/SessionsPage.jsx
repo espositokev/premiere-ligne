@@ -45,7 +45,7 @@ export default function SessionsPage() {
       supabase.from('coaching_sessions').select('*').eq('structure_id', profile.structure_id).order('scheduled_date', { ascending: false }),
       supabase.from('profiles').select('id, full_name, poste').eq('structure_id', profile.structure_id).eq('role', 'vendeur'),
       supabase.from('dojos').select('id, titre').eq('structure_id', profile.structure_id),
-      supabase.from('competences').select('id, title, numero').eq('structure_id', profile.structure_id).order('numero'),
+      supabase.from('competences').select('id, title, numero, bloc').eq('structure_id', profile.structure_id).order('numero'),
     ])
     const compIds = (compData || []).map(c => c.id)
     const { data: scData } = compIds.length
@@ -279,7 +279,16 @@ export default function SessionsPage() {
             <Field label="Compétence ciblée">
               <select value={form.sousCompId} onChange={e => setField('sousCompId', e.target.value)} style={inputStyle}>
                 <option value="">Aucune (optionnel)</option>
-                {comps.map(comp => (
+                <option disabled style={{ color: '#999', fontStyle: 'italic' }}>── Tunnel de vente ──</option>
+                {comps.filter(c => c.bloc === 'tunnel_vente').map(comp => (
+                  <optgroup key={comp.id} label={comp.title}>
+                    {(comp.sous_competences || []).map(sc => (
+                      <option key={sc.id} value={sc.id}>{sc.title}</option>
+                    ))}
+                  </optgroup>
+                ))}
+                <option disabled style={{ color: '#999', fontStyle: 'italic' }}>── Compétences transversales ──</option>
+                {comps.filter(c => c.bloc === 'transversales').map(comp => (
                   <optgroup key={comp.id} label={comp.title}>
                     {(comp.sous_competences || []).map(sc => (
                       <option key={sc.id} value={sc.id}>{sc.title}</option>

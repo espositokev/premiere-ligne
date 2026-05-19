@@ -129,7 +129,7 @@ export default function MatricePage() {
     if (!vendeur) return
     const today = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
-    const compBlocks = comps.map(comp => {
+    const renderComp = comp => {
       const validScores = comp.sous.map(sc => evals[sc.id]?.score || 0).filter(s => s > 0)
       const avg = validScores.length ? validScores.reduce((a, b) => a + b, 0) / validScores.length : 0
       const pct = Math.round((avg / 3) * 100)
@@ -153,7 +153,15 @@ export default function MatricePage() {
         <div class="prog-wrap" style="background:rgba(0,0,0,.1)"><div class="prog-bar" style="width:${pct}%;background:${lvl.bar}"></div></div>
         ${scRows}
       </div>`
-    }).join('')
+    }
+    const blocT = comps.filter(c => c.bloc === 'tunnel_vente')
+    const blocX = comps.filter(c => c.bloc === 'transversales')
+    const compBlocks = [
+      '<div class="sec-label">Bloc 1 — Tunnel de vente</div>',
+      ...blocT.map(renderComp),
+      '<div class="sec-label" style="margin-top:16px">Bloc 2 — Compétences transversales</div>',
+      ...blocX.map(renderComp),
+    ].join('')
 
     const priorityItems = comps.flatMap(c =>
       c.sous.filter(sc => evals[sc.id]?.is_priority).map(sc => {
@@ -420,7 +428,15 @@ export default function MatricePage() {
 
             {loadingVendeur && <div style={{ textAlign: 'center', padding: 40, color: 'var(--mu)' }}>Chargement…</div>}
 
-            {!loadingVendeur && comps.map(comp => {
+            {!loadingVendeur && [
+              { bloc: 'tunnel_vente',  label: 'BLOC 1 — TUNNEL DE VENTE' },
+              { bloc: 'transversales', label: 'BLOC 2 — COMPÉTENCES TRANSVERSALES' },
+            ].flatMap(({ bloc, label }) => [
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 12px' }}>
+                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--forest)', letterSpacing: '1.2px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{label}</span>
+                <div style={{ flex: 1, height: 1, background: 'var(--forest)', opacity: .2 }} />
+              </div>,
+              ...comps.filter(c => c.bloc === bloc).map(comp => {
               const { avg, pct, count, total } = compStats(comp)
               const isOpen = openBlocks[comp.id] !== false
               return (
@@ -496,7 +512,8 @@ export default function MatricePage() {
                   )}
                 </div>
               )
-            })}
+            }),
+            ])}
           </>
         )}
 
@@ -544,8 +561,13 @@ function DashView({ comps, evals, teamScores, vendeurs, scope, onScopeChange, pr
         {/* Barres */}
         <div style={{ background: '#fff', borderRadius: 14, boxShadow: 'var(--sh)', padding: '18px 20px' }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--fi)', marginBottom: 16 }}>Score moyen par compétence</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {comps.map(comp => {
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {[
+              { bloc: 'tunnel_vente',  label: 'Tunnel de vente' },
+              { bloc: 'transversales', label: 'Compétences transversales' },
+            ].flatMap(({ bloc, label }) => [
+              <div key={label} style={{ fontSize: 10, fontWeight: 700, color: 'var(--mu)', letterSpacing: '.8px', textTransform: 'uppercase', paddingTop: 10, paddingBottom: 4 }}>{label}</div>,
+              ...comps.filter(c => c.bloc === bloc).map(comp => {
               const avg = compAvg(comp)
               const pct = Math.round((avg / 3) * 100)
               const lvl = SCORES[Math.min(3, Math.round(avg))] || SCORES[0]
@@ -567,7 +589,8 @@ function DashView({ comps, evals, teamScores, vendeurs, scope, onScopeChange, pr
                   </div>
                 </div>
               )
-            })}
+            }),
+            ])}
           </div>
         </div>
 
