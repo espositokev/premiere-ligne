@@ -58,44 +58,54 @@ export default function BibliothequePage() {
   }
 
   async function handleSave() {
-    if (!form.titre.trim() || !form.competenceId) return
+    if (!form.titre.trim()) return
     setSaving(true)
-    try {
-      let fichier_url = modal?.dojo?.fichier_url || null
 
-      if (file) {
-        const ext = file.name.split('.').pop()
-        const path = `${profile.structure_id}/${Date.now()}.${ext}`
-        const { error: uploadErr } = await supabase.storage
-          .from('dojos-pptx')
-          .upload(path, file, { upsert: true })
-        if (!uploadErr) {
-          const { data: { publicUrl } } = supabase.storage
-            .from('dojos-pptx')
-            .getPublicUrl(path)
-          fichier_url = publicUrl
-        }
-      }
+    let fichier_url = modal?.dojo?.fichier_url || null
 
-      const payload = {
-        titre:         form.titre.trim(),
-        objectif:      form.objectif.trim() || null,
-        duree:         form.duree.trim() || null,
-        competence_id: form.competenceId,
-        fichier_url,
-        structure_id:  profile.structure_id,
-      }
-
-      if (modal?.type === 'edit') {
-        await supabase.from('dojos').update(payload).eq('id', modal.dojo.id)
+    if (file) {
+      const ext = file.name.split('.').pop()
+      const path = `${profile.structure_id}/${Date.now()}.${ext}`
+      const { error: uploadErr } = await supabase.storage
+        .from('dojos-pptx')
+        .upload(path, file, { upsert: true })
+      if (uploadErr) {
+        console.error('[Bibliothèque] upload error:', uploadErr)
       } else {
-        await supabase.from('dojos').insert(payload)
+        const { data: { publicUrl } } = supabase.storage
+          .from('dojos-pptx')
+          .getPublicUrl(path)
+        fichier_url = publicUrl
       }
-      await load()
-      setModal(null)
-    } catch (e) {
-      console.error(e)
     }
+
+    const payload = {
+      titre:        form.titre.trim(),
+      structure_id: profile.structure_id,
+    }
+    if (form.objectif.trim())  payload.objectif      = form.objectif.trim()
+    if (form.duree.trim())     payload.duree         = form.duree.trim()
+    if (form.competenceId)     payload.competence_id = form.competenceId
+    if (fichier_url)           payload.fichier_url   = fichier_url
+
+    let dbError
+    if (modal?.type === 'edit') {
+      const { error } = await supabase.from('dojos').update(payload).eq('id', modal.dojo.id)
+      dbError = error
+    } else {
+      const { error } = await supabase.from('dojos').insert(payload)
+      dbError = error
+    }
+
+    if (dbError) {
+      console.error('[Bibliothèque] DB error:', dbError)
+      alert(`Erreur Supabase : ${dbError.message}`)
+      setSaving(false)
+      return
+    }
+
+    await load()
+    setModal(null)
     setSaving(false)
   }
 
