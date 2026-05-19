@@ -19,6 +19,9 @@ import DefisPage from './pages/manager/DefisPage'
 import ClassementPage from './pages/manager/ClassementPage'
 import ParametresPage from './pages/manager/ParametresPage'
 
+// Shared pages
+import BibliothequePage from './pages/shared/BibliothequePage'
+
 // Vendeur pages
 import VendeurHomePage from './pages/vendeur/VendeurHomePage'
 import VendeurEvalPage from './pages/vendeur/VendeurEvalPage'
@@ -53,6 +56,9 @@ export default function App() {
             <Route path="/defis" element={<DefisPage />} />
             <Route path="/classement" element={<ClassementPage />} />
             <Route path="/parametres" element={<ParametresPage />} />
+
+            {/* Shared */}
+            <Route path="/bibliotheque" element={<BibliothequePage />} />
 
             {/* Vendeur */}
             <Route path="/mon-espace" element={<VendeurHomePage />} />

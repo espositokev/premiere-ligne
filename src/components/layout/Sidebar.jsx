@@ -7,7 +7,7 @@ import { Avatar } from '../Avatar'
 import {
   IconLayoutDashboard, IconUsers, IconGridDots, IconCalendar,
   IconBolt, IconTrophy, IconSettings, IconHome, IconTarget,
-  IconMedal, IconChevronDown,
+  IconMedal, IconChevronDown, IconBook2,
 } from '@tabler/icons-react'
 
 const MANAGER_NAV = [
@@ -18,6 +18,7 @@ const MANAGER_NAV = [
       { icon: IconUsers, label: 'Mon équipe', path: '/equipe' },
       { icon: IconGridDots, label: 'Matrice & Évals', path: '/matrice' },
       { icon: IconCalendar, label: 'Sessions de coaching', path: '/sessions' },
+      { icon: IconBook2, label: 'Bibliothèque Dojos', path: '/bibliotheque' },
     ],
   },
   {
@@ -42,6 +43,7 @@ const VENDEUR_NAV = [
       { icon: IconHome, label: 'Accueil', path: '/mon-espace' },
       { icon: IconGridDots, label: 'Mon évaluation', path: '/mon-evaluation' },
       { icon: IconTarget, label: 'Mes sessions', path: '/mon-plan' },
+      { icon: IconBook2, label: 'Bibliothèque Dojos', path: '/bibliotheque' },
       { icon: IconMedal, label: 'Badges', path: '/mes-badges' },
     ],
   },
