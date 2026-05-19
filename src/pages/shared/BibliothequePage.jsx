@@ -30,7 +30,7 @@ export default function BibliothequePage() {
         .eq('structure_id', profile.structure_id)
         .order('numero'),
       supabase.from('dojos')
-        .select('id, titre, objectif, duree, fichier_url, competence_id, created_at')
+        .select('*')
         .eq('structure_id', profile.structure_id)
         .order('created_at', { ascending: true }),
     ])
