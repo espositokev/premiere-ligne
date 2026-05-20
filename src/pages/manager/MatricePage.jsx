@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { IconChevronUp, IconChevronDown, IconPrinter, IconUsers, IconUser } from '@tabler/icons-react'
+import { IconChevronUp, IconChevronDown, IconPrinter, IconUsers, IconUser, IconPencil, IconTrash, IconPlus, IconX } from '@tabler/icons-react'
 
 const SCORES = [
   { value: 0, label: 'Non évalué', short: '—', bg: '#F8D7DA', color: '#842029', bar: '#F87171' },
@@ -27,6 +27,11 @@ export default function MatricePage() {
   const [openBlocks, setOpenBlocks] = useState({})
   const [loadingInit, setLoadingInit]     = useState(true)
   const [loadingVendeur, setLoadingVendeur] = useState(false)
+
+  const isAdmin = profile?.is_admin === true
+  const [editModal,  setEditModal]  = useState(null)
+  const [editForm,   setEditForm]   = useState({})
+  const [editSaving, setEditSaving] = useState(false)
 
   useEffect(() => { if (profile?.structure_id) init() }, [profile?.structure_id])
   useEffect(() => { if (selectedId) loadVendeur(selectedId) }, [selectedId])
@@ -98,6 +103,70 @@ export default function MatricePage() {
       vendeur_id: selectedId, sous_competence_id: scId, score: cur.score,
       is_priority: isPriority, evaluated_by: profile.id, evaluated_at: new Date().toISOString(),
     }, { onConflict: 'vendeur_id,sous_competence_id' })
+  }
+
+  // ── Admin edit helpers ─────────────────────────────────────────────────────
+
+  function openEditComp(comp) {
+    setEditForm({ title: comp.title, bloc: comp.bloc, numero: comp.numero })
+    setEditModal({ type: 'comp', comp })
+  }
+
+  function openAddComp(bloc) {
+    const nextNum = Math.max(0, ...comps.filter(c => c.bloc === bloc).map(c => c.numero)) + 1
+    setEditForm({ title: '', bloc, numero: nextNum })
+    setEditModal({ type: 'add-comp' })
+  }
+
+  function openEditSc(sc, comp) {
+    setEditForm({ title: sc.title, order_index: sc.order_index })
+    setEditModal({ type: 'sc', sc, comp })
+  }
+
+  function openAddSc(comp) {
+    setEditForm({ title: '', order_index: comp.sous.length + 1 })
+    setEditModal({ type: 'add-sc', comp })
+  }
+
+  async function saveEditComp() {
+    if (!editForm.title?.trim()) return
+    setEditSaving(true)
+    const payload = { title: editForm.title.trim(), bloc: editForm.bloc, numero: Number(editForm.numero) }
+    if (editModal.type === 'add-comp') {
+      await supabase.from('competences').insert({ ...payload, structure_id: profile.structure_id })
+    } else {
+      await supabase.from('competences').update(payload).eq('id', editModal.comp.id)
+    }
+    await init()
+    setEditModal(null)
+    setEditSaving(false)
+  }
+
+  async function saveEditSc() {
+    if (!editForm.title?.trim()) return
+    setEditSaving(true)
+    const payload = { title: editForm.title.trim(), order_index: Number(editForm.order_index) }
+    if (editModal.type === 'add-sc') {
+      await supabase.from('sous_competences').insert({ ...payload, competence_id: editModal.comp.id })
+    } else {
+      await supabase.from('sous_competences').update(payload).eq('id', editModal.sc.id)
+    }
+    await init()
+    setEditModal(null)
+    setEditSaving(false)
+  }
+
+  async function deleteComp(comp) {
+    if (!confirm(`Supprimer "${comp.title}" et toutes ses sous-compétences ?`)) return
+    await supabase.from('sous_competences').delete().eq('competence_id', comp.id)
+    await supabase.from('competences').delete().eq('id', comp.id)
+    await init()
+  }
+
+  async function deleteSc(sc) {
+    if (!confirm(`Supprimer la sous-compétence "${sc.title}" ?`)) return
+    await supabase.from('sous_competences').delete().eq('id', sc.id)
+    await init()
   }
 
   function compStats(comp) {
@@ -439,6 +508,7 @@ export default function MatricePage() {
               ...comps.filter(c => c.bloc === bloc).map(comp => {
               const { avg, pct, count, total } = compStats(comp)
               const isOpen = openBlocks[comp.id] !== false
+              const gridCols = isAdmin ? '1fr 150px 100px 64px' : '1fr 150px 100px'
               return (
                 <div key={comp.id} style={{ background: '#fff', borderRadius: 14, boxShadow: 'var(--sh)', overflow: 'hidden', marginBottom: 10 }}>
 
@@ -464,20 +534,31 @@ export default function MatricePage() {
                         {avg > 0 ? `${avg.toFixed(1)}/3` : '—'}
                       </span>
                     </div>
+                    {isAdmin && (
+                      <div style={{ display: 'flex', gap: 4 }} onClick={e => e.stopPropagation()}>
+                        <button onClick={() => openEditComp(comp)} title="Modifier" style={adminBtnLight}>
+                          <IconPencil size={13} />
+                        </button>
+                        <button onClick={() => deleteComp(comp)} title="Supprimer" style={adminBtnDanger}>
+                          <IconTrash size={13} />
+                        </button>
+                      </div>
+                    )}
                     {isOpen ? <IconChevronUp size={15} color="rgba(255,255,255,.6)" /> : <IconChevronDown size={15} color="rgba(255,255,255,.6)" />}
                   </div>
 
                   {/* Sous-compétences */}
                   {isOpen && (
                     <div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 150px 100px', padding: '6px 16px 4px', fontSize: 10, fontWeight: 600, color: 'var(--mu)', letterSpacing: '.5px', textTransform: 'uppercase', background: 'var(--bg)', borderBottom: '1px solid var(--ln)', gap: 10 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: gridCols, padding: '6px 16px 4px', fontSize: 10, fontWeight: 600, color: 'var(--mu)', letterSpacing: '.5px', textTransform: 'uppercase', background: 'var(--bg)', borderBottom: '1px solid var(--ln)', gap: 10 }}>
                         <span>Sous-compétence</span><span>Niveau</span><span>Action</span>
+                        {isAdmin && <span />}
                       </div>
                       {comp.sous.map((sc, idx) => {
                         const ev = evals[sc.id] || { score: 0, is_priority: false }
                         return (
                           <div key={sc.id}
-                            style={{ display: 'grid', gridTemplateColumns: '1fr 150px 100px', alignItems: 'center', padding: '9px 16px', gap: 10, borderBottom: idx < comp.sous.length - 1 ? '1px solid var(--ln)' : 'none', transition: 'background .1s' }}
+                            style={{ display: 'grid', gridTemplateColumns: gridCols, alignItems: 'center', padding: '9px 16px', gap: 10, borderBottom: idx < comp.sous.length - 1 ? '1px solid var(--ln)' : 'none', transition: 'background .1s' }}
                             onMouseEnter={e => e.currentTarget.style.background = '#FAFAFA'}
                             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                           >
@@ -505,16 +586,107 @@ export default function MatricePage() {
                               style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 9px', borderRadius: 7, fontSize: 11, fontWeight: 500, cursor: 'pointer', transition: 'all .15s', border: ev.is_priority ? '1px solid #F59E0B' : '1px solid var(--ln)', background: ev.is_priority ? '#FEF9C3' : '#fff', color: ev.is_priority ? '#92400E' : 'var(--mu)' }}>
                               {ev.is_priority ? '★' : '☆'} Priorité
                             </button>
+
+                            {/* Admin actions */}
+                            {isAdmin && (
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <button onClick={() => openEditSc(sc, comp)} title="Modifier" style={{ ...adminBtnNeutral }}>
+                                  <IconPencil size={13} />
+                                </button>
+                                <button onClick={() => deleteSc(sc)} title="Supprimer" style={{ ...adminBtnRed }}>
+                                  <IconTrash size={13} />
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )
                       })}
+                      {isAdmin && (
+                        <div style={{ padding: '8px 16px', borderTop: comp.sous.length > 0 ? '1px solid var(--ln)' : 'none' }}>
+                          <button onClick={() => openAddSc(comp)} style={addRowBtn}>
+                            <IconPlus size={12} /> Ajouter une sous-compétence
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               )
             }),
+              ...(isAdmin ? [
+                <div key={`add-comp-${bloc}`} style={{ marginBottom: 10 }}>
+                  <button onClick={() => openAddComp(bloc)} style={addBlocBtn}>
+                    <IconPlus size={14} /> Ajouter une compétence dans ce bloc
+                  </button>
+                </div>,
+              ] : []),
             ])}
           </>
+        )}
+
+        {/* ── Admin edit modal ── */}
+        {editModal && (
+          <div
+            style={{ position: 'fixed', inset: 0, background: 'rgba(7,40,32,.35)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(2px)' }}
+            onClick={() => setEditModal(null)}
+          >
+            <div
+              style={{ background: '#fff', borderRadius: 16, padding: 24, width: 440, boxShadow: '0 16px 48px rgba(7,40,32,.2)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--fi)' }}>
+                  {editModal.type === 'comp'     ? 'Modifier la compétence'       :
+                   editModal.type === 'add-comp' ? 'Ajouter une compétence'       :
+                   editModal.type === 'sc'       ? 'Modifier la sous-compétence'  :
+                                                   'Ajouter une sous-compétence'}
+                </div>
+                <button onClick={() => setEditModal(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--mu)', padding: 2 }}>
+                  <IconX size={18} />
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <EditField label="Libellé *">
+                  <input
+                    value={editForm.title || ''}
+                    onChange={e => setEditForm(p => ({ ...p, title: e.target.value }))}
+                    style={inputStyle}
+                    autoFocus
+                  />
+                </EditField>
+
+                {(editModal.type === 'comp' || editModal.type === 'add-comp') && (<>
+                  <EditField label="Bloc">
+                    <select value={editForm.bloc || ''} onChange={e => setEditForm(p => ({ ...p, bloc: e.target.value }))} style={inputStyle}>
+                      <option value="tunnel_vente">Bloc 1 — Tunnel de vente</option>
+                      <option value="transversales">Bloc 2 — Compétences transversales</option>
+                    </select>
+                  </EditField>
+                  <EditField label="Numéro d'ordre">
+                    <input type="number" min="1" value={editForm.numero || ''} onChange={e => setEditForm(p => ({ ...p, numero: e.target.value }))} style={inputStyle} />
+                  </EditField>
+                </>)}
+
+                {(editModal.type === 'sc' || editModal.type === 'add-sc') && (
+                  <EditField label="Ordre d'affichage">
+                    <input type="number" min="1" value={editForm.order_index || ''} onChange={e => setEditForm(p => ({ ...p, order_index: e.target.value }))} style={inputStyle} />
+                  </EditField>
+                )}
+
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
+                  <button onClick={() => setEditModal(null)} style={btnGhost}>Annuler</button>
+                  <button
+                    onClick={editModal.type === 'sc' || editModal.type === 'add-sc' ? saveEditSc : saveEditComp}
+                    disabled={editSaving || !editForm.title?.trim()}
+                    style={{ ...btnPrimary, opacity: !editForm.title?.trim() ? 0.5 : 1 }}
+                  >
+                    {editSaving ? 'Sauvegarde…' : 'Sauvegarder'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* ── Dashboard view ── */}
@@ -635,4 +807,62 @@ const btnGhost = {
   display: 'inline-flex', alignItems: 'center', gap: 6,
   padding: '7px 12px', borderRadius: 8, fontSize: 12, fontWeight: 500,
   cursor: 'pointer', border: '1px solid var(--ln)', background: '#fff', color: 'var(--fi)',
+}
+
+const btnPrimary = {
+  background: 'var(--forest)', color: 'var(--fluo)', border: 'none',
+  padding: '9px 17px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+  cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+  boxShadow: '0 2px 8px rgba(11,61,46,.2)',
+}
+
+const inputStyle = {
+  padding: '9px 12px', borderRadius: 9, border: '1px solid var(--ln)',
+  fontSize: 13, background: 'var(--bg)', fontFamily: 'inherit', width: '100%',
+  boxSizing: 'border-box',
+}
+
+const adminBtnLight = {
+  width: 28, height: 28, borderRadius: 7, border: 'none', cursor: 'pointer',
+  background: 'rgba(212,255,58,.18)', color: 'var(--fluo)',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+}
+
+const adminBtnDanger = {
+  width: 28, height: 28, borderRadius: 7, border: 'none', cursor: 'pointer',
+  background: 'rgba(255,80,80,.18)', color: '#FCA5A5',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+}
+
+const adminBtnNeutral = {
+  width: 28, height: 28, borderRadius: 7, border: '1px solid var(--ln)', cursor: 'pointer',
+  background: '#fff', color: 'var(--fi)',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+}
+
+const adminBtnRed = {
+  width: 28, height: 28, borderRadius: 7, border: '1px solid #FCA5A5', cursor: 'pointer',
+  background: '#FEF2F2', color: '#DC2626',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+}
+
+const addRowBtn = {
+  display: 'inline-flex', alignItems: 'center', gap: 5,
+  padding: '5px 10px', borderRadius: 7, fontSize: 11, fontWeight: 500,
+  cursor: 'pointer', border: '1px dashed var(--forest)', background: 'transparent', color: 'var(--forest)',
+}
+
+const addBlocBtn = {
+  display: 'inline-flex', alignItems: 'center', gap: 6,
+  padding: '7px 14px', borderRadius: 9, fontSize: 12, fontWeight: 500,
+  cursor: 'pointer', border: '1.5px dashed var(--forest)', background: 'transparent', color: 'var(--forest)',
+}
+
+function EditField({ label, children }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+      <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--fi)' }}>{label}</label>
+      {children}
+    </div>
+  )
 }
