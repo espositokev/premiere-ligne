@@ -29,6 +29,7 @@ export default function MatricePage() {
   const [loadingVendeur, setLoadingVendeur] = useState(false)
 
   const isAdmin = profile?.is_admin === true
+  console.log('[MatricePage] profile.is_admin =', profile?.is_admin, '→ isAdmin =', isAdmin)
   const [editModal,  setEditModal]  = useState(null)
   const [editForm,   setEditForm]   = useState({})
   const [editSaving, setEditSaving] = useState(false)
