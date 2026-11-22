@@ -6,10 +6,33 @@
 | 1 — Comptes, entreprises, rôles                     | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 2 — Référentiels et Dojos                           | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 3 — Évaluations et fiche commercial                 | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
-| 4 — Coachings                                       | À faire                                                                          |
+| 4 — Coachings                                       | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 5 — Plan de progrès et vue commercial               | À faire                                                                          |
 | 6 — Tableaux de bord, « voir en tant que », journal | À faire                                                                          |
 | 7 — RGPD et mise en production                      | À faire                                                                          |
+
+## Étape 4 — Coachings, demandes, séances de Dojo
+
+### Fait
+
+- Planifier un coaching (commercial, date, durée, terrain ou distance, lieu, 1 à 3 compétences, objectif), le modifier ou l'annuler avec motif ; email au commercial avec invitation agenda (.ics).
+- Page « Coachings » : à traiter (CR à rédiger avec ancienneté, demandes en attente, à venir sur 14 jours), vue semaine, clôturés, demandes.
+- Compte rendu enregistré automatiquement : contexte, observation par compétence (note « observée en coaching »), points forts, axes de progrès, plan d'action.
+- Clôture : CR figé, email au commercial, actions ajoutées à son plan de progrès ; commentaire du commercial ; réouverture par le responsable avec motif (journal).
+- Demandes de coaching par le commercial (email aux managers de son équipe), acceptation (formulaire prérempli) ou refus avec message.
+- Séances de Dojo : notées depuis un Dojo, une ou plusieurs personnes, visibles sur la fiche et dans « Mes coachings ».
+- Rappel quotidien par email des CR non rédigés 48 h après le coaching (Vercel Cron).
+- Fiche commercial : onglet Coachings, dernier et prochain coaching ; matrice avec les notes observées en coaching.
+
+### Vérifié
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test` (66 tests), `pnpm build`.
+- Tests SQL de RLS (33 + 8 vérifications pour l'étape 4) et tests de bout en bout ordinateur + mobile : CI verte.
+- Écrans vérifiés en capture sur téléphone (données d'exemple).
+
+### Reste à faire par le fondateur (mise en ligne)
+
+- Renseigner `CRON_SECRET` dans Vercel pour activer le rappel quotidien.
 
 ## Étape 3 — Évaluations et fiche commercial
 
