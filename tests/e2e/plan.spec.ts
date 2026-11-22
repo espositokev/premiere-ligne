@@ -35,6 +35,7 @@ test.describe("Plan de progrès", () => {
     await expect(page.getByRole("heading", { name: "Mon plan de progrès" })).toBeVisible();
     await expect(page.getByRole("heading", { name: /En retard/ })).toBeVisible();
 
+    await page.getByText("Ajouter une action", { exact: true }).click();
     await page.getByLabel("Ton action").fill("Proposer un essai à chaque client");
     await page.getByRole("button", { name: "Ajouter l'action" }).click();
     const card = page.locator('[data-action="Proposer un essai à chaque client"]');
