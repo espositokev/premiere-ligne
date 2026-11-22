@@ -17,7 +17,7 @@ Choix faits en l'absence d'information dans `docs/SPEC.md`, ou validés avec le 
 - **Actions destructives** : confirmation en deux appuis sur le même bouton plutôt qu'une fenêtre modale (plus rapide au pouce).
 - **Tests de la base en local** : sans Docker, `pnpm db:test:local` applique les migrations et les tests pgTAP sur un PostgreSQL ordinaire avec une émulation minimale de Supabase (`tests/db/supabase-shim.sql`). La CI les rejoue sur un vrai Supabase local.
 - **Types de la base écrits à la main** (`lib/supabase/types.ts`) en attendant de pouvoir lancer `supabase gen types`.
-- **Supabase en ligne** : le compte gratuit a déjà 2 projets actifs. Décision reportée par le fondateur : l'étape 1 est construite et testée sans base en ligne.
+- **Supabase en ligne** : le compte gratuit a déjà 2 projets actifs (Caleido, à ne jamais mettre en pause, et « petit-coeur », actif jusqu'au 7/12/2026). Décision du fondateur : rester en gratuit ; le projet Première Ligne sera créé (région Paris) après la mise en pause de « petit-coeur », à partir du 8/12/2026. D'ici là, les étapes sont construites et testées en CI sur Supabase local.
 
 ## 22/11/2026 — Étape 0
 
