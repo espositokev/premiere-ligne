@@ -29,8 +29,16 @@ test.describe("Matrices de compétences", () => {
     // Adaptation : ajout d'une sous-compétence au métier du client.
     await page.getByRole("link", { name: "Adapter la matrice" }).click();
     await expect(page.getByRole("heading", { name: "Matrice de compétences" })).toBeVisible();
-    await page.getByText("Je sais créer un accueil personnalisé avec mon client").click();
-    await page.getByText("Ajouter une sous-compétence").first().click();
+    const competency = page
+      .locator("details")
+      .filter({
+        has: page.locator("summary", {
+          hasText: "Je sais créer un accueil personnalisé avec mon client",
+        }),
+      })
+      .last();
+    await competency.locator("summary").first().click();
+    await competency.locator("summary", { hasText: "Ajouter une sous-compétence" }).first().click();
     await page.getByLabel("Nom court").filter({ visible: true }).fill("Accueil atelier");
     await page
       .getByRole("button", { name: "Ajouter une sous-compétence" })
