@@ -7,9 +7,25 @@
 | 2 — Référentiels et Dojos                           | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 3 — Évaluations et fiche commercial                 | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 4 — Coachings                                       | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
-| 5 — Plan de progrès et vue commercial               | À faire                                                                          |
+| 5 — Plan de progrès et vue commercial               | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 6 — Tableaux de bord, « voir en tant que », journal | À faire                                                                          |
 | 7 — RGPD et mise en production                      | À faire                                                                          |
+
+## Étape 5 — Plan de progrès et espace commercial
+
+### Fait
+
+- Plan de progrès : actions (titre, détails, compétence, échéance), statuts à faire / en cours / faite / abandonnée changés en un tap, retard en rouge en tête de liste, actions issues des coachings reliées au CR.
+- Commercial : onglet « Mon plan » ; ajout, modification, suppression de ses propres actions.
+- Manager : onglet « Plan de progrès » sur la fiche, page « Actions de l'équipe » filtrable (commercial, compétence, en retard, terminées) ; indicateur « actions en retard » sur la fiche.
+- « Ma progression » : encart « À faire pour toi » (CR à lire, actions en retard, prochain coaching, auto-évaluation commencée).
+- Matrice : niveaux détaillés de chaque sous-compétence, niveau actuel et prochaine marche.
+
+### Vérifié
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test` (74 tests), `pnpm build`.
+- Tests SQL de RLS (12 vérifications pour l'étape 5) et tests de bout en bout ordinateur + mobile : CI verte.
+- Écrans vérifiés en capture sur téléphone (données d'exemple).
 
 ## Étape 4 — Coachings, demandes, séances de Dojo
 
