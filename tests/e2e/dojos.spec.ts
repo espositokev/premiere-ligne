@@ -68,7 +68,7 @@ test.describe("Dojos", () => {
     await page.getByRole("button", { name: "Créer le Dojo" }).click();
     await expect(page.getByRole("heading", { name: "Modifier le Dojo" })).toBeVisible();
     await page
-      .getByLabel("Objectif pédagogique")
+      .locator("#dojo-objective")
       .fill("Le commercial sait décrocher en moins de 3 sonneries.");
     await page.getByRole("button", { name: "Enregistrer le Dojo" }).click();
     await expect(page.getByText("Dojo enregistré")).toBeVisible();

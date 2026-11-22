@@ -16,8 +16,8 @@ test.describe("Matrices de compétences", () => {
 
     // Les deux modèles fournis sont là.
     await page.goto("/admin/modeles");
-    await expect(page.getByText("Vente automobile")).toBeVisible();
-    await expect(page.getByText("Vente — socle général")).toBeVisible();
+    await expect(page.getByRole("link", { name: /^Vente automobile/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /^Vente — socle général/ })).toBeVisible();
 
     // Création du client avec le modèle automobile.
     await page.goto("/admin/entreprises/nouvelle");
