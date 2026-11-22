@@ -4,12 +4,39 @@
 | --------------------------------------------------- | -------------------------------------------------------------------------------- |
 | 0 — Socle                                           | ✅ Validée par le fondateur le 22/11/2026                                        |
 | 1 — Comptes, entreprises, rôles                     | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
-| 2 — Référentiels et Dojos                           | À faire                                                                          |
+| 2 — Référentiels et Dojos                           | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 3 — Évaluations et fiche commercial                 | À faire                                                                          |
 | 4 — Coachings                                       | À faire                                                                          |
 | 5 — Plan de progrès et vue commercial               | À faire                                                                          |
 | 6 — Tableaux de bord, « voir en tant que », journal | À faire                                                                          |
 | 7 — RGPD et mise en production                      | À faire                                                                          |
+
+## Étape 2 — Référentiels et Dojos
+
+### Fait
+
+- Matrices : 2 blocs (Tunnel de vente / Compétences transversales) → compétences → sous-compétences notées de 0 à 4 (« Expert »).
+- Deux modèles fournis : « Vente automobile » (matrice du fondateur, 40 sous-compétences) et « Vente — socle général » (39 sous-compétences, à relire).
+- Espace super admin « Modèles » : créer, dupliquer, modifier, publier un modèle.
+- À la création d'un client, le modèle est copié chez lui puis adaptable sur le terrain (ajout, renommage, désactivation ; une sous-compétence déjà utilisée ne peut pas être supprimée).
+- Dojos : bibliothèque Première Ligne (42 Dojos tirés des PowerPoint, copiés chez chaque client), création manuelle par les managers, statuts brouillon / à tester / validé / archivé, résumé lisible sur téléphone. Les commerciaux ne voient que les Dojos validés.
+- Génération de Dojo par IA selon la méthode Première Ligne, prête mais inactive tant que la clé Anthropic n'est pas renseignée.
+
+### Vérifié
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test` (43 tests), `pnpm build`.
+- Tests SQL de RLS (73 assertions) et tests de bout en bout ordinateur + mobile : CI verte.
+
+### À tester par le fondateur (dès que la base en ligne existe)
+
+- Créer un client avec la matrice automobile, ajouter une sous-compétence.
+- Ouvrir un Dojo de la bibliothèque sur téléphone, en créer un, le passer en « validé ».
+- Relire le modèle « Vente — socle général ».
+
+### Reste à faire par le fondateur
+
+- Créer une clé API Anthropic (plus tard) pour activer la génération de Dojos.
+- 7 Dojos de la bibliothèque contiennent des zones « à compléter » : les relire.
 
 ## Étape 1 — Comptes, entreprises, rôles
 
