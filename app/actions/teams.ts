@@ -53,15 +53,13 @@ async function setManagers(
     if (error) throw error;
   }
   if (toAdd.length) {
-    const { error } = await supabase
-      .from("team_managers")
-      .insert(
-        toAdd.map((membership_id) => ({
-          team_id: teamId,
-          membership_id,
-          organization_id: organizationId,
-        })),
-      );
+    const { error } = await supabase.from("team_managers").insert(
+      toAdd.map((membership_id) => ({
+        team_id: teamId,
+        membership_id,
+        organization_id: organizationId,
+      })),
+    );
     if (error) throw error;
   }
 }

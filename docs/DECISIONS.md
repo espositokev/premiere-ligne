@@ -2,6 +2,23 @@
 
 Choix faits en l'absence d'information dans `docs/SPEC.md`, ou validés avec le fondateur quand ils s'en écartent. Le plus récent en haut.
 
+## 22/11/2026 — Étape 1
+
+- **Cache Components désactivé** (`cacheComponents: false`) : presque toutes les pages dépendent de l'utilisateur connecté ; le rendu dynamique classique est plus simple et évite les pièges de mise en cache de données personnelles.
+- **Connexion uniquement par code email** (OTP Supabase à 6 chiffres) : pas de mot de passe, donc pas de pages « mot de passe oublié » ni « réinitialiser ». Le gabarit d'email est dans `supabase/templates/code-connexion.html` et doit être recopié dans Supabase en production (Authentication > Email Templates > Magic Link).
+- **Adresse inconnue à la connexion** : même message qu'une adresse connue (« si cette adresse a un compte… »), pour ne pas révéler qui a un compte.
+- **Acceptation d'invitation = connexion immédiate** : le serveur crée le compte, puis génère et vérifie aussitôt un lien magique, ce qui pose la session sans attendre de code.
+- **Une personne déjà membre d'une autre entreprise** réutilise son compte ; une personne désactivée puis réinvitée retrouve son appartenance (réactivée avec le nouveau rôle).
+- **Pas d'import CSV en V1** (décision du fondateur à l'étape 0).
+- **Emails** : gabarits HTML en TypeScript (`lib/email/templates.ts`) plutôt que React Email, pour limiter les dépendances ; envoi par l'API HTTP de Resend. Sans `RESEND_API_KEY`, l'email est simulé (journaux serveur) ; avec `DEV_EMAIL_REDIRECT`, tout part vers cette adresse unique.
+- **Clés étrangères composites** (`(team_id, organization_id)`, `(membership_id, organization_id)`) : la base interdit de rattacher une personne à l'équipe d'une autre entreprise.
+- **Colonnes modifiables restreintes** par des droits par colonne (ex. un utilisateur ne peut modifier que prénom, nom, téléphone de son profil), en plus de la RLS et de déclencheurs de garde (statut d'entreprise, drapeau super admin).
+- **Le journal d'activité et le journal des emails** ne sont écrits qu'avec la clé serveur, après l'action de l'utilisateur ; un échec d'écriture du journal ne bloque pas l'action.
+- **Actions destructives** : confirmation en deux appuis sur le même bouton plutôt qu'une fenêtre modale (plus rapide au pouce).
+- **Tests de la base en local** : sans Docker, `pnpm db:test:local` applique les migrations et les tests pgTAP sur un PostgreSQL ordinaire avec une émulation minimale de Supabase (`tests/db/supabase-shim.sql`). La CI les rejoue sur un vrai Supabase local.
+- **Types de la base écrits à la main** (`lib/supabase/types.ts`) en attendant de pouvoir lancer `supabase gen types`.
+- **Supabase en ligne** : le compte gratuit a déjà 2 projets actifs. Décision reportée par le fondateur : l'étape 1 est construite et testée sans base en ligne.
+
 ## 22/11/2026 — Étape 0
 
 ### Validé avec le fondateur

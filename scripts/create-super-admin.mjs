@@ -52,15 +52,13 @@ if (!userId) {
     process.exit(1);
   }
   userId = data.user.id;
-  const { error: profileError } = await supabase
-    .from("profiles")
-    .insert({
-      id: userId,
-      email: normalized,
-      first_name: firstName,
-      last_name: lastName,
-      is_super_admin: true,
-    });
+  const { error: profileError } = await supabase.from("profiles").insert({
+    id: userId,
+    email: normalized,
+    first_name: firstName,
+    last_name: lastName,
+    is_super_admin: true,
+  });
   if (profileError) {
     console.error("Création du profil impossible :", profileError.message);
     process.exit(1);
