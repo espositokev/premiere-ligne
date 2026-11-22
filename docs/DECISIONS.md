@@ -2,6 +2,17 @@
 
 Choix faits en l'absence d'information dans `docs/SPEC.md`, ou validés avec le fondateur quand ils s'en écartent. Le plus récent en haut.
 
+## 22/11/2026 — Étapes 6 et 7 (pilotage, RGPD, démonstration)
+
+- **Tableaux de bord** sur la page d'accueil de l'espace : manager (son équipe) et responsable (toute l'entreprise, par équipe, coachings clôturés par mois et par manager, CR sous 48 h, couverture à 90 jours). Radar d'équipe par compétence (comme le radar individuel). Exports CSV au format Excel français (« ; », UTF-8), journalisés.
+- **« Voir en tant que »** : cookie signé (PREVIEW_COOKIE_SECRET, 1 h) + jeton d'accès court au nom de la personne regardée, signé avec le secret JWT de Supabase (SUPABASE_JWT_SECRET) : la base applique exactement ses droits. Ce client refuse toute écriture (les formulaires affichent une erreur), les opérations RGPD sont refusées pendant un aperçu, et les droits du vrai connecté sont revérifiés à chaque requête. Désactivé si l'un des deux secrets manque. La déconnexion et la connexion utilisent toujours la vraie session.
+- **Journal** : `/admin/journal` (tout) et Paramètres > Journal (son entreprise), filtrable par famille.
+- **Paramètres d'entreprise** (Paramètres > Fonctionnement) : délai « sans coaching » (45 j par défaut), auto-évaluation et demandes de coaching activables ; les deux interrupteurs sont appliqués par la base (RLS).
+- **RGPD** : export JSON d'une personne (fiche utilisateur) et de toute l'entreprise (super admin) ; anonymisation d'une personne désactivée partout (nom, email, notes privées ; compte de connexion neutralisé) ; archivage puis suppression définitive possible 30 jours après, en retapant l'adresse de l'entreprise. Durée de conservation automatique (24 mois) : reportée.
+- **Limitation de débit** : 50 invitations par personne et par heure ; la connexion par code est limitée par Supabase.
+- **Données de démonstration** : `scripts/seed-demo.mjs` (et non `seed.sql`, car il faut créer des comptes de connexion), sur la matrice automobile ; refuse de tourner sur une base Supabase distante sans ALLOW_DEMO_SEED=1.
+- **Visite guidée** : le workflow « Visite guidée » lance l'application avec ces données et photographie chaque écran (téléphone + ordinateur) sur la branche `visite-guidee`.
+
 ## 22/11/2026 — Étape 5 (plan de progrès, espace commercial)
 
 - **Adresses** : plan du commercial sous `/e/[slug]/moi/plan` (onglet « Mon plan » du menu commercial), actions de l'équipe sous `/e/[slug]/equipe/actions` (au lieu de `/e/[slug]/actions`), pour que l'onglet « Mon équipe » reste allumé ; plan d'un commercial = onglet « Plan de progrès » de sa fiche.

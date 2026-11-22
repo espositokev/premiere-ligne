@@ -8,8 +8,28 @@
 | 3 — Évaluations et fiche commercial                 | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 4 — Coachings                                       | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 5 — Plan de progrès et vue commercial               | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
-| 6 — Tableaux de bord, « voir en tant que », journal | À faire                                                                          |
-| 7 — RGPD et mise en production                      | À faire                                                                          |
+| 6 — Tableaux de bord, « voir en tant que », journal | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
+| 7 — RGPD et mise en production                      | 🔨 Code prêt ; mise en production le 8 décembre (actions du fondateur)           |
+
+## Étapes 6 et 7 — Pilotage, RGPD, démonstration
+
+### Fait
+
+- Tableaux de bord manager, responsable et super admin, exports CSV.
+- « Voir en tant que » en lecture seule, journalisé ; journal d'activité consultable.
+- Paramètres d'entreprise appliqués par la base ; export, anonymisation, archivage puis purge d'une entreprise.
+- Données de démonstration et visite guidée photographiée automatiquement (27 écrans × 2 appareils).
+
+### Vérifié
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test` (85 tests), `pnpm build`.
+- Tests SQL de RLS (11 vérifications pour ces étapes) et tests de bout en bout ordinateur + mobile : CI verte.
+
+### Reste à faire par le fondateur (mise en ligne, 8 décembre)
+
+- Mettre « petit-coeur » en pause, puis créer le projet Supabase (je prépare tout, il valide).
+- Renseigner dans Vercel : clés Supabase, `SUPABASE_JWT_SECRET`, `PREVIEW_COOKIE_SECRET`, `CRON_SECRET`.
+- Plus tard : compte Resend et domaine premiereligne-app.fr, passage à Vercel Pro avant le premier client.
 
 ## Étape 5 — Plan de progrès et espace commercial
 
