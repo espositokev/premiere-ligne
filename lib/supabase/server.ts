@@ -12,8 +12,9 @@ import type { Database } from "./types";
  * agissant avec la session de l'utilisateur connecté : la RLS s'applique.
  */
 export async function createClient() {
-  const env = publicEnv();
+  // Lire les cookies en premier : la page devient dynamique (jamais pré-rendue au build).
   const cookieStore = await cookies();
+  const env = publicEnv();
 
   return createServerClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,

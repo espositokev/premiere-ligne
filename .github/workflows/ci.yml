@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [master, main, "etape-*"]
   pull_request:
 
 concurrency:
@@ -28,7 +28,7 @@ jobs:
       - run: pnpm build
 
   e2e:
-    name: Tests de bout en bout (ordinateur + mobile)
+    name: Tests de bout en bout (ordinateur + mobile, avec Supabase local)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +38,19 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Démarrer Supabase en local (avec la boîte mail de test)
+        run: pnpm exec supabase start -x studio,imgproxy,vector,logflare,supavisor,edge-runtime,realtime,storage-api
+      - name: Exposer les clés locales à l'application
+        run: |
+          pnpm exec supabase status -o env > /tmp/supabase.env
+          set -a; source /tmp/supabase.env; set +a
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            echo "MAILPIT_URL=${MAILPIT_URL:-${INBUCKET_URL:-http://127.0.0.1:54324}}"
+            echo "APP_URL=http://localhost:3100"
+          } >> "$GITHUB_ENV"
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v4

@@ -1,27 +1,35 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { Logo } from "@/components/brand/logo";
-import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { safeNextPath } from "@/lib/domain/redirects";
+
+import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "Connexion" };
 
-// Page provisoire : la connexion par code email arrive à l'étape 1.
-export default function LoginPlaceholderPage() {
+export default async function LoginPage({ searchParams }: PageProps<"/connexion">) {
+  const params = await searchParams;
+  const next = safeNextPath(params.suivant);
+
+  // Déjà connecté : on file directement vers son espace.
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && (await getCurrentUser())) {
+    redirect(next ?? "/espaces");
+  }
+
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center px-4 py-16">
-      <Card className="w-full text-center">
-        <Logo kind="mark" className="mx-auto mb-4 h-10" />
-        <CardTitle>Connexion bientôt disponible</CardTitle>
-        <CardDescription className="mt-2">
-          L&apos;accès à la plateforme est en cours de préparation. Vous recevrez une invitation par
-          email dès l&apos;ouverture de votre espace.
-        </CardDescription>
-        <Button asChild variant="outline" className="mt-6">
-          <Link href="/">Retour à l&apos;accueil</Link>
-        </Button>
+    <div className="mx-auto flex max-w-md flex-col px-4 py-12 sm:py-16">
+      <Card className="w-full">
+        <Logo kind="mark" className="mb-4 h-9" />
+        <h1 className="text-2xl font-bold">Connexion</h1>
+        <p className="mt-1 mb-6 text-muted">Accédez à votre espace Première Ligne.</p>
+        <LoginForm next={next} />
       </Card>
+      <p className="mt-6 text-center text-sm text-muted">
+        Pas encore de compte ? L&apos;accès se fait sur invitation de votre responsable.
+      </p>
     </div>
   );
 }
