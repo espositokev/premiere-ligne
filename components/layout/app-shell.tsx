@@ -1,7 +1,10 @@
 "use client";
 
 import {
+  BookOpen,
   Building2,
+  Grid3x3,
+  Settings,
   House,
   LogOut,
   TrendingUp,
@@ -16,7 +19,7 @@ import type { ReactNode } from "react";
 
 import { signOut } from "@/app/actions/auth";
 import { Logo } from "@/components/brand/logo";
-import { isNavItemActive, type NavIcon, type NavItem } from "@/lib/domain/navigation";
+import { activeNavHref, type NavIcon, type NavItem } from "@/lib/domain/navigation";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<NavIcon | "building", LucideIcon> = {
@@ -27,6 +30,9 @@ const ICONS: Record<NavIcon | "building", LucideIcon> = {
   progress: TrendingUp,
   profile: UserRound,
   building: Building2,
+  matrix: Grid3x3,
+  dojo: BookOpen,
+  settings: Settings,
 };
 
 export type ShellNavItem = Omit<NavItem, "icon"> & { icon: NavIcon | "building" };
@@ -56,6 +62,7 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname();
   const mobileNav = nav.slice(0, 4);
+  const currentHref = activeNavHref(nav, pathname);
 
   return (
     <div className="flex min-h-full flex-1">
@@ -71,7 +78,7 @@ export function AppShell({
           <ul className="flex flex-col gap-1">
             {nav.map((item) => {
               const Icon = ICONS[item.icon];
-              const active = isNavItemActive(item, pathname);
+              const active = item.href === currentHref;
               return (
                 <li key={item.href}>
                   <Link
@@ -132,7 +139,7 @@ export function AppShell({
             <ul className="mx-auto flex max-w-lg">
               {mobileNav.map((item) => {
                 const Icon = ICONS[item.icon];
-                const active = isNavItemActive(item, pathname);
+                const active = item.href === currentHref;
                 return (
                   <li key={item.href} className="flex-1">
                     <Link

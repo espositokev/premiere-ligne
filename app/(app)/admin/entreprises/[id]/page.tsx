@@ -13,10 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { EmptyState, PageHeader, SectionTitle } from "@/components/ui/page";
 import { requireSuperAdmin } from "@/lib/auth/current-user";
+import { listTemplates, loadOrganizationTree } from "@/lib/data/framework";
 import { listInvitations, listMembers, listTeams } from "@/lib/data/organization";
+import { countTree } from "@/lib/domain/framework";
 import { uuidSchema } from "@/lib/validation/schemas";
 import { createClient } from "@/lib/supabase/server";
 
+import { ApplyTemplateForm } from "@/components/framework/apply-template-form";
 import { STATUS_LABELS } from "../../organization-table";
 
 export const metadata: Metadata = { title: "Fiche entreprise" };
@@ -36,11 +39,14 @@ export default async function OrganizationDetailPage({
     .maybeSingle();
   if (!organization) notFound();
 
-  const [members, invitations, teams] = await Promise.all([
+  const [members, invitations, teams, framework, templates] = await Promise.all([
     listMembers(organization.id),
     listInvitations(organization.id),
     listTeams(organization.id),
+    loadOrganizationTree(organization.id),
+    listTemplates({ publishedOnly: true }),
   ]);
+  const frameworkCounts = framework ? countTree(framework.tree) : null;
   const leaders = members.filter((m) => m.role !== "sales_rep");
   const repCount = members.filter((m) => m.role === "sales_rep" && m.active).length;
 
@@ -113,6 +119,29 @@ export default async function OrganizationDetailPage({
         </div>
 
         <aside className="flex flex-col gap-4">
+          <Card>
+            <CardTitle>Matrice de compétences</CardTitle>
+            {framework && frameworkCounts ? (
+              <>
+                <CardDescription className="mt-2 mb-4 text-sm">
+                  {frameworkCounts.competencies} compétences · {frameworkCounts.skills}{" "}
+                  sous-compétences
+                </CardDescription>
+                <Button asChild variant="outline" size="sm">
+                  <Link href={`/e/${organization.slug}/parametres/referentiel`}>
+                    Adapter la matrice
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <div className="mt-3">
+                <ApplyTemplateForm
+                  organizationId={organization.id}
+                  templates={templates.map((t) => ({ id: t.id, name: t.name }))}
+                />
+              </div>
+            )}
+          </Card>
           <Card>
             <CardTitle>Statut de l&apos;espace</CardTitle>
             <CardDescription className="mt-2 mb-4 text-sm">

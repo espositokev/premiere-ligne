@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
 import { requireSuperAdmin } from "@/lib/auth/current-user";
+import { listTemplates } from "@/lib/data/framework";
 
 import { NewOrganizationForm } from "./new-organization-form";
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = { title: "Nouvelle entreprise" };
 
 export default async function NewOrganizationPage() {
   await requireSuperAdmin();
+  const templates = await listTemplates({ publishedOnly: true });
   return (
     <>
       <Link
@@ -25,7 +27,7 @@ export default async function NewOrganizationPage() {
         description="Vous inviterez ensuite son responsable et ses managers."
       />
       <Card className="max-w-xl">
-        <NewOrganizationForm />
+        <NewOrganizationForm templates={templates.map((t) => ({ id: t.id, name: t.name }))} />
       </Card>
     </>
   );

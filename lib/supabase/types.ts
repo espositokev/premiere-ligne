@@ -105,6 +105,99 @@ type EmailLogRow = {
   created_at: string;
 };
 
+
+type LevelDescriptors = {
+  level_0: string | null;
+  level_1: string | null;
+  level_2: string | null;
+  level_3: string | null;
+  level_4: string | null;
+};
+
+type FrameworkTemplateRow = {
+  id: string;
+  name: string;
+  description: string | null;
+  published: boolean;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type TemplateBlockRow = {
+  id: string;
+  template_id: string;
+  name: string;
+  position: number;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type TemplateCompetencyRow = {
+  id: string;
+  block_id: string;
+  name: string;
+  statement: string | null;
+  position: number;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type TemplateSkillRow = LevelDescriptors & {
+  id: string;
+  competency_id: string;
+  name: string;
+  statement: string | null;
+  position: number;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type FrameworkRow = {
+  id: string;
+  organization_id: string;
+  name: string;
+  description: string | null;
+  source_template_id: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type BlockRow = {
+  id: string;
+  organization_id: string;
+  framework_id: string;
+  name: string;
+  position: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type CompetencyRow = {
+  id: string;
+  organization_id: string;
+  block_id: string;
+  name: string;
+  statement: string | null;
+  position: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type SkillRow = LevelDescriptors & {
+  id: string;
+  organization_id: string;
+  competency_id: string;
+  name: string;
+  statement: string | null;
+  position: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string | null;
+};
+
 /** Champs générés par la base : facultatifs à l'insertion. */
 type Generated = "id" | "created_at" | "updated_at";
 type InsertOf<Row, Optional extends keyof Row> = Omit<Row, Optional> & Partial<Pick<Row, Optional>>;
@@ -224,6 +317,81 @@ export type Database = {
         Update: Partial<EmailLogRow>;
         Relationships: [];
       };
+      framework_templates: {
+        Row: FrameworkTemplateRow;
+        Insert: InsertOf<FrameworkTemplateRow, Generated | "description" | "published">;
+        Update: Partial<FrameworkTemplateRow>;
+        Relationships: [];
+      };
+      template_blocks: {
+        Row: TemplateBlockRow;
+        Insert: InsertOf<TemplateBlockRow, Generated | "position">;
+        Update: Partial<TemplateBlockRow>;
+        Relationships: [
+          Rel<"template_blocks_template_id_fkey", ["template_id"], "framework_templates", ["id"]>,
+        ];
+      };
+      template_competencies: {
+        Row: TemplateCompetencyRow;
+        Insert: InsertOf<TemplateCompetencyRow, Generated | "position" | "statement">;
+        Update: Partial<TemplateCompetencyRow>;
+        Relationships: [
+          Rel<"template_competencies_block_id_fkey", ["block_id"], "template_blocks", ["id"]>,
+        ];
+      };
+      template_skills: {
+        Row: TemplateSkillRow;
+        Insert: InsertOf<TemplateSkillRow, Generated | "position" | "statement" | keyof LevelDescriptors>;
+        Update: Partial<TemplateSkillRow>;
+        Relationships: [
+          Rel<"template_skills_competency_id_fkey", ["competency_id"], "template_competencies", ["id"]>,
+        ];
+      };
+      frameworks: {
+        Row: FrameworkRow;
+        Insert: InsertOf<FrameworkRow, Generated | "description" | "source_template_id" | "active">;
+        Update: Partial<FrameworkRow>;
+        Relationships: [];
+      };
+      blocks: {
+        Row: BlockRow;
+        Insert: InsertOf<BlockRow, Generated | "position" | "active">;
+        Update: Partial<BlockRow>;
+        Relationships: [
+          Rel<
+            "blocks_framework_id_organization_id_fkey",
+            ["framework_id", "organization_id"],
+            "frameworks",
+            ["id", "organization_id"]
+          >,
+        ];
+      };
+      competencies: {
+        Row: CompetencyRow;
+        Insert: InsertOf<CompetencyRow, Generated | "position" | "active" | "statement">;
+        Update: Partial<CompetencyRow>;
+        Relationships: [
+          Rel<
+            "competencies_block_id_organization_id_fkey",
+            ["block_id", "organization_id"],
+            "blocks",
+            ["id", "organization_id"]
+          >,
+        ];
+      };
+      skills: {
+        Row: SkillRow;
+        Insert: InsertOf<SkillRow, Generated | "position" | "active" | "statement" | keyof LevelDescriptors>;
+        Update: Partial<SkillRow>;
+        Relationships: [
+          Rel<
+            "skills_competency_id_organization_id_fkey",
+            ["competency_id", "organization_id"],
+            "competencies",
+            ["id", "organization_id"]
+          >,
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -232,6 +400,12 @@ export type Database = {
       is_org_admin: { Args: { org: string }; Returns: boolean };
       can_manage_member: { Args: { member: string }; Returns: boolean };
       can_view_member: { Args: { member: string }; Returns: boolean };
+      copy_template_to_organization: { Args: { template: string; org: string }; Returns: string };
+      is_skill_used: { Args: { skill: string }; Returns: boolean };
+      is_competency_used: { Args: { competency: string }; Returns: boolean };
+      is_block_used: { Args: { block: string }; Returns: boolean };
+      used_skill_ids: { Args: { org: string }; Returns: string[] };
+      duplicate_template: { Args: { template: string; new_name: string }; Returns: string };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

@@ -19,7 +19,10 @@ export type AuditAction =
   | "member.reactivated"
   | "team.created"
   | "team.updated"
-  | "profile.updated";
+  | "profile.updated"
+  | "template.created"
+  | "template.deleted"
+  | "framework.created";
 
 /**
  * Journal d'activité (§4.12). Écrit avec la clé serveur : les utilisateurs ne peuvent pas

@@ -1,6 +1,7 @@
 import { canAdministerOrg, type SpaceRole } from "./roles";
 
-export type NavIcon = "home" | "users" | "teams" | "team" | "progress" | "profile";
+export type NavIcon =
+  "home" | "users" | "teams" | "team" | "progress" | "profile" | "matrix" | "dojo" | "settings";
 
 export type NavItem = {
   label: string;
@@ -34,8 +35,8 @@ export function orgNavigation(slug: string, role: SpaceRole): NavItem[] {
   ];
 
   if (canAdministerOrg(role)) {
-    items.push({ label: "Utilisateurs", href: `${base}/parametres/utilisateurs`, icon: "users" });
-    items.push({ label: "Équipes", href: `${base}/parametres/equipes`, icon: "teams" });
+    items.push({ label: "Matrice", href: `${base}/parametres/referentiel`, icon: "matrix" });
+    items.push({ label: "Paramètres", href: `${base}/parametres`, icon: "settings" });
   } else {
     items.push({ label: "Profil", href: "/profil", icon: "profile" });
   }
@@ -46,6 +47,16 @@ export function orgNavigation(slug: string, role: SpaceRole): NavItem[] {
 export function isNavItemActive(item: Pick<NavItem, "href" | "exact">, pathname: string): boolean {
   if (item.exact) return pathname === item.href;
   return pathname === item.href || pathname.startsWith(`${item.href}/`);
+}
+
+/** Entrée active : celle dont l'adresse correspond le plus précisément à la page affichée. */
+export function activeNavHref(
+  items: Pick<NavItem, "href" | "exact">[],
+  pathname: string,
+): string | null {
+  const matches = items.filter((item) => isNavItemActive(item, pathname));
+  if (matches.length === 0) return null;
+  return matches.reduce((best, item) => (item.href.length > best.href.length ? item : best)).href;
 }
 
 /** Page d'arrivée après connexion. */

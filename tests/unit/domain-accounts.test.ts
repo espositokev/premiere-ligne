@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import { invitationExpiry, invitationState } from "@/lib/domain/invitations";
-import { homePathFor, isNavItemActive, orgNavigation } from "@/lib/domain/navigation";
+import {
+  activeNavHref,
+  homePathFor,
+  isNavItemActive,
+  orgNavigation,
+} from "@/lib/domain/navigation";
 import { safeNextPath } from "@/lib/domain/redirects";
 import { canAdministerOrg, invitableRoles } from "@/lib/domain/roles";
 import { slugify } from "@/lib/domain/slug";
@@ -74,6 +79,15 @@ describe("navigation", () => {
         "/e/acme/parametres/utilisateurs/123",
       ),
     ).toBe(true);
+  });
+
+  it("ne surligne que l'entrée la plus précise", () => {
+    const items = orgNavigation("acme", "org_admin");
+    expect(activeNavHref(items, "/e/acme/parametres/referentiel")).toBe(
+      "/e/acme/parametres/referentiel",
+    );
+    expect(activeNavHref(items, "/e/acme/parametres/equipes")).toBe("/e/acme/parametres");
+    expect(activeNavHref(items, "/e/acme")).toBe("/e/acme");
   });
 
   it("envoie chacun vers la bonne page après connexion", () => {

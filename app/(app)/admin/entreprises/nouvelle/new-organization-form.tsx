@@ -3,12 +3,12 @@
 import { useActionState, useState } from "react";
 
 import { createOrganization } from "@/app/actions/organizations";
-import { Field, FormFeedback, SubmitButton } from "@/components/ui/form-controls";
+import { Field, FormFeedback, Select, SubmitButton } from "@/components/ui/form-controls";
 import { Input } from "@/components/ui/input";
 import { slugify } from "@/lib/domain/slug";
 import { initialFormState } from "@/lib/forms";
 
-export function NewOrganizationForm() {
+export function NewOrganizationForm({ templates }: { templates: { id: string; name: string }[] }) {
   const [state, action] = useActionState(createOrganization, initialFormState);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -48,6 +48,20 @@ export function NewOrganizationForm() {
             setSlug(slugify(event.target.value));
           }}
         />
+      </Field>
+      <Field
+        label="Matrice de départ"
+        htmlFor="org-template"
+        hint="Copiée dans l'espace du client ; vous l'adapterez ensemble sur le terrain."
+      >
+        <Select id="org-template" name="template_id" defaultValue={templates[0]?.id ?? ""}>
+          {templates.map((template) => (
+            <option key={template.id} value={template.id}>
+              {template.name}
+            </option>
+          ))}
+          <option value="">Aucune pour l&apos;instant</option>
+        </Select>
       </Field>
       <FormFeedback state={state} />
       <div>

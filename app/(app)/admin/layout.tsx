@@ -4,6 +4,7 @@ import { getMySpaces, requireSuperAdmin } from "@/lib/auth/current-user";
 const NAV: ShellNavItem[] = [
   { label: "Tableau de bord", href: "/admin", icon: "home", exact: true },
   { label: "Entreprises", href: "/admin/entreprises", icon: "building" },
+  { label: "Modèles", href: "/admin/modeles", icon: "matrix" },
   { label: "Profil", href: "/profil", icon: "profile" },
 ];
 

@@ -40,13 +40,23 @@ export async function createOrganization(_prev: FormState, formData: FormData): 
     return formError(UNEXPECTED_ERROR);
   }
 
+  // Modèle de matrice choisi à la création : copié dans l'entreprise (§3.1).
+  const templateId = uuidSchema.safeParse(formData.get("template_id"));
+  if (templateId.success) {
+    const { error: copyError } = await supabase.rpc("copy_template_to_organization", {
+      template: templateId.data,
+      org: data.id,
+    });
+    if (copyError) console.error("[entreprise] copie du modèle", copyError.message);
+  }
+
   await audit({
     action: "organization.created",
     actorUserId: user.id,
     organizationId: data.id,
     targetType: "organization",
     targetId: data.id,
-    details: { name: parsed.data.name },
+    details: { name: parsed.data.name, template_id: templateId.success ? templateId.data : null },
   });
   revalidatePath("/admin", "layout");
   redirect(`/admin/entreprises/${data.id}`);
