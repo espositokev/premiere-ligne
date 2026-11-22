@@ -11,12 +11,14 @@ export function MemberProgress({
   radar,
   latest,
   self,
+  observed,
   selfVoice = false,
 }: {
   tree: FrameworkTree;
   radar: RadarPoint[];
   latest: Map<string, LatestScore>;
   self: Map<string, LatestScore>;
+  observed?: Map<string, { score: number }>;
   selfVoice?: boolean;
 }) {
   const hasScores = latest.size > 0 || self.size > 0;
@@ -34,7 +36,13 @@ export function MemberProgress({
           />
         </Card>
       ) : null}
-      <SkillMatrix tree={tree} latest={latest} self={self} selfLabel={selfVoice ? "Moi" : "Auto"} />
+      <SkillMatrix
+        tree={tree}
+        latest={latest}
+        self={self}
+        observed={observed}
+        selfLabel={selfVoice ? "Moi" : "Auto"}
+      />
     </div>
   );
 }

@@ -1,57 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import {
-  admin,
-  backendAvailable,
-  createUser,
-  loginWithCode,
-  uniqueSuffix,
-} from "./support/backend";
-
-/** Entreprise avec la matrice automobile, une équipe, son manager et un commercial. */
-async function seedTeam(id: string) {
-  const client = admin();
-  const { data: org } = await client
-    .from("organizations")
-    .insert({ name: `Éval ${id}`, slug: `eval-${id}` })
-    .select("id, slug")
-    .single();
-  const { data: template } = await client
-    .from("framework_templates")
-    .select("id")
-    .eq("name", "Vente automobile")
-    .single();
-  await client.rpc("copy_template_to_organization", { template: template!.id, org: org!.id });
-  const { data: team } = await client
-    .from("teams")
-    .insert({ organization_id: org!.id, name: "Bordeaux Lac" })
-    .select("id")
-    .single();
-
-  const managerEmail = `manager.eval.${id}@test.local`;
-  const repEmail = `rep.eval.${id}@test.local`;
-  const managerId = await createUser({
-    email: managerEmail,
-    firstName: "Julien",
-    lastName: "Petit",
-  });
-  const repId = await createUser({ email: repEmail, firstName: "Léo", lastName: "Bernard" });
-  const { data: manager } = await client
-    .from("memberships")
-    .insert({ organization_id: org!.id, user_id: managerId, role: "manager" })
-    .select("id")
-    .single();
-  const { data: rep } = await client
-    .from("memberships")
-    .insert({ organization_id: org!.id, user_id: repId, role: "sales_rep", team_id: team!.id })
-    .select("id")
-    .single();
-  await client
-    .from("team_managers")
-    .insert({ team_id: team!.id, membership_id: manager!.id, organization_id: org!.id });
-
-  return { slug: org!.slug, managerEmail, repEmail, repId: rep!.id };
-}
+import { backendAvailable, loginWithCode, uniqueSuffix } from "./support/backend";
+import { seedTeam } from "./support/seed";
 
 function skillRow(page: Page, name: string) {
   return page.locator(`li[data-skill="${name}"]`);
@@ -83,7 +33,7 @@ test.describe("Évaluations", () => {
     await expect(page.getByText(/Brouillon enregistré à/)).toBeVisible({ timeout: 10_000 });
 
     // On quitte puis on reprend : le brouillon est conservé.
-    await page.getByRole("link", { name: "Continuer plus tard" }).click();
+    await page.getByRole("link", { name: "Finir plus tard" }).click();
     await expect(page.getByRole("button", { name: "Reprendre l'évaluation" })).toBeVisible();
     await page.getByRole("button", { name: "Reprendre l'évaluation" }).click();
     await expect(page.getByText("1 / 40 notées")).toBeVisible();

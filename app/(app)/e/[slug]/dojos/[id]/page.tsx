@@ -1,14 +1,16 @@
-import { Copy, Pencil } from "lucide-react";
+import { ClipboardPlus, Copy, Pencil } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { duplicateDojo, setDojoStatus } from "@/app/actions/dojos";
 import { DojoView } from "@/components/dojo/dojo-view";
+import { SessionList } from "@/components/dojo/session-list";
 import { ToggleForm } from "@/components/org/toggle-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getOrgContext } from "@/lib/auth/org-context";
+import { listDojoSessions } from "@/lib/data/dojo-sessions";
 import { getDojo } from "@/lib/data/dojos";
 import {
   canCreateDojo,
@@ -18,6 +20,7 @@ import {
   DOJO_STATUS_LABELS,
   type DojoPhase,
 } from "@/lib/domain/dojo";
+import { isCoach } from "@/lib/domain/roles";
 import { uuidSchema } from "@/lib/validation/schemas";
 
 export const metadata: Metadata = { title: "Dojo" };
@@ -34,7 +37,7 @@ export default async function DojoPage({
   searchParams,
 }: PageProps<"/e/[slug]/dojos/[id]">) {
   const { slug, id } = await params;
-  const { phase } = await searchParams;
+  const { phase, seance } = await searchParams;
   if (!uuidSchema.safeParse(id).success) notFound();
   const context = await getOrgContext(slug);
   const dojo = await getDojo(context.organization.id, id);
@@ -45,6 +48,8 @@ export default async function DojoPage({
     : "theorie";
   const editable = canEditDojo(context.role, context.user.id, dojo);
   const base = `/e/${slug}/dojos/${dojo.id}`;
+  const sessions = await listDojoSessions(context.organization.id, { dojoId: dojo.id });
+  const coach = isCoach(context.role);
 
   return (
     <>
@@ -67,8 +72,21 @@ export default async function DojoPage({
             <Badge tone="warning">Modèle à compléter pour l&apos;entreprise</Badge>
           ) : null}
         </div>
+        {seance ? (
+          <p className="mt-4 rounded-(--radius-card) bg-fluo/40 px-4 py-3 text-sm" role="status">
+            Séance enregistrée : elle apparaît sur la fiche des participants.
+          </p>
+        ) : null}
         {canCreateDojo(context.role) ? (
           <div className="mt-4 flex flex-wrap gap-2">
+            {coach && dojo.status !== "archive" ? (
+              <Button asChild size="sm">
+                <Link href={`${base}/seance`}>
+                  <ClipboardPlus aria-hidden="true" />
+                  Noter une séance
+                </Link>
+              </Button>
+            ) : null}
             {editable ? (
               <Button asChild variant="secondary" size="sm">
                 <Link href={`${base}/modifier`}>
@@ -111,6 +129,15 @@ export default async function DojoPage({
       </header>
 
       <DojoView content={dojo.content} phase={currentPhase} baseHref={base} />
+
+      {sessions.length ? (
+        <section id="seances" className="mt-10">
+          <h2 className="mb-3 text-xl font-semibold">
+            {coach ? "Séances notées" : "Mes séances"} ({sessions.length})
+          </h2>
+          <SessionList sessions={sessions} />
+        </section>
+      ) : null}
     </>
   );
 }

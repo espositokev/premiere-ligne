@@ -9,6 +9,8 @@ export type EmailMessage = {
   text: string;
   template: string;
   organizationId?: string | null;
+  /** Pièces jointes (ex. invitation agenda .ics), contenu en texte. */
+  attachments?: { filename: string; content: string; contentType: string }[];
 };
 
 export type EmailResult =
@@ -40,7 +42,18 @@ export async function sendEmail(message: EmailMessage): Promise<EmailResult> {
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ from, to: [to], subject, html: message.html, text: message.text }),
+        body: JSON.stringify({
+          from,
+          to: [to],
+          subject,
+          html: message.html,
+          text: message.text,
+          attachments: message.attachments?.map((a) => ({
+            filename: a.filename,
+            content: Buffer.from(a.content, "utf8").toString("base64"),
+            content_type: a.contentType,
+          })),
+        }),
       });
       const body = (await response.json().catch(() => ({}))) as { id?: string; message?: string };
       if (response.ok) {

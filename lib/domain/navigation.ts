@@ -1,7 +1,16 @@
 import { canAdministerOrg, type SpaceRole } from "./roles";
 
 export type NavIcon =
-  "home" | "users" | "teams" | "team" | "progress" | "profile" | "matrix" | "dojo" | "settings";
+  | "home"
+  | "users"
+  | "teams"
+  | "team"
+  | "progress"
+  | "profile"
+  | "matrix"
+  | "dojo"
+  | "settings"
+  | "coaching";
 
 export type NavItem = {
   label: string;
@@ -13,7 +22,7 @@ export type NavItem = {
 
 /**
  * Entrées de navigation d'un espace entreprise selon le rôle.
- * Sur mobile, la barre d'onglets en affiche au plus 4 (§10.4) : on les garde courtes.
+ * Sur mobile, la barre d'onglets en affiche au plus 4 (§10.4) ; les suivantes passent dans le menu du compte.
  */
 export function orgNavigation(slug: string, role: SpaceRole): NavItem[] {
   const base = `/e/${slug}`;
@@ -21,6 +30,7 @@ export function orgNavigation(slug: string, role: SpaceRole): NavItem[] {
   if (role === "sales_rep") {
     return [
       { label: "Ma progression", href: `${base}/moi`, icon: "progress" },
+      { label: "Coachings", href: `${base}/coachings`, icon: "coaching" },
       { label: "Dojos", href: `${base}/dojos`, icon: "dojo" },
       { label: "Profil", href: "/profil", icon: "profile" },
     ];
@@ -35,6 +45,7 @@ export function orgNavigation(slug: string, role: SpaceRole): NavItem[] {
     },
   ];
 
+  items.push({ label: "Coachings", href: `${base}/coachings`, icon: "coaching" });
   items.push({ label: "Dojos", href: `${base}/dojos`, icon: "dojo" });
 
   if (canAdministerOrg(role)) {

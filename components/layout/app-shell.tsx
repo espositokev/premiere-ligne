@@ -3,6 +3,7 @@
 import {
   BookOpen,
   Building2,
+  CalendarCheck,
   Grid3x3,
   Settings,
   House,
@@ -33,6 +34,7 @@ const ICONS: Record<NavIcon | "building", LucideIcon> = {
   matrix: Grid3x3,
   dojo: BookOpen,
   settings: Settings,
+  coaching: CalendarCheck,
 };
 
 export type ShellNavItem = Omit<NavItem, "icon"> & { icon: NavIcon | "building" };
@@ -119,6 +121,24 @@ export function AppShell({
               {initials(userName)}
             </summary>
             <div className="absolute right-0 mt-2 w-64 rounded-(--radius-card) border border-line bg-surface p-2 shadow-(--shadow-card)">
+              {nav.length > mobileNav.length ? (
+                <ul className="mb-2 border-b border-line pb-2">
+                  {nav.slice(mobileNav.length).map((item) => {
+                    const Icon = ICONS[item.icon];
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          className="flex min-h-11 items-center gap-3 rounded-(--radius-control) px-3 font-medium hover:bg-bone"
+                        >
+                          <Icon aria-hidden="true" className="size-5" />
+                          {item.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : null}
               <UserMenu userName={userName} showSpacesLink={showSpacesLink} />
             </div>
           </details>

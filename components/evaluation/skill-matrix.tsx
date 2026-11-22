@@ -34,11 +34,14 @@ export function SkillMatrix({
   latest,
   self,
   selfLabel = "Auto",
+  observed,
 }: {
   tree: FrameworkTree;
   latest: Map<string, LatestScore>;
   self: Map<string, LatestScore>;
   selfLabel?: string;
+  /** Dernière note « observée en coaching » (affichée à part, ne compte pas comme évaluation). */
+  observed?: Map<string, { score: number }>;
 }) {
   const read = scoreReader(latest);
   return (
@@ -88,6 +91,9 @@ export function SkillMatrix({
                                 <p className="text-xs text-muted">
                                   {current ? shortDate(current.evaluatedAt) : "Jamais évaluée"}
                                   {own ? ` · ${selfLabel} : ${own.score}` : ""}
+                                  {observed?.get(skill.id)
+                                    ? ` · Coaching : ${observed.get(skill.id)?.score}`
+                                    : ""}
                                 </p>
                               </div>
                               <TrendIcon value={trend(current?.score, current?.previousScore)} />

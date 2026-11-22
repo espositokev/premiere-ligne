@@ -330,9 +330,9 @@ export function EvaluationEditor(props: Props) {
           <Link
             href={props.backHref}
             onClick={leave}
-            className="text-sm font-semibold text-forest-light hover:text-forest-deep"
+            className="shrink-0 text-sm font-semibold whitespace-nowrap text-forest-light hover:text-forest-deep"
           >
-            {props.mode === "correction" ? "Terminer" : "Continuer plus tard"}
+            {props.mode === "correction" ? "Terminer" : "Finir plus tard"}
           </Link>
           {props.mode === "draft" ? (
             armed ? (

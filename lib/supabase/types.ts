@@ -269,6 +269,99 @@ type LatestSkillScoreRow = {
   evaluation_id: string;
 };
 
+type CoachingRequestRow = {
+  id: string;
+  organization_id: string;
+  requester_membership_id: string;
+  message: string | null;
+  status: "en_attente" | "acceptee" | "refusee";
+  answer: string | null;
+  answered_by: string | null;
+  answered_at: string | null;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type CoachingRequestSkillRow = { request_id: string; skill_id: string; organization_id: string };
+
+type CoachingRow = {
+  id: string;
+  organization_id: string;
+  subject_membership_id: string;
+  coach_membership_id: string | null;
+  coach_user_id: string;
+  scheduled_at: string;
+  duration_minutes: number;
+  mode: "terrain" | "distance";
+  location: string | null;
+  objective: string | null;
+  status: "planifie" | "cloture" | "annule";
+  cancel_reason: string | null;
+  rep_comment: string | null;
+  closed_at: string | null;
+  reopened_at: string | null;
+  reopen_reason: string | null;
+  request_id: string | null;
+  reminder_sent_at: string | null;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type CoachingSkillRow = { coaching_id: string; skill_id: string; organization_id: string };
+
+type CoachingReportRow = {
+  coaching_id: string;
+  organization_id: string;
+  context: string | null;
+  strengths: string | null;
+  improvements: string | null;
+  action_plan: Json;
+  updated_at: string | null;
+};
+
+type CoachingObservationRow = {
+  coaching_id: string;
+  skill_id: string;
+  organization_id: string;
+  score: number | null;
+  comment: string | null;
+  updated_at: string | null;
+};
+
+type ActionRow = {
+  id: string;
+  organization_id: string;
+  subject_membership_id: string;
+  skill_id: string | null;
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  status: "a_faire" | "en_cours" | "faite" | "abandonnee";
+  source: "coaching" | "evaluation" | "manuelle";
+  coaching_id: string | null;
+  created_by: string;
+  done_at: string | null;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type DojoSessionRow = {
+  id: string;
+  organization_id: string;
+  dojo_id: string;
+  coach_user_id: string;
+  held_on: string;
+  scenario: number | null;
+  went_well: string | null;
+  priority_axis: string | null;
+  commitment: string | null;
+  coaching_id: string | null;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type DojoSessionParticipantRow = { session_id: string; membership_id: string; organization_id: string };
+
 type Generated = "id" | "created_at" | "updated_at";
 type InsertOf<Row, Optional extends keyof Row> = Omit<Row, Optional> & Partial<Pick<Row, Optional>>;
 
@@ -527,6 +620,166 @@ export type Database = {
         Insert: InsertOf<ManagerNoteRow, Generated | "author_user_id">;
         Update: Partial<ManagerNoteRow>;
         Relationships: [Rel<"manager_notes_author_user_id_fkey", ["author_user_id"], "profiles", ["id"]>];
+      };
+      coaching_requests: {
+        Row: CoachingRequestRow;
+        Insert: InsertOf<
+          CoachingRequestRow,
+          Generated | "message" | "status" | "answer" | "answered_by" | "answered_at"
+        >;
+        Update: Partial<CoachingRequestRow>;
+        Relationships: [
+          Rel<
+            "coaching_requests_requester_membership_id_organization_id_fkey",
+            ["requester_membership_id", "organization_id"],
+            "memberships",
+            ["id", "organization_id"]
+          >,
+        ];
+      };
+      coaching_request_skills: {
+        Row: CoachingRequestSkillRow;
+        Insert: CoachingRequestSkillRow;
+        Update: Partial<CoachingRequestSkillRow>;
+        Relationships: [
+          Rel<
+            "coaching_request_skills_request_id_organization_id_fkey",
+            ["request_id", "organization_id"],
+            "coaching_requests",
+            ["id", "organization_id"]
+          >,
+          Rel<
+            "coaching_request_skills_skill_id_organization_id_fkey",
+            ["skill_id", "organization_id"],
+            "skills",
+            ["id", "organization_id"]
+          >,
+        ];
+      };
+      coachings: {
+        Row: CoachingRow;
+        Insert: InsertOf<
+          CoachingRow,
+          | Generated
+          | "coach_membership_id"
+          | "coach_user_id"
+          | "duration_minutes"
+          | "mode"
+          | "location"
+          | "objective"
+          | "status"
+          | "cancel_reason"
+          | "rep_comment"
+          | "closed_at"
+          | "reopened_at"
+          | "reopen_reason"
+          | "request_id"
+          | "reminder_sent_at"
+        >;
+        Update: Partial<CoachingRow>;
+        Relationships: [
+          Rel<
+            "coachings_subject_membership_id_organization_id_fkey",
+            ["subject_membership_id", "organization_id"],
+            "memberships",
+            ["id", "organization_id"]
+          >,
+          Rel<"coachings_coach_user_id_fkey", ["coach_user_id"], "profiles", ["id"]>,
+          Rel<"coachings_organization_id_fkey", ["organization_id"], "organizations", ["id"]>,
+        ];
+      };
+      coaching_skills: {
+        Row: CoachingSkillRow;
+        Insert: CoachingSkillRow;
+        Update: Partial<CoachingSkillRow>;
+        Relationships: [
+          Rel<
+            "coaching_skills_coaching_id_organization_id_fkey",
+            ["coaching_id", "organization_id"],
+            "coachings",
+            ["id", "organization_id"]
+          >,
+          Rel<
+            "coaching_skills_skill_id_organization_id_fkey",
+            ["skill_id", "organization_id"],
+            "skills",
+            ["id", "organization_id"]
+          >,
+        ];
+      };
+      coaching_reports: {
+        Row: CoachingReportRow;
+        Insert: InsertOf<CoachingReportRow, "context" | "strengths" | "improvements" | "action_plan" | "updated_at">;
+        Update: Partial<CoachingReportRow>;
+        Relationships: [
+          Rel<
+            "coaching_reports_coaching_id_organization_id_fkey",
+            ["coaching_id", "organization_id"],
+            "coachings",
+            ["id", "organization_id"]
+          >,
+        ];
+      };
+      coaching_observations: {
+        Row: CoachingObservationRow;
+        Insert: InsertOf<CoachingObservationRow, "score" | "comment" | "updated_at">;
+        Update: Partial<CoachingObservationRow>;
+        Relationships: [
+          Rel<
+            "coaching_observations_coaching_id_organization_id_fkey",
+            ["coaching_id", "organization_id"],
+            "coachings",
+            ["id", "organization_id"]
+          >,
+        ];
+      };
+      actions: {
+        Row: ActionRow;
+        Insert: InsertOf<
+          ActionRow,
+          | Generated
+          | "skill_id"
+          | "description"
+          | "due_date"
+          | "status"
+          | "source"
+          | "coaching_id"
+          | "created_by"
+          | "done_at"
+        >;
+        Update: Partial<ActionRow>;
+        Relationships: [];
+      };
+      dojo_sessions: {
+        Row: DojoSessionRow;
+        Insert: InsertOf<
+          DojoSessionRow,
+          Generated | "coach_user_id" | "held_on" | "scenario" | "went_well" | "priority_axis" | "commitment" | "coaching_id"
+        >;
+        Update: Partial<DojoSessionRow>;
+        Relationships: [
+          Rel<"dojo_sessions_dojo_id_organization_id_fkey", ["dojo_id", "organization_id"], "dojos", ["id", "organization_id"]>,
+          Rel<"dojo_sessions_coach_user_id_fkey", ["coach_user_id"], "profiles", ["id"]>,
+        ];
+      };
+      dojo_session_participants: {
+        Row: DojoSessionParticipantRow;
+        Insert: DojoSessionParticipantRow;
+        Update: Partial<DojoSessionParticipantRow>;
+        Relationships: [
+          Rel<
+            "dojo_session_participants_session_id_organization_id_fkey",
+            ["session_id", "organization_id"],
+            "dojo_sessions",
+            ["id", "organization_id"]
+          >,
+          Rel<
+            "dojo_session_participants_membership_id_organization_id_fkey",
+            ["membership_id", "organization_id"],
+            "memberships",
+            ["id", "organization_id"]
+          >,
+        ];
       };
     };
     Views: {

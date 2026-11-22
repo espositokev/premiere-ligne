@@ -1,9 +1,11 @@
-import { ClipboardCheck, Settings2 } from "lucide-react";
+import { CalendarPlus, ClipboardCheck, Settings2 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { startEvaluation } from "@/app/actions/evaluations";
+import { CoachingList } from "@/components/coaching/coaching-list";
+import { SessionList } from "@/components/dojo/session-list";
 import { EvaluationHistory } from "@/components/evaluation/evaluation-history";
 import { ManagerNotes } from "@/components/evaluation/manager-notes";
 import { MemberProgress } from "@/components/evaluation/member-progress";
@@ -13,14 +15,18 @@ import { SubmitButton } from "@/components/ui/form-controls";
 import { EmptyState, PageHeader } from "@/components/ui/page";
 import { TabsNav } from "@/components/ui/tabs-nav";
 import { requireCoach } from "@/lib/auth/require-org";
+import { now as currentTime } from "@/lib/clock";
+import { listCoachings } from "@/lib/data/coachings";
+import { listDojoSessions } from "@/lib/data/dojo-sessions";
 import { canManageMember, listManagerNotes, loadMemberProfile } from "@/lib/data/evaluations";
 import { formatDate, formatShortDate, loadProgress } from "@/lib/data/progress";
+import { formatShortDay, groupCoachings } from "@/lib/domain/coaching";
 import { activeSkillsOf } from "@/lib/domain/evaluation";
 import { canAdministerOrg } from "@/lib/domain/roles";
 
 export const metadata: Metadata = { title: "Fiche commercial" };
 
-const TABS = ["matrice", "historique", "notes"] as const;
+const TABS = ["matrice", "coachings", "historique", "notes"] as const;
 type Tab = (typeof TABS)[number];
 
 function seniority(hiredAt: string | null) {
@@ -52,10 +58,16 @@ export default async function MemberPage({
   const member = await loadMemberProfile(orgId, memberId);
   if (!member || member.role !== "sales_rep" || !(await canManageMember(memberId))) notFound();
 
-  const [progress, notes] = await Promise.all([
+  const [progress, notes, coachings, sessions] = await Promise.all([
     loadProgress(orgId, memberId),
     tab === "notes" ? listManagerNotes(memberId) : Promise.resolve([]),
+    listCoachings(orgId, { memberId }),
+    tab === "coachings" ? listDojoSessions(orgId, { memberId }) : Promise.resolve([]),
   ]);
+  const now = currentTime();
+  const coachingGroups = groupCoachings(coachings, now);
+  const lastCoaching = coachingGroups.closed[0];
+  const nextCoaching = coachingGroups.upcoming[0];
   const admin = canAdministerOrg(context.role);
   const base = `/e/${slug}/equipe/${memberId}`;
   const total = activeSkillsOf(progress.tree).length;
@@ -71,15 +83,22 @@ export default async function MemberPage({
     .join(" · ");
 
   const action = progress.hasFramework ? (
-    <form action={startEvaluation}>
-      <input type="hidden" name="slug" value={slug} />
-      <input type="hidden" name="member_id" value={memberId} />
-      <input type="hidden" name="kind" value="manager" />
-      <SubmitButton pendingLabel="Ouverture…" className="w-full sm:w-auto">
-        <ClipboardCheck aria-hidden="true" />
-        {progress.managerDraft ? "Reprendre l'évaluation" : "Nouvelle évaluation"}
-      </SubmitButton>
-    </form>
+    <div className="flex flex-col gap-2 sm:flex-row">
+      <Button asChild variant="outline" className="w-full sm:w-auto">
+        <Link href={`/e/${slug}/coachings/nouveau?commercial=${memberId}`}>
+          <CalendarPlus aria-hidden="true" /> Planifier un coaching
+        </Link>
+      </Button>
+      <form action={startEvaluation}>
+        <input type="hidden" name="slug" value={slug} />
+        <input type="hidden" name="member_id" value={memberId} />
+        <input type="hidden" name="kind" value="manager" />
+        <SubmitButton pendingLabel="Ouverture…" className="w-full sm:w-auto">
+          <ClipboardCheck aria-hidden="true" />
+          {progress.managerDraft ? "Reprendre l'évaluation" : "Nouvelle évaluation"}
+        </SubmitButton>
+      </form>
+    </div>
   ) : null;
 
   return (
@@ -111,7 +130,9 @@ export default async function MemberPage({
               {
                 label: "Maîtrise",
                 value: progress.mastery === null ? "–" : `${progress.mastery} %`,
-                hint: "sous-compétences à 3 ou plus",
+                hint: unrated
+                  ? `${unrated} non évaluée${unrated > 1 ? "s" : ""} sur ${total}`
+                  : "sous-compétences à 3 ou plus",
               },
               {
                 label: "Dernière évaluation",
@@ -119,10 +140,13 @@ export default async function MemberPage({
                   ? formatShortDate(progress.lastEvaluatedAt)
                   : "Aucune",
               },
-              { label: "Non évaluées", value: `${unrated}`, hint: `sur ${total}` },
               {
-                label: "Auto-évaluation",
-                value: progress.self.size > 0 ? "Faite" : "Pas encore",
+                label: "Dernier coaching",
+                value: lastCoaching ? formatShortDay(lastCoaching.scheduledAt) : "Aucun",
+              },
+              {
+                label: "Prochain coaching",
+                value: nextCoaching ? formatShortDay(nextCoaching.scheduledAt) : "—",
               },
             ]}
           />
@@ -133,6 +157,7 @@ export default async function MemberPage({
               current={tab}
               tabs={[
                 { key: "matrice", label: "Matrice", href: base },
+                { key: "coachings", label: "Coachings", href: `${base}?vue=coachings` },
                 { key: "historique", label: "Historique", href: `${base}?vue=historique` },
                 { key: "notes", label: "Notes privées", href: `${base}?vue=notes` },
               ]}
@@ -145,7 +170,42 @@ export default async function MemberPage({
               radar={progress.radar}
               latest={progress.latest}
               self={progress.self}
+              observed={progress.observed}
             />
+          ) : null}
+          {tab === "coachings" ? (
+            <div className="flex flex-col gap-8">
+              <section>
+                <h2 className="mb-3 text-lg font-semibold">Coachings</h2>
+                {coachings.length ? (
+                  <CoachingList
+                    coachings={[
+                      ...coachingGroups.toWrite,
+                      ...coachingGroups.upcoming,
+                      ...coachingGroups.closed,
+                    ]}
+                    now={now}
+                    hrefFor={(c) => `/e/${slug}/coachings/${c.id}`}
+                    showRep={false}
+                    showCoach
+                  />
+                ) : (
+                  <p className="text-muted">Aucun coaching pour l&apos;instant.</p>
+                )}
+              </section>
+              <section>
+                <h2 className="mb-3 text-lg font-semibold">Séances de Dojo</h2>
+                {sessions.length ? (
+                  <SessionList
+                    sessions={sessions}
+                    showDojo
+                    dojoHref={(s) => `/e/${slug}/dojos/${s.dojoId}`}
+                  />
+                ) : (
+                  <p className="text-muted">Aucune séance de Dojo notée.</p>
+                )}
+              </section>
+            </div>
           ) : null}
           {tab === "historique" ? (
             <EvaluationHistory

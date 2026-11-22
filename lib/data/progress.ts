@@ -9,14 +9,16 @@ import {
 } from "@/lib/domain/evaluation";
 import type { FrameworkTree } from "@/lib/domain/framework";
 
+import { latestObservedScores } from "./coachings";
 import { listEvaluations } from "./evaluations";
 import { loadOrganizationTree } from "./framework";
 
 /** Tout ce qu'il faut pour afficher la progression d'un commercial (fiche et « Ma progression »). */
 export async function loadProgress(organizationId: string, memberId: string) {
-  const [framework, evaluations] = await Promise.all([
+  const [framework, evaluations, observed] = await Promise.all([
     loadOrganizationTree(organizationId),
     listEvaluations(memberId),
+    latestObservedScores(memberId),
   ]);
   const tree: FrameworkTree = framework?.tree ?? { id: "", name: "", blocks: [] };
   const latest = latestScores(evaluations);
@@ -28,6 +30,7 @@ export async function loadProgress(organizationId: string, memberId: string) {
     evaluations,
     latest,
     self,
+    observed,
     radar: radarData(tree, evaluations),
     mastery: masteryPercent(tree, latest),
     lastEvaluatedAt: lastManager?.validatedAt ?? null,

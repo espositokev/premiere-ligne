@@ -59,9 +59,11 @@ describe("invitations (§3.2)", () => {
 });
 
 describe("navigation", () => {
-  it("affiche au plus 4 entrées pour chaque rôle (barre d'onglets mobile)", () => {
+  it("met les 4 entrées principales en tête (barre d'onglets mobile), les autres vont au menu", () => {
     for (const role of ["super_admin", "org_admin", "manager", "sales_rep"] as const) {
-      expect(orgNavigation("acme", role).length).toBeLessThanOrEqual(4);
+      const labels = orgNavigation("acme", role).map((i) => i.label);
+      expect(labels.length).toBeLessThanOrEqual(5);
+      expect(labels.slice(0, 4)).toContain("Coachings");
     }
   });
 

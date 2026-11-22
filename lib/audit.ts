@@ -27,7 +27,14 @@ export type AuditAction =
   | "dojo.deleted"
   | "evaluation.validated"
   | "evaluation.corrected"
-  | "manager_note.deleted";
+  | "manager_note.deleted"
+  | "coaching.created"
+  | "coaching.cancelled"
+  | "coaching.closed"
+  | "coaching.reopened"
+  | "coaching_request.created"
+  | "coaching_request.declined"
+  | "dojo_session.created";
 
 /**
  * Journal d'activité (§4.12). Écrit avec la clé serveur : les utilisateurs ne peuvent pas

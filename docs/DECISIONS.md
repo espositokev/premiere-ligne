@@ -2,6 +2,19 @@
 
 Choix faits en l'absence d'information dans `docs/SPEC.md`, ou validés avec le fondateur quand ils s'en écartent. Le plus récent en haut.
 
+## 22/11/2026 — Étape 4 (coachings, demandes, séances de Dojo)
+
+- **Compte rendu séparé du coaching** : `coaching_reports` et `coaching_observations` sont des tables à part, lisibles par le commercial seulement une fois le coaching clôturé (au lieu d'une vue `v_my_coachings`). Les compétences ciblées (`coaching_skills`) restent visibles dès la planification.
+- **Plan d'action** préparé dans le CR (JSON validé par Zod), transformé en lignes de `actions` (origine `coaching`) à la clôture ; une réouverture suivie d'une nouvelle clôture ne les recrée pas. La table `actions` est créée maintenant ; son écran complet arrive à l'étape 5.
+- **Demandes** : compétences dans une table de liaison (`coaching_request_skills`) plutôt qu'un tableau, pour garder les clés étrangères et le contrôle « compétence utilisée ». Accepter = planifier depuis la demande (formulaire prérempli) ; refuser = message obligatoire. Le commercial peut retirer une demande en attente.
+- **Clôture** possible dès que le coaching a commencé (pas seulement après la fin). Un coaching annulé disparaît pour le commercial ; il n'est prévenu que si le coaching était encore à venir.
+- **Heure** : saisie et affichage à l'heure de Paris, stockage en UTC.
+- **Rappel des CR** : Vercel Cron chaque jour à 7 h (Paris), route `/api/cron/rappels-cr` protégée par `CRON_SECRET`, un email par coach, au plus une fois par semaine par coaching.
+- **Invitation agenda** : fichier `.ics` joint aux emails de planification, de modification et d'annulation.
+- **Séances de Dojo** : notées depuis un Dojo, avec un ou plusieurs participants (séances de groupe), scénario joué, ce qui a marché, axe prioritaire, engagement. Visibles sur la fiche des participants et dans « Mes coachings ». Un Dojo joué ne se supprime plus (on l'archive).
+- **Navigation** : « Coachings » ajouté pour tous ; sur téléphone, la barre garde 4 onglets et les suivants (Profil, Paramètres) passent dans le menu du compte.
+- Paramètres entreprise (N jours sans coaching, autoriser les demandes) : reportés à l'étape des paramètres, valeurs par défaut en attendant.
+
 ## 22/11/2026 — Étape 3 (évaluations et fiche commercial)
 
 - **Radar : un axe par compétence** (moyenne de ses sous-compétences), pas par bloc : la matrice n'a que 2 blocs, un radar à 2 axes ne dirait rien. Superposition : dernière évaluation (plein), précédente (clair), auto-évaluation (pointillés).
