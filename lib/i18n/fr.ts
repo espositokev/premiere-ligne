@@ -8,25 +8,39 @@ export const fr = {
     tagline: "On forme là où ça se joue.",
   },
   home: {
-    title: "Faites progresser vos vendeurs, là où ça se joue.",
-    lead: "Première Ligne forme les équipes commerciales et les managers sur le terrain. La plateforme suit la montée en compétences de chaque vendeur : évaluations, coachings, plans d'action et Dojos.",
+    titleStart: "Faites progresser vos vendeurs,",
+    titleHighlight: "là où ça se joue",
+    lead: "Première Ligne forme vos équipes commerciales et vos managers sur le terrain. Entre deux sessions, l'application suit chaque vendeur : évaluations, coachings, plan d'action et Dojos.",
     login: "Se connecter",
     contact: "Nous contacter",
     contactEmail: "contact@premiereligne-app.fr",
+    methodTitle: "Une méthode en trois temps",
+    methodLead:
+      "Le manager mesure, accompagne sur le terrain, puis fait répéter. Le vendeur voit sa progression à chaque étape.",
     pillars: [
       {
         title: "Évaluer",
-        text: "Une matrice de compétences claire, notée de 0 à 4, avec l'avis du manager et celui du vendeur côte à côte.",
+        text: "Une matrice de compétences claire, notée de 0 à 4, avec l'avis du manager et celui du vendeur côte à côte",
       },
       {
         title: "Coacher",
-        text: "Un coaching terrain préparé en quelques secondes et un compte rendu rédigé sur place, depuis le téléphone.",
+        text: "Un coaching terrain préparé en quelques secondes et un compte rendu rédigé sur place, depuis le téléphone",
       },
       {
         title: "S'entraîner",
-        text: "Des Dojos prêts à l'emploi, proposés automatiquement sur les compétences à travailler.",
+        text: "Des Dojos prêts à l'emploi, proposés automatiquement sur les compétences à travailler",
       },
     ],
+    preview: {
+      name: "Léo Bernard",
+      role: "Vendeur · Concession de Lyon",
+      mastery: "Maîtrise",
+      change: "+25 pts depuis août",
+      stepsLabel: "Maîtrise à chaque évaluation",
+      skillsTitle: "Compétences travaillées",
+      next: "Prochain coaching",
+      nextWhen: "Jeudi 9 h 00 · Découverte des besoins",
+    },
   },
   legal: {
     notice: "Mentions légales",

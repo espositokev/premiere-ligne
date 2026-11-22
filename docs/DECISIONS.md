@@ -116,3 +116,7 @@ Le skill unslop (Damir Sokolovsky, CC BY 4.0) est installé dans `.claude/skills
 - plus de points d'exclamation dans l'interface et les emails (« Bonjour Léo, ») ;
 - plus d'italique d'emphase ;
 - le fluo est réservé à l'action principale, à la sélection et aux graphiques : les moyennes de compétence et les icônes de la page d'accueil passent en neutre.
+
+## Page d'accueil refaite avec unslop (22 novembre 2026)
+
+Direction validée par Kevin : direct, terrain, exigeant ; univers de la fiche de coaching et de la grille 0 à 4 ; charte inchangée. Bouton principal « Nous contacter » (la page sert à convaincre des prospects), « Se connecter » devient un lien discret. L'aperçu est une fiche vendeur dont la maîtrise monte en marches, comme le logo. Les trois cartes deviennent « Une méthode en trois temps ». Le fluo ne marque que l'action principale, le dernier mois et le surlignage de « là où ça se joue ».
