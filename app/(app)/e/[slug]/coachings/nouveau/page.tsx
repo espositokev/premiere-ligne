@@ -71,7 +71,6 @@ export default async function NewCoachingPage({
             reps={reps}
             blocks={editorBlocks(framework.tree)}
             requestId={request?.id}
-            minLocal={utcToLocalInput(now.toISOString())}
             defaults={{
               memberId: reps.some((r) => r.id === memberId) ? memberId : undefined,
               scheduledLocal: `${tomorrow}T09:00`,

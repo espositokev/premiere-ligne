@@ -30,7 +30,6 @@ export function CoachingForm({
   defaults = {},
   requestId,
   coachingId,
-  minLocal,
 }: {
   slug: string;
   organizationId: string;
@@ -40,7 +39,6 @@ export function CoachingForm({
   requestId?: string;
   /** Présent : modification d'un coaching existant. */
   coachingId?: string;
-  minLocal?: string;
 }) {
   const editing = Boolean(coachingId);
   const [state, action] = useActionState(
@@ -80,9 +78,7 @@ export function CoachingForm({
             name="scheduled_local"
             type="datetime-local"
             required
-            min={editing ? undefined : minLocal}
             defaultValue={defaults.scheduledLocal}
-            step={900}
           />
         </Field>
         <Field label="Durée" htmlFor="duration_minutes">
