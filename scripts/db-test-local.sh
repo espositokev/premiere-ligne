@@ -37,10 +37,13 @@ fi
 FAILED=0
 for f in "$TMP"/tests/*.sql; do
   OUT="$(run "$DB" "$f" 2>&1 || true)"
-  if echo "$OUT" | grep -qE "^\s*not ok|ERROR|Looks like you failed"; then
+  PLANNED="$(echo "$OUT" | grep -oE '^\s*1\.\.[0-9]+' | head -1 | grep -oE '[0-9]+$' || true)"
+  RAN="$(echo "$OUT" | grep -cE '^\s*(not )?ok [0-9]+' || true)"
+  if echo "$OUT" | grep -qE "^\s*not ok|ERROR|Looks like you (failed|planned)" || [ "${PLANNED:-0}" != "$RAN" ]; then
+    [ "${PLANNED:-0}" != "$RAN" ] && echo "  ! $RAN vérifications faites pour ${PLANNED:-?} annoncées (plan)"
     echo "✗ $(basename "$f")"; echo "$OUT" | grep -E "not ok|ERROR|#" | head -40; FAILED=1
   else
-    echo "✓ $(basename "$f") ($(echo "$OUT" | grep -cE '^\s*ok') vérifications)"
+    echo "✓ $(basename "$f") ($RAN vérifications)"
   fi
 done
 rm -rf "$TMP"

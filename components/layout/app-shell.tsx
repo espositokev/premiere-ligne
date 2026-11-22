@@ -7,6 +7,7 @@ import {
   Grid3x3,
   Settings,
   House,
+  ListChecks,
   LogOut,
   TrendingUp,
   UserRound,
@@ -35,6 +36,7 @@ const ICONS: Record<NavIcon | "building", LucideIcon> = {
   dojo: BookOpen,
   settings: Settings,
   coaching: CalendarCheck,
+  plan: ListChecks,
 };
 
 export type ShellNavItem = Omit<NavItem, "icon"> & { icon: NavIcon | "building" };

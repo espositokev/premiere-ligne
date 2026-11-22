@@ -748,7 +748,15 @@ export type Database = {
           | "done_at"
         >;
         Update: Partial<ActionRow>;
-        Relationships: [];
+        Relationships: [
+          Rel<
+            "actions_subject_membership_id_organization_id_fkey",
+            ["subject_membership_id", "organization_id"],
+            "memberships",
+            ["id", "organization_id"]
+          >,
+          Rel<"actions_skill_id_organization_id_fkey", ["skill_id", "organization_id"], "skills", ["id", "organization_id"]>,
+        ];
       };
       dojo_sessions: {
         Row: DojoSessionRow;

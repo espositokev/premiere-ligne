@@ -6,11 +6,17 @@ import { startEvaluation } from "@/app/actions/evaluations";
 import { EvaluationHistory } from "@/components/evaluation/evaluation-history";
 import { MemberProgress } from "@/components/evaluation/member-progress";
 import { ProgressSummary } from "@/components/evaluation/progress-summary";
+import { RepTodo, type TodoItem } from "@/components/evaluation/rep-todo";
 import { SubmitButton } from "@/components/ui/form-controls";
 import { EmptyState, PageHeader } from "@/components/ui/page";
 import { TabsNav } from "@/components/ui/tabs-nav";
 import { getOrgContext } from "@/lib/auth/org-context";
+import { now as currentTime } from "@/lib/clock";
+import { listActions } from "@/lib/data/actions";
+import { listCoachings } from "@/lib/data/coachings";
 import { formatShortDate, loadProgress } from "@/lib/data/progress";
+import { countOverdue, isDueSoon, reportsToRead } from "@/lib/domain/actions";
+import { formatShortDay, formatWhen, groupCoachings, todayInZone } from "@/lib/domain/coaching";
 import { activeSkillsOf } from "@/lib/domain/evaluation";
 
 export const metadata: Metadata = { title: "Ma progression" };
@@ -23,7 +29,66 @@ export default async function MyProgressPage({ params, searchParams }: PageProps
   if (context.role !== "sales_rep" || !context.membershipId) redirect(`/e/${slug}`);
   const tab = vue === "historique" ? "historique" : "matrice";
 
-  const progress = await loadProgress(context.organization.id, context.membershipId);
+  const [progress, coachings, actions] = await Promise.all([
+    loadProgress(context.organization.id, context.membershipId),
+    listCoachings(context.organization.id, { memberId: context.membershipId }),
+    listActions(context.organization.id, { memberId: context.membershipId }),
+  ]);
+  const now = currentTime();
+  const today = todayInZone(now);
+  const nextCoaching = groupCoachings(coachings, now).upcoming[0];
+  const overdue = countOverdue(actions, today);
+  const dueSoon = actions.filter((a) => isDueSoon(a, today)).length;
+  const todo: TodoItem[] = [
+    ...reportsToRead(coachings, now)
+      .slice(0, 2)
+      .map((c) => ({
+        icon: "report" as const,
+        title: "Nouveau compte rendu à lire",
+        text: `Coaching du ${formatShortDay(c.scheduledAt)} avec ${c.coachName}`,
+        href: `/e/${slug}/coachings/${c.id}`,
+      })),
+    ...(overdue
+      ? [
+          {
+            icon: "late" as const,
+            title: `${overdue} action${overdue > 1 ? "s" : ""} en retard`,
+            text: "Fais le point sur ton plan de progrès",
+            href: `/e/${slug}/moi/plan`,
+            urgent: true,
+          },
+        ]
+      : dueSoon
+        ? [
+            {
+              icon: "late" as const,
+              title: `${dueSoon} action${dueSoon > 1 ? "s" : ""} à faire cette semaine`,
+              text: "Ton plan de progrès",
+              href: `/e/${slug}/moi/plan`,
+            },
+          ]
+        : []),
+    ...(nextCoaching
+      ? [
+          {
+            icon: "coaching" as const,
+            title: "Prochain coaching",
+            text: `${formatWhen(nextCoaching.scheduledAt)} avec ${nextCoaching.coachName}`,
+            href: `/e/${slug}/coachings/${nextCoaching.id}`,
+          },
+        ]
+      : []),
+    ...(progress.selfDraft
+      ? [
+          {
+            icon: "self" as const,
+            title: "Termine ton auto-évaluation",
+            text: "Tu l'as commencée, il ne reste que quelques notes",
+            href: `/e/${slug}/moi/evaluations/${progress.selfDraft.id}`,
+          },
+        ]
+      : []),
+  ];
   const total = activeSkillsOf(progress.tree).length;
   const base = `/e/${slug}/moi`;
 
@@ -50,6 +115,8 @@ export default async function MyProgressPage({ params, searchParams }: PageProps
           ) : undefined
         }
       />
+
+      <RepTodo items={todo} />
 
       {!progress.hasFramework ? (
         <EmptyState

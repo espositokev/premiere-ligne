@@ -86,3 +86,13 @@ export function formatDate(iso: string | null) {
     year: "numeric",
   });
 }
+
+/** Sous-compétences actives regroupées par compétence, pour les listes de choix. */
+export function skillGroups(tree: FrameworkTree) {
+  return editorBlocks(tree).flatMap((b) =>
+    b.competencies.map((c) => ({
+      competency: c.name,
+      skills: c.skills.map((s) => ({ id: s.id, name: s.name })),
+    })),
+  );
+}

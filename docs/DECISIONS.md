@@ -2,6 +2,15 @@
 
 Choix faits en l'absence d'information dans `docs/SPEC.md`, ou validés avec le fondateur quand ils s'en écartent. Le plus récent en haut.
 
+## 22/11/2026 — Étape 5 (plan de progrès, espace commercial)
+
+- **Adresses** : plan du commercial sous `/e/[slug]/moi/plan` (onglet « Mon plan » du menu commercial), actions de l'équipe sous `/e/[slug]/equipe/actions` (au lieu de `/e/[slug]/actions`), pour que l'onglet « Mon équipe » reste allumé ; plan d'un commercial = onglet « Plan de progrès » de sa fiche.
+- **Statut en un tap** : « Je commence », « C'est fait », « Rouvrir » ; « Abandonner », « Modifier » et « Supprimer » sont rangés derrière « … ».
+- **Suppression** : le manager supprime toute action de ses commerciaux ; le commercial seulement celles qu'il a ajoutées (une action décidée en coaching reste, il peut l'abandonner). Journalisé.
+- **Origine « évaluation »** : prévue dans la base, pas encore proposée à l'écran (les actions s'ajoutent depuis le plan ou le CR).
+- **« À faire pour toi »** en tête de « Ma progression » : CR récents non commentés, actions en retard (ou à faire dans la semaine), prochain coaching, auto-évaluation commencée.
+- **Descripteurs de niveaux** : toucher une sous-compétence de la matrice déplie ses 5 niveaux, niveau actuel en avant et « prochaine marche » signalée (descriptif propre à la sous-compétence, sinon libellé général).
+
 ## 22/11/2026 — Étape 4 (coachings, demandes, séances de Dojo)
 
 - **Compte rendu séparé du coaching** : `coaching_reports` et `coaching_observations` sont des tables à part, lisibles par le commercial seulement une fois le coaching clôturé (au lieu d'une vue `v_my_coachings`). Les compétences ciblées (`coaching_skills`) restent visibles dès la planification.

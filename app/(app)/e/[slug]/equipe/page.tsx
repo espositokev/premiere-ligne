@@ -1,9 +1,11 @@
-import { Users } from "lucide-react";
+import { ListChecks, Users } from "lucide-react";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 import { InvitationList } from "@/components/org/invitation-list";
 import { InviteForm } from "@/components/org/invite-form";
 import { MemberList } from "@/components/org/member-list";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState, PageHeader, SectionTitle } from "@/components/ui/page";
 import { requireCoach } from "@/lib/auth/require-org";
@@ -50,6 +52,15 @@ export default async function TeamPage({ params }: PageProps<"/e/[slug]/equipe">
       <PageHeader
         title={admin ? "Commerciaux" : "Mon équipe"}
         description={`${reps.filter((r) => r.active).length} commercia${reps.filter((r) => r.active).length > 1 ? "ux" : "l"} actif${reps.filter((r) => r.active).length > 1 ? "s" : ""}`}
+        action={
+          reps.length ? (
+            <Button asChild variant="outline" className="w-full sm:w-auto">
+              <Link href={`/e/${slug}/equipe/actions`}>
+                <ListChecks aria-hidden="true" /> Actions de l&apos;équipe
+              </Link>
+            </Button>
+          ) : undefined
+        }
       />
 
       <div className="grid gap-8 lg:grid-cols-[1fr_24rem]">

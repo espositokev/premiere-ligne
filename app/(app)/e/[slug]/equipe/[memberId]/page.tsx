@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { startEvaluation } from "@/app/actions/evaluations";
+import { ActionPlan } from "@/components/actions/action-plan";
 import { CoachingList } from "@/components/coaching/coaching-list";
 import { SessionList } from "@/components/dojo/session-list";
 import { EvaluationHistory } from "@/components/evaluation/evaluation-history";
@@ -16,17 +17,19 @@ import { EmptyState, PageHeader } from "@/components/ui/page";
 import { TabsNav } from "@/components/ui/tabs-nav";
 import { requireCoach } from "@/lib/auth/require-org";
 import { now as currentTime } from "@/lib/clock";
+import { listActions } from "@/lib/data/actions";
 import { listCoachings } from "@/lib/data/coachings";
 import { listDojoSessions } from "@/lib/data/dojo-sessions";
 import { canManageMember, listManagerNotes, loadMemberProfile } from "@/lib/data/evaluations";
-import { formatDate, formatShortDate, loadProgress } from "@/lib/data/progress";
-import { formatShortDay, groupCoachings } from "@/lib/domain/coaching";
+import { formatDate, formatShortDate, loadProgress, skillGroups } from "@/lib/data/progress";
+import { countOverdue } from "@/lib/domain/actions";
+import { formatShortDay, groupCoachings, todayInZone } from "@/lib/domain/coaching";
 import { activeSkillsOf } from "@/lib/domain/evaluation";
 import { canAdministerOrg } from "@/lib/domain/roles";
 
 export const metadata: Metadata = { title: "Fiche commercial" };
 
-const TABS = ["matrice", "coachings", "historique", "notes"] as const;
+const TABS = ["matrice", "plan", "coachings", "historique", "notes"] as const;
 type Tab = (typeof TABS)[number];
 
 function seniority(hiredAt: string | null) {
@@ -58,13 +61,19 @@ export default async function MemberPage({
   const member = await loadMemberProfile(orgId, memberId);
   if (!member || member.role !== "sales_rep" || !(await canManageMember(memberId))) notFound();
 
-  const [progress, notes, coachings, sessions] = await Promise.all([
+  const [progress, notes, coachings, sessions, actions] = await Promise.all([
     loadProgress(orgId, memberId),
     tab === "notes" ? listManagerNotes(memberId) : Promise.resolve([]),
     listCoachings(orgId, { memberId }),
     tab === "coachings" ? listDojoSessions(orgId, { memberId }) : Promise.resolve([]),
+    listActions(orgId, { memberId }),
   ]);
   const now = currentTime();
+  const today = todayInZone(now);
+  const overdueActions = countOverdue(actions, today);
+  const openActions = actions.filter(
+    (a) => a.status === "a_faire" || a.status === "en_cours",
+  ).length;
   const coachingGroups = groupCoachings(coachings, now);
   const lastCoaching = coachingGroups.closed[0];
   const nextCoaching = coachingGroups.upcoming[0];
@@ -141,12 +150,16 @@ export default async function MemberPage({
                   : "Aucune",
               },
               {
-                label: "Dernier coaching",
+                label: "Coachings",
                 value: lastCoaching ? formatShortDay(lastCoaching.scheduledAt) : "Aucun",
+                hint: nextCoaching
+                  ? `prochain : ${formatShortDay(nextCoaching.scheduledAt)}`
+                  : "dernier clôturé",
               },
               {
-                label: "Prochain coaching",
-                value: nextCoaching ? formatShortDay(nextCoaching.scheduledAt) : "—",
+                label: "Actions en retard",
+                value: `${overdueActions}`,
+                hint: `sur ${openActions} en cours`,
               },
             ]}
           />
@@ -157,6 +170,11 @@ export default async function MemberPage({
               current={tab}
               tabs={[
                 { key: "matrice", label: "Matrice", href: base },
+                {
+                  key: "plan",
+                  label: `Plan de progrès${overdueActions ? ` (${overdueActions} en retard)` : ""}`,
+                  href: `${base}?vue=plan`,
+                },
                 { key: "coachings", label: "Coachings", href: `${base}?vue=coachings` },
                 { key: "historique", label: "Historique", href: `${base}?vue=historique` },
                 { key: "notes", label: "Notes privées", href: `${base}?vue=notes` },
@@ -171,6 +189,18 @@ export default async function MemberPage({
               latest={progress.latest}
               self={progress.self}
               observed={progress.observed}
+            />
+          ) : null}
+          {tab === "plan" ? (
+            <ActionPlan
+              actions={actions}
+              today={today}
+              slug={slug}
+              organizationId={orgId}
+              memberId={memberId}
+              skillGroups={skillGroups(progress.tree)}
+              self={false}
+              canManage
             />
           ) : null}
           {tab === "coachings" ? (

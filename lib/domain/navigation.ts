@@ -10,7 +10,8 @@ export type NavIcon =
   | "matrix"
   | "dojo"
   | "settings"
-  | "coaching";
+  | "coaching"
+  | "plan";
 
 export type NavItem = {
   label: string;
@@ -29,7 +30,8 @@ export function orgNavigation(slug: string, role: SpaceRole): NavItem[] {
 
   if (role === "sales_rep") {
     return [
-      { label: "Ma progression", href: `${base}/moi`, icon: "progress" },
+      { label: "Ma progression", href: `${base}/moi`, icon: "progress", exact: true },
+      { label: "Mon plan", href: `${base}/moi/plan`, icon: "plan" },
       { label: "Coachings", href: `${base}/coachings`, icon: "coaching" },
       { label: "Dojos", href: `${base}/dojos`, icon: "dojo" },
       { label: "Profil", href: "/profil", icon: "profile" },

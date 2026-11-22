@@ -11,7 +11,48 @@ import {
   type LatestScore,
 } from "@/lib/domain/evaluation";
 import type { FrameworkTree } from "@/lib/domain/framework";
+import { SCORE_VALUES } from "@/lib/domain/levels";
+import { fr } from "@/lib/i18n/fr";
 import { cn } from "@/lib/utils";
+
+/**
+ * Les 5 niveaux d'une sous-compétence (§4.9 : « les descripteurs de niveaux ») : le niveau actuel
+ * est mis en avant, le suivant signalé comme prochaine marche.
+ */
+function LevelLadder({
+  statement,
+  levels,
+  current,
+}: {
+  statement: string | null;
+  levels: (string | null)[];
+  current: number | null;
+}) {
+  const next = current === null ? 0 : current < 4 ? current + 1 : null;
+  return (
+    <div className="border-t border-line bg-bone/60 px-4 py-3">
+      {statement ? <p className="mb-2 text-sm italic">{statement}</p> : null}
+      <ol className="flex flex-col gap-1.5">
+        {SCORE_VALUES.map((level) => (
+          <li
+            key={level}
+            className={cn(
+              "flex gap-2 rounded-(--radius-control) px-2 py-1.5 text-sm",
+              level === current && "bg-fluo/50 font-semibold",
+              level === next && "border border-dashed border-forest",
+            )}
+          >
+            <span className="w-4 shrink-0 font-display font-bold tabular-nums">{level}</span>
+            <span>
+              {levels[level] ?? fr.levels[level]}
+              {level === current ? " · niveau actuel" : level === next ? " · prochaine marche" : ""}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
 
 function shortDate(iso: string) {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
@@ -85,19 +126,36 @@ export function SkillMatrix({
                           const current = latest.get(skill.id);
                           const own = self.get(skill.id);
                           return (
-                            <li key={skill.id} className="flex items-center gap-3 px-4 py-2.5">
-                              <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium">{skill.name}</p>
-                                <p className="text-xs text-muted">
-                                  {current ? shortDate(current.evaluatedAt) : "Jamais évaluée"}
-                                  {own ? ` · ${selfLabel} : ${own.score}` : ""}
-                                  {observed?.get(skill.id)
-                                    ? ` · Coaching : ${observed.get(skill.id)?.score}`
-                                    : ""}
-                                </p>
-                              </div>
-                              <TrendIcon value={trend(current?.score, current?.previousScore)} />
-                              <ScoreBadge score={current?.score ?? null} />
+                            <li key={skill.id}>
+                              <details className="group">
+                                <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-2.5 hover:bg-bone [&::-webkit-details-marker]:hidden">
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-medium">{skill.name}</p>
+                                    <p className="text-xs text-muted">
+                                      {current ? shortDate(current.evaluatedAt) : "Jamais évaluée"}
+                                      {own ? ` · ${selfLabel} : ${own.score}` : ""}
+                                      {observed?.get(skill.id)
+                                        ? ` · Coaching : ${observed.get(skill.id)?.score}`
+                                        : ""}
+                                    </p>
+                                  </div>
+                                  <TrendIcon
+                                    value={trend(current?.score, current?.previousScore)}
+                                  />
+                                  <ScoreBadge score={current?.score ?? null} />
+                                </summary>
+                                <LevelLadder
+                                  statement={skill.statement}
+                                  levels={[
+                                    skill.levels.level_0,
+                                    skill.levels.level_1,
+                                    skill.levels.level_2,
+                                    skill.levels.level_3,
+                                    skill.levels.level_4,
+                                  ]}
+                                  current={current?.score ?? null}
+                                />
+                              </details>
                             </li>
                           );
                         })}
