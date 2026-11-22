@@ -33,7 +33,7 @@ test.describe("Pilotage", () => {
 
     // Une tentative d'écriture est refusée.
     await page.goto(`/e/${seed.slug}/moi/plan`);
-    await page.getByText("Ajouter une action", { exact: true }).click();
+    // Plan vide : le formulaire d'ajout est déjà ouvert.
     await page.getByLabel("Ton action").fill("Écriture interdite");
     await page.getByRole("button", { name: "Ajouter l'action" }).click();
     await expect(page.getByText("Vous ne pouvez pas modifier ce plan.").first()).toBeVisible();
