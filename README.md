@@ -1,16 +1,46 @@
-# React + Vite
+# Première Ligne
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Plateforme de suivi de la montée en compétences des équipes commerciales : référentiel, évaluations, coachings terrain, plans de progrès et Dojos.
 
-Currently, two official plugins are available:
+Cahier des charges : [`docs/SPEC.md`](docs/SPEC.md) · Décisions : [`docs/DECISIONS.md`](docs/DECISIONS.md) · Avancement : [`docs/PROGRESS.md`](docs/PROGRESS.md)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Lancer le projet en local
 
-## React Compiler
+Prérequis : Node.js 22, pnpm 10 (`corepack enable`), et Docker pour la base locale.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+pnpm install
+cp .env.example .env.local   # puis remplir les valeurs
+pnpm dev                     # http://localhost:3000
+```
 
-## Expanding the ESLint configuration
+Base de données locale :
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+pnpm db:start     # démarre Supabase dans Docker, applique les migrations
+pnpm db:test      # tests de sécurité (RLS)
+pnpm db:stop
+```
+
+## Vérifier avant de livrer
+
+```bash
+pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build
+pnpm test:e2e     # ordinateur + mobile
+```
+
+La CI GitHub Actions lance les mêmes vérifications, plus les tests RLS, à chaque pull request.
+
+## Organisation
+
+```
+app/(public)     accueil, connexion, pages légales
+components/ui    composants de base (shadcn/ui, aux couleurs Première Ligne)
+components/brand logo
+lib/domain       calculs métier purs (testés)
+lib/supabase     clients Supabase (navigateur, serveur, service)
+lib/i18n/fr.ts   tous les textes affichés
+supabase/        configuration, migrations, tests SQL
+tests/           tests unitaires et de bout en bout
+docs/            cahier des charges, décisions, avancement
+```

@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+/*
+ * Charte Première Ligne.
+ * Toutes les couleurs passent par ces jetons : ne jamais écrire un hexadécimal
+ * directement dans un composant. Un mode sombre (V2) n'aura qu'à redéfinir :root.
+ */
+:root {
+  /* Marque */
+  --pl-forest: #0b3d2e; /* primaire : en-têtes, barre latérale, boutons secondaires */
+  --pl-forest-deep: #072820; /* texte fort */
+  --pl-forest-light: #1a5c42; /* survol, liens */
+  --pl-fluo: #d4ff3a; /* accent : bouton principal (texte forêt dessus, jamais blanc) */
+  --pl-fluo-hover: #c4f020;
+
+  /* Neutres */
+  --pl-bone: #f4f2ee; /* fond de page */
+  --pl-surface: #ffffff; /* cartes */
+  --pl-line: #e8e4dc; /* bordures */
+  --pl-muted: #5f635d; /* texte secondaire (contraste AA sur fond os) */
+  --pl-subtle: #8a8d88; /* texte tertiaire, icônes inactives */
+
+  /* Niveaux de compétence (§6.4) */
+  --pl-level-low: #d64545; /* 0 et 1 */
+  --pl-level-mid: #e9a23b; /* 2 */
+  --pl-level-good: #2e9e6a; /* 3 */
+  --pl-level-expert: #2f6fdb; /* 4 */
+  --pl-level-none: #a3a6a0; /* non évaluée */
+
+  /* États */
+  --pl-danger: #d64545;
+  --pl-success: #2e9e6a;
+  --pl-warning: #e9a23b;
+
+  --pl-shadow: 0 1px 2px rgb(7 40 32 / 0.05), 0 2px 8px rgb(7 40 32 / 0.05);
+}
+
+@theme inline {
+  --color-forest: var(--pl-forest);
+  --color-forest-deep: var(--pl-forest-deep);
+  --color-forest-light: var(--pl-forest-light);
+  --color-fluo: var(--pl-fluo);
+  --color-fluo-hover: var(--pl-fluo-hover);
+  --color-bone: var(--pl-bone);
+  --color-surface: var(--pl-surface);
+  --color-line: var(--pl-line);
+  --color-muted: var(--pl-muted);
+  --color-subtle: var(--pl-subtle);
+  --color-level-low: var(--pl-level-low);
+  --color-level-mid: var(--pl-level-mid);
+  --color-level-good: var(--pl-level-good);
+  --color-level-expert: var(--pl-level-expert);
+  --color-level-none: var(--pl-level-none);
+  --color-danger: var(--pl-danger);
+  --color-success: var(--pl-success);
+  --color-warning: var(--pl-warning);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sora), var(--font-inter), ui-sans-serif, sans-serif;
+
+  --radius-card: 12px;
+  --radius-control: 8px;
+  --shadow-card: var(--pl-shadow);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--pl-bone);
+    color: var(--pl-forest-deep);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  /* Focus toujours visible au clavier (§10.4, accessibilité) */
+  :focus-visible {
+    outline: 3px solid var(--pl-forest-light);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--pl-fluo);
+    color: var(--pl-forest-deep);
+  }
+}
