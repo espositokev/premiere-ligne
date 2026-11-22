@@ -83,7 +83,7 @@ export default async function TeamPage({ params }: PageProps<"/e/[slug]/equipe">
                 <MemberList
                   members={group.reps}
                   showRole={false}
-                  hrefFor={admin ? (m) => `/e/${slug}/parametres/utilisateurs/${m.id}` : undefined}
+                  hrefFor={(m) => `/e/${slug}/equipe/${m.id}`}
                 />
               </section>
             ))

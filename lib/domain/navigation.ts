@@ -21,6 +21,7 @@ export function orgNavigation(slug: string, role: SpaceRole): NavItem[] {
   if (role === "sales_rep") {
     return [
       { label: "Ma progression", href: `${base}/moi`, icon: "progress" },
+      { label: "Dojos", href: `${base}/dojos`, icon: "dojo" },
       { label: "Profil", href: "/profil", icon: "profile" },
     ];
   }
@@ -34,8 +35,9 @@ export function orgNavigation(slug: string, role: SpaceRole): NavItem[] {
     },
   ];
 
+  items.push({ label: "Dojos", href: `${base}/dojos`, icon: "dojo" });
+
   if (canAdministerOrg(role)) {
-    items.push({ label: "Matrice", href: `${base}/parametres/referentiel`, icon: "matrix" });
     items.push({ label: "Paramètres", href: `${base}/parametres`, icon: "settings" });
   } else {
     items.push({ label: "Profil", href: "/profil", icon: "profile" });

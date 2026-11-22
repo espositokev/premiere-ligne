@@ -83,9 +83,7 @@ describe("navigation", () => {
 
   it("ne surligne que l'entrée la plus précise", () => {
     const items = orgNavigation("acme", "org_admin");
-    expect(activeNavHref(items, "/e/acme/parametres/referentiel")).toBe(
-      "/e/acme/parametres/referentiel",
-    );
+    expect(activeNavHref(items, "/e/acme/dojos/123")).toBe("/e/acme/dojos");
     expect(activeNavHref(items, "/e/acme/parametres/equipes")).toBe("/e/acme/parametres");
     expect(activeNavHref(items, "/e/acme")).toBe("/e/acme");
   });

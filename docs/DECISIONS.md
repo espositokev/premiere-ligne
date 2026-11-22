@@ -2,6 +2,17 @@
 
 Choix faits en l'absence d'information dans `docs/SPEC.md`, ou validés avec le fondateur quand ils s'en écartent. Le plus récent en haut.
 
+## 22/11/2026 — Étape 3 (évaluations et fiche commercial)
+
+- **Radar : un axe par compétence** (moyenne de ses sous-compétences), pas par bloc : la matrice n'a que 2 blocs, un radar à 2 axes ne dirait rien. Superposition : dernière évaluation (plein), précédente (clair), auto-évaluation (pointillés).
+- **Adresses** : la fiche commercial est sous `/e/[slug]/equipe/[memberId]` (au lieu de `/commerciaux/[id]`) pour que l'onglet « Mon équipe / Commerciaux » reste allumé. Saisie : `/equipe/[memberId]/evaluations/[id]` ; côté commercial : `/moi/evaluations/[id]`.
+- **Un seul brouillon** par commercial et par type (manager / auto) : « Nouvelle évaluation » reprend le brouillon en cours.
+- **Lecture** : le commercial ne voit une évaluation manager qu'une fois validée ; le manager ne voit une auto-évaluation qu'une fois validée.
+- **Correction** d'une évaluation validée : réservée au responsable (et au super admin), sur demande explicite (« Corriger »), chaque enregistrement est inscrit au journal (`evaluation.corrected`).
+- **Note effacée** = sous-compétence « non évaluée » (la ligne est retirée, donc la sous-compétence peut encore être supprimée si elle n'a jamais été notée ailleurs).
+- **Paramètre « auto-évaluation activée »** (§6.8) : reporté à l'étape des paramètres d'entreprise ; l'auto-évaluation est toujours possible en attendant.
+- **Navigation** : « Dojos » ajouté au menu des trois rôles ; « Matrice » est accessible depuis Paramètres.
+
 ## 22/11/2026 — Étape 2 (matrices et Dojos)
 
 - **Matrice à 3 niveaux**, celle de la méthode Première Ligne : Bloc (« Tunnel de vente », « Compétences transversales ») → Compétence (ex. « Accueil ») → Sous-compétence notée de 0 à 4. Dans le code, la sous-compétence notée garde le nom `skills` de la spec ; le niveau intermédiaire s'appelle `competencies`.

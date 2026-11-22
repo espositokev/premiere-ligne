@@ -226,6 +226,49 @@ type DojoRow = {
 };
 
 /** Champs générés par la base : facultatifs à l'insertion. */
+type EvaluationRow = {
+  id: string;
+  organization_id: string;
+  subject_membership_id: string;
+  author_membership_id: string | null;
+  author_user_id: string;
+  framework_id: string;
+  kind: "manager" | "self";
+  status: "brouillon" | "validee";
+  general_comment: string | null;
+  validated_at: string | null;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type EvaluationScoreRow = {
+  evaluation_id: string;
+  skill_id: string;
+  organization_id: string;
+  score: number | null;
+  comment: string | null;
+  updated_at: string | null;
+};
+
+type ManagerNoteRow = {
+  id: string;
+  organization_id: string;
+  subject_membership_id: string;
+  author_user_id: string;
+  body: string;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type LatestSkillScoreRow = {
+  subject_membership_id: string;
+  skill_id: string;
+  organization_id: string;
+  score: number;
+  evaluated_at: string;
+  evaluation_id: string;
+};
+
 type Generated = "id" | "created_at" | "updated_at";
 type InsertOf<Row, Optional extends keyof Row> = Omit<Row, Optional> & Partial<Pick<Row, Optional>>;
 
@@ -449,8 +492,46 @@ export type Database = {
           Rel<"dojos_organization_id_fkey", ["organization_id"], "organizations", ["id"]>,
         ];
       };
+      evaluations: {
+        Row: EvaluationRow;
+        Insert: InsertOf<
+          EvaluationRow,
+          Generated | "status" | "author_user_id" | "author_membership_id" | "general_comment" | "validated_at"
+        >;
+        Update: Partial<EvaluationRow>;
+        Relationships: [
+          Rel<
+            "evaluations_subject_membership_id_organization_id_fkey",
+            ["subject_membership_id", "organization_id"],
+            "memberships",
+            ["id", "organization_id"]
+          >,
+          Rel<"evaluations_author_user_id_fkey", ["author_user_id"], "profiles", ["id"]>,
+        ];
+      };
+      evaluation_scores: {
+        Row: EvaluationScoreRow;
+        Insert: InsertOf<EvaluationScoreRow, "comment" | "updated_at">;
+        Update: Partial<EvaluationScoreRow>;
+        Relationships: [
+          Rel<
+            "evaluation_scores_evaluation_id_organization_id_fkey",
+            ["evaluation_id", "organization_id"],
+            "evaluations",
+            ["id", "organization_id"]
+          >,
+        ];
+      };
+      manager_notes: {
+        Row: ManagerNoteRow;
+        Insert: InsertOf<ManagerNoteRow, Generated | "author_user_id">;
+        Update: Partial<ManagerNoteRow>;
+        Relationships: [Rel<"manager_notes_author_user_id_fkey", ["author_user_id"], "profiles", ["id"]>];
+      };
     };
-    Views: Record<string, never>;
+    Views: {
+      v_latest_skill_scores: { Row: LatestSkillScoreRow; Relationships: [] };
+    };
     Functions: {
       is_super_admin: { Args: Record<string, never>; Returns: boolean };
       my_role: { Args: { org: string }; Returns: OrgRole | null };
@@ -463,6 +544,7 @@ export type Database = {
       is_block_used: { Args: { block: string }; Returns: boolean };
       used_skill_ids: { Args: { org: string }; Returns: string[] };
       duplicate_template: { Args: { template: string; new_name: string }; Returns: string };
+      mastery_percent: { Args: { member: string }; Returns: number | null };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
