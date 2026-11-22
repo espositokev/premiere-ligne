@@ -5,11 +5,34 @@
 | 0 — Socle                                           | ✅ Validée par le fondateur le 22/11/2026                                        |
 | 1 — Comptes, entreprises, rôles                     | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 2 — Référentiels et Dojos                           | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
-| 3 — Évaluations et fiche commercial                 | À faire                                                                          |
+| 3 — Évaluations et fiche commercial                 | 🔨 Construite et testée, en attente d'une base Supabase en ligne pour la recette |
 | 4 — Coachings                                       | À faire                                                                          |
 | 5 — Plan de progrès et vue commercial               | À faire                                                                          |
 | 6 — Tableaux de bord, « voir en tant que », journal | À faire                                                                          |
 | 7 — RGPD et mise en production                      | À faire                                                                          |
+
+## Étape 3 — Évaluations et fiche commercial
+
+### Fait
+
+- Évaluation par le manager : notes 0 à 4 en gros boutons, description du niveau, note précédente rappelée, commentaire par sous-compétence et commentaire général, enregistrement automatique du brouillon, validation en deux temps.
+- Auto-évaluation du commercial (tutoiement), affichée à côté de l'évaluation du manager sans la remplacer.
+- Correction d'une évaluation validée réservée au responsable, tracée dans le journal.
+- Fiche commercial : % de maîtrise, date de la dernière évaluation, radar (un axe par compétence, avec précédente et auto-évaluation), matrice avec pastilles, évolution ↑ ↓ = et historique.
+- Notes privées du manager, jamais visibles par le commercial.
+- « Ma progression » côté commercial, et « Dojos » ajouté au menu.
+- Une sous-compétence déjà notée ne peut plus être supprimée (on la désactive).
+
+### Vérifié
+
+- `pnpm lint`, `pnpm typecheck`, `pnpm test` (55 tests), `pnpm build`.
+- Tests SQL de RLS (31 vérifications pour l'étape 3) et tests de bout en bout ordinateur + mobile : CI verte.
+- Écrans de saisie et de fiche vérifiés en capture sur téléphone et ordinateur (données d'exemple).
+
+### À tester par le fondateur (dès que la base en ligne existe)
+
+- Évaluer un commercial sur téléphone, quitter, reprendre, valider.
+- Se connecter en commercial : voir sa progression, faire son auto-évaluation.
 
 ## Étape 2 — Référentiels et Dojos
 
