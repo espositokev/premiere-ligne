@@ -315,6 +315,11 @@ for (const persona of personas) {
     for (const [slug, path] of persona.pages) {
       await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
       await page.waitForTimeout(700);
+      // Capture de la page entière : les éléments fixes (menus, barres d'action) reprennent leur place.
+      await page.addStyleTag({
+        content:
+          ".fixed{position:static!important} aside.sticky{position:static!important;height:auto!important}",
+      });
       const file = `${String(n + persona.pages.findIndex((p) => p[0] === slug)).padStart(2, "0")}-${slug}-${device}.jpg`;
       await page.screenshot({ path: `${OUT}/${file}`, fullPage: true, type: "jpeg", quality: 72 });
       console.log("📸", file);

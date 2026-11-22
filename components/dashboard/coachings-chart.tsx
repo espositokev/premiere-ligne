@@ -38,7 +38,12 @@ export function CoachingsChart({
             tickLine={false}
           />
           <Tooltip cursor={{ fill: "var(--color-bone)" }} />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Legend
+            wrapperStyle={{ fontSize: 12 }}
+            formatter={(value) => (
+              <span style={{ color: "var(--color-forest-deep)" }}>{value}</span>
+            )}
+          />
           {coaches.map((coach, i) => (
             <Bar
               key={coach}

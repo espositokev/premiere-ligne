@@ -295,14 +295,14 @@ await must(
 );
 
 const repsSpec = [
-  ["leo.bernard", "Léo", "Bernard", nord, 2.2, "Conseiller commercial VO"],
-  ["ines.robert", "Inès", "Robert", nord, 2.8, "Conseillère commerciale VO"],
-  ["tom.martin", "Tom", "Martin", nord, 1.4, "Conseiller commercial junior"],
-  ["chloe.dubois", "Chloé", "Dubois", nord, 3.1, "Conseillère commerciale senior"],
-  ["yanis.moreau", "Yanis", "Moreau", sud, 2.0, "Conseiller commercial VN"],
-  ["emma.laurent", "Emma", "Laurent", sud, 2.6, "Conseillère commerciale VN"],
-  ["hugo.simon", "Hugo", "Simon", sud, 1.7, "Conseiller commercial VN"],
-  ["manon.michel", "Manon", "Michel", sud, 2.4, "Conseillère commerciale VN"],
+  ["leo.bernard", "Léo", "Bernard", nord, 1.7, "Conseiller commercial VO"],
+  ["ines.robert", "Inès", "Robert", nord, 2.2, "Conseillère commerciale VO"],
+  ["tom.martin", "Tom", "Martin", nord, 1.1, "Conseiller commercial junior"],
+  ["chloe.dubois", "Chloé", "Dubois", nord, 2.6, "Conseillère commerciale senior"],
+  ["yanis.moreau", "Yanis", "Moreau", sud, 1.6, "Conseiller commercial VN"],
+  ["emma.laurent", "Emma", "Laurent", sud, 2.1, "Conseillère commerciale VN"],
+  ["hugo.simon", "Hugo", "Simon", sud, 1.3, "Conseiller commercial VN"],
+  ["manon.michel", "Manon", "Michel", sud, 1.9, "Conseillère commerciale VN"],
 ];
 const reps = [];
 for (const [login, first, last, team, level, title] of repsSpec) {
@@ -328,7 +328,7 @@ for (const [index, rep] of reps.entries()) {
   const base = skillIds.map((_, i) => rep.level + weakness[i] + (rand() - 0.5) * 1.2);
   const rounds = index === 2 ? [80] : index === 6 ? [75, 38] : [82, 45, 9 + index];
   for (const [r, days] of rounds.entries()) {
-    const gain = r * 0.45;
+    const gain = r * 0.35;
     const scores = {};
     skillIds.forEach((id, i) => {
       if (rand() < 0.12) return; // quelques sous-compétences non évaluées
