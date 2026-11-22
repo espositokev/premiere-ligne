@@ -7,7 +7,7 @@ import { getMySpaces } from "@/lib/auth/current-user";
 import { homePathFor } from "@/lib/domain/navigation";
 import { safeNextPath } from "@/lib/domain/redirects";
 import { formError, UNEXPECTED_ERROR, type FormState } from "@/lib/forms";
-import { createClient } from "@/lib/supabase/server";
+import { createSessionClient as createClient } from "@/lib/supabase/session";
 import { fieldErrors, requestCodeSchema, verifyCodeSchema } from "@/lib/validation/schemas";
 
 export type LoginState = FormState & { step?: "email" | "code"; email?: string };

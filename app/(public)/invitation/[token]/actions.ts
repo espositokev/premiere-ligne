@@ -6,7 +6,7 @@ import { audit } from "@/lib/audit";
 import { hashToken } from "@/lib/auth/tokens";
 import { invitationState } from "@/lib/domain/invitations";
 import { formError, UNEXPECTED_ERROR, type FormState } from "@/lib/forms";
-import { createClient } from "@/lib/supabase/server";
+import { createSessionClient as createClient } from "@/lib/supabase/session";
 import { createServiceClient } from "@/lib/supabase/service";
 import { acceptInvitationSchema, fieldErrors } from "@/lib/validation/schemas";
 

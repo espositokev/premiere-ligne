@@ -5,6 +5,8 @@ import { cache } from "react";
 
 import type { SpaceRole } from "@/lib/domain/roles";
 import { createClient } from "@/lib/supabase/server";
+
+import { getActivePreview } from "./preview";
 import type { OrgStatus } from "@/lib/supabase/types";
 
 export type CurrentUser = {
@@ -15,6 +17,8 @@ export type CurrentUser = {
   phone: string | null;
   isSuperAdmin: boolean;
   termsAcceptedAt: string | null;
+  /** Présent pendant un « voir en tant que » : la personne réellement connectée. */
+  previewActorId?: string;
 };
 
 export type Space = {
@@ -32,15 +36,22 @@ export type Space = {
  */
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const preview = await getActivePreview();
+  let userId: string;
+  if (preview) {
+    userId = preview.targetUserId;
+  } else {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+    userId = user.id;
+  }
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, email, first_name, last_name, phone, is_super_admin, terms_accepted_at")
-    .eq("id", user.id)
+    .eq("id", userId)
     .maybeSingle();
   if (!profile) return null;
 
@@ -51,7 +62,11 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     lastName: profile.last_name,
     phone: profile.phone,
     isSuperAdmin: profile.is_super_admin,
-    termsAcceptedAt: profile.terms_accepted_at,
+    // En aperçu, on ne bloque pas sur l'acceptation des CGU de la personne regardée.
+    termsAcceptedAt: preview
+      ? (profile.terms_accepted_at ?? new Date(0).toISOString())
+      : profile.terms_accepted_at,
+    previewActorId: preview?.actorId,
   };
 });
 

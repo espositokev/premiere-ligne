@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/ui/page";
 import { getOrgContext } from "@/lib/auth/org-context";
 import { loadOrganizationTree } from "@/lib/data/framework";
 import { editorBlocks } from "@/lib/data/progress";
+import { getOrgSettings } from "@/lib/data/settings";
 
 export const metadata: Metadata = { title: "Demander un coaching" };
 
@@ -20,8 +21,11 @@ export default async function RequestCoachingPage({
   const { competence } = await searchParams;
   const context = await getOrgContext(slug);
   if (context.role !== "sales_rep" || !context.membershipId) redirect(`/e/${slug}/coachings`);
-  const framework = await loadOrganizationTree(context.organization.id);
-  if (!framework) redirect(`/e/${slug}/coachings`);
+  const [framework, settings] = await Promise.all([
+    loadOrganizationTree(context.organization.id),
+    getOrgSettings(context.organization.id),
+  ]);
+  if (!framework || !settings.allowCoachingRequests) redirect(`/e/${slug}/coachings`);
 
   return (
     <>

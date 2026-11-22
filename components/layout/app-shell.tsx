@@ -6,6 +6,7 @@ import {
   CalendarCheck,
   Grid3x3,
   Settings,
+  History,
   House,
   ListChecks,
   LogOut,
@@ -37,6 +38,7 @@ const ICONS: Record<NavIcon | "building", LucideIcon> = {
   settings: Settings,
   coaching: CalendarCheck,
   plan: ListChecks,
+  history: History,
 };
 
 export type ShellNavItem = Omit<NavItem, "icon"> & { icon: NavIcon | "building" };

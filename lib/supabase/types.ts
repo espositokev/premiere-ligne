@@ -30,6 +30,7 @@ type OrganizationRow = {
   logo_url: string | null;
   status: OrgStatus;
   settings: Json;
+  archived_at: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string | null;
@@ -395,7 +396,7 @@ export type Database = {
         Row: OrganizationRow;
         Insert: InsertOf<
           OrganizationRow,
-          Generated | "logo_url" | "status" | "settings" | "created_by"
+          Generated | "logo_url" | "status" | "settings" | "created_by" | "archived_at"
         >;
         Update: Partial<OrganizationRow>;
         Relationships: [];
@@ -472,7 +473,10 @@ export type Database = {
           "id" | "created_at" | "organization_id" | "actor_user_id" | "target_type" | "target_id" | "details"
         >;
         Update: Partial<AuditLogRow>;
-        Relationships: [];
+        Relationships: [
+          Rel<"audit_log_actor_user_id_fkey", ["actor_user_id"], "profiles", ["id"]>,
+          Rel<"audit_log_organization_id_fkey", ["organization_id"], "organizations", ["id"]>,
+        ];
       };
       email_log: {
         Row: EmailLogRow;
@@ -798,6 +802,7 @@ export type Database = {
       my_role: { Args: { org: string }; Returns: OrgRole | null };
       is_org_admin: { Args: { org: string }; Returns: boolean };
       can_manage_member: { Args: { member: string }; Returns: boolean };
+      managed_member_ids: { Args: { org: string }; Returns: string[] };
       can_view_member: { Args: { member: string }; Returns: boolean };
       copy_template_to_organization: { Args: { template: string; org: string }; Returns: string };
       is_skill_used: { Args: { skill: string }; Returns: boolean };
@@ -806,6 +811,8 @@ export type Database = {
       used_skill_ids: { Args: { org: string }; Returns: string[] };
       duplicate_template: { Args: { template: string; new_name: string }; Returns: string };
       mastery_percent: { Args: { member: string }; Returns: number | null };
+      anonymize_profile: { Args: { target: string }; Returns: undefined };
+      purge_organization: { Args: { org: string }; Returns: string[] };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

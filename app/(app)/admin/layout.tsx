@@ -5,6 +5,7 @@ const NAV: ShellNavItem[] = [
   { label: "Tableau de bord", href: "/admin", icon: "home", exact: true },
   { label: "Entreprises", href: "/admin/entreprises", icon: "building" },
   { label: "Modèles", href: "/admin/modeles", icon: "matrix" },
+  { label: "Journal", href: "/admin/journal", icon: "history" },
   { label: "Profil", href: "/profil", icon: "profile" },
 ];
 

@@ -1,3 +1,4 @@
+import { Download, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import type { Metadata } from "next";
@@ -5,11 +6,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { setMemberActive } from "@/app/actions/members";
+import { anonymizeMember } from "@/app/actions/rgpd";
+import { startPreview } from "@/app/actions/preview";
 import { MemberEditForm } from "@/components/org/member-edit-form";
+import { Button } from "@/components/ui/button";
 import { ToggleForm } from "@/components/org/toggle-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
+import { previewAvailable } from "@/lib/auth/preview";
 import { requireOrgAdmin } from "@/lib/auth/require-org";
 import { listMembers, listTeams } from "@/lib/data/organization";
 import { ROLE_LABELS } from "@/lib/domain/roles";
@@ -72,6 +77,49 @@ export default async function MemberPage({
                 : "Jamais connecté"}
             </CardDescription>
           </Card>
+          {!isSelf && member.active && previewAvailable() ? (
+            <Card>
+              <CardTitle>Voir en tant que</CardTitle>
+              <CardDescription className="mt-2 mb-4 text-sm">
+                Affiche l&apos;application exactement comme cette personne la voit, sans rien
+                pouvoir modifier. Journalisé.
+              </CardDescription>
+              <form action={startPreview}>
+                <input type="hidden" name="slug" value={slug} />
+                <input type="hidden" name="member_id" value={member.id} />
+                <Button type="submit" variant="secondary">
+                  <Eye aria-hidden="true" /> Voir en tant que {member.firstName}
+                </Button>
+              </form>
+            </Card>
+          ) : null}
+          <Card>
+            <CardTitle>Données personnelles</CardTitle>
+            <CardDescription className="mt-2 mb-4 text-sm">
+              Export de toutes les données de cette personne (droit d&apos;accès RGPD).
+            </CardDescription>
+            <Button asChild variant="outline">
+              <a href={`/e/${slug}/parametres/utilisateurs/${member.id}/export`} download>
+                <Download aria-hidden="true" /> Exporter ses données
+              </a>
+            </Button>
+          </Card>
+          {!isSelf && !member.active ? (
+            <Card>
+              <CardTitle>Anonymiser</CardTitle>
+              <CardDescription className="mt-2 mb-4 text-sm">
+                Pour un ancien salarié : son nom et son email sont effacés, ses notes privées
+                supprimées. Les évaluations et coachings restent, sans nom. Irréversible.
+              </CardDescription>
+              <ToggleForm
+                action={anonymizeMember}
+                fields={{ membership_id: member.id, slug }}
+                label="Anonymiser"
+                confirmLabel="Confirmer l'anonymisation"
+                variant="outline"
+              />
+            </Card>
+          ) : null}
           {!isSelf ? (
             <Card>
               <CardTitle>{member.active ? "Désactiver l'accès" : "Réactiver l'accès"}</CardTitle>

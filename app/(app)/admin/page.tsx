@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState, PageHeader, SectionTitle } from "@/components/ui/page";
 import { requireSuperAdmin } from "@/lib/auth/current-user";
-import { getPlatformStats } from "@/lib/data/platform";
+import { getOrganizationActivity, getPlatformStats } from "@/lib/data/platform";
 
 import { OrganizationTable } from "./organization-table";
 
@@ -14,7 +14,10 @@ export const metadata: Metadata = { title: "Administration" };
 
 export default async function AdminDashboardPage() {
   const user = await requireSuperAdmin();
-  const { organizations, activeUsers, pendingInvitations } = await getPlatformStats();
+  const [{ organizations, activeUsers, pendingInvitations }, activity] = await Promise.all([
+    getPlatformStats(),
+    getOrganizationActivity(),
+  ]);
 
   const activeOrganizations = organizations.filter((o) => o.status === "actif").length;
 
@@ -46,6 +49,54 @@ export default async function AdminDashboardPage() {
           </Card>
         ))}
       </div>
+      {activity.length ? (
+        <section className="mb-8">
+          <SectionTitle
+            aside={
+              <a
+                href="/admin/export"
+                download
+                className="text-sm font-semibold text-forest-light hover:underline"
+              >
+                Exporter (CSV)
+              </a>
+            }
+          >
+            Activité par entreprise
+          </SectionTitle>
+          <div className="overflow-x-auto rounded-(--radius-card) border border-line bg-surface">
+            <table className="w-full min-w-[36rem] text-left text-sm">
+              <thead className="border-b border-line bg-bone text-xs tracking-wide text-muted uppercase">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Entreprise</th>
+                  <th className="px-4 py-3 font-semibold">Connectés 30 j</th>
+                  <th className="px-4 py-3 font-semibold">Coachings du mois</th>
+                  <th className="px-4 py-3 font-semibold">Évaluations du mois</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {activity.map((o) => (
+                  <tr key={o.id} className="hover:bg-bone">
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/admin/entreprises/${o.id}`}
+                        className="font-semibold hover:underline"
+                      >
+                        {o.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 tabular-nums">
+                      {o.activeUsers30d} <span className="text-muted">/ {o.members}</span>
+                    </td>
+                    <td className="px-4 py-3 tabular-nums">{o.coachingsThisMonth}</td>
+                    <td className="px-4 py-3 tabular-nums">{o.evaluationsThisMonth}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ) : null}
       <SectionTitle>Entreprises</SectionTitle>
       {organizations.length === 0 ? (
         <EmptyState

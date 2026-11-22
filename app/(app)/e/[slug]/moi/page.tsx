@@ -15,6 +15,7 @@ import { now as currentTime } from "@/lib/clock";
 import { listActions } from "@/lib/data/actions";
 import { listCoachings } from "@/lib/data/coachings";
 import { formatShortDate, loadProgress } from "@/lib/data/progress";
+import { getOrgSettings } from "@/lib/data/settings";
 import { countOverdue, isDueSoon, reportsToRead } from "@/lib/domain/actions";
 import { formatShortDay, formatWhen, groupCoachings, todayInZone } from "@/lib/domain/coaching";
 import { activeSkillsOf } from "@/lib/domain/evaluation";
@@ -29,10 +30,11 @@ export default async function MyProgressPage({ params, searchParams }: PageProps
   if (context.role !== "sales_rep" || !context.membershipId) redirect(`/e/${slug}`);
   const tab = vue === "historique" ? "historique" : "matrice";
 
-  const [progress, coachings, actions] = await Promise.all([
+  const [progress, coachings, actions, settings] = await Promise.all([
     loadProgress(context.organization.id, context.membershipId),
     listCoachings(context.organization.id, { memberId: context.membershipId }),
     listActions(context.organization.id, { memberId: context.membershipId }),
+    getOrgSettings(context.organization.id),
   ]);
   const now = currentTime();
   const today = todayInZone(now);
@@ -98,7 +100,7 @@ export default async function MyProgressPage({ params, searchParams }: PageProps
         title={`Salut ${context.user.firstName} !`}
         description={context.organization.name}
         action={
-          progress.hasFramework ? (
+          progress.hasFramework && settings.allowSelfEvaluation ? (
             <form action={startEvaluation}>
               <input type="hidden" name="slug" value={slug} />
               <input type="hidden" name="member_id" value={context.membershipId} />

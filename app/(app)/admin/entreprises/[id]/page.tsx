@@ -7,6 +7,7 @@ import { setOrganizationStatus } from "@/app/actions/organizations";
 import { InvitationList } from "@/components/org/invitation-list";
 import { InviteForm } from "@/components/org/invite-form";
 import { MemberList } from "@/components/org/member-list";
+import { PurgeForm } from "@/components/org/purge-form";
 import { ToggleForm } from "@/components/org/toggle-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,11 @@ import { uuidSchema } from "@/lib/validation/schemas";
 import { createClient } from "@/lib/supabase/server";
 
 import { ApplyTemplateForm } from "@/components/framework/apply-template-form";
+import { now as currentTime } from "@/lib/clock";
+
 import { STATUS_LABELS } from "../../organization-table";
+
+const PURGE_DELAY_MS = 30 * 86_400_000;
 
 export const metadata: Metadata = { title: "Fiche entreprise" };
 
@@ -32,9 +37,10 @@ export default async function OrganizationDetailPage({
   if (!uuidSchema.safeParse(id).success) notFound();
 
   const supabase = await createClient();
+  const nowMs = currentTime().getTime();
   const { data: organization } = await supabase
     .from("organizations")
-    .select("id, name, slug, status, created_at")
+    .select("id, name, slug, status, created_at, archived_at")
     .eq("id", id)
     .maybeSingle();
   if (!organization) notFound();
@@ -176,6 +182,42 @@ export default async function OrganizationDetailPage({
               ) : null}
             </div>
           </Card>
+          <Card>
+            <CardTitle>Données de l&apos;entreprise</CardTitle>
+            <CardDescription className="mt-2 mb-4 text-sm">
+              Export complet (structure, personnes, évaluations, coachings, actions), à remettre au
+              client en fin de contrat.
+            </CardDescription>
+            <Button asChild variant="outline">
+              <a href={`/admin/entreprises/${organization.id}/export`} download>
+                Exporter toutes les données
+              </a>
+            </Button>
+          </Card>
+          {organization.status === "archive" && organization.archived_at ? (
+            <Card>
+              <CardTitle>Suppression définitive</CardTitle>
+              {Date.parse(organization.archived_at) + PURGE_DELAY_MS <= nowMs ? (
+                <>
+                  <CardDescription className="mt-2 mb-4 text-sm">
+                    Archivée depuis plus de 30 jours. Toutes les données seront effacées, ainsi que
+                    les comptes qui n&apos;ont pas d&apos;autre accès. Irréversible : exportez
+                    d&apos;abord.
+                  </CardDescription>
+                  <PurgeForm organizationId={organization.id} slug={organization.slug} />
+                </>
+              ) : (
+                <CardDescription className="mt-2 text-sm">
+                  Archivée le {new Date(organization.archived_at).toLocaleDateString("fr-FR")}. La
+                  suppression définitive sera possible à partir du{" "}
+                  {new Date(
+                    Date.parse(organization.archived_at) + PURGE_DELAY_MS,
+                  ).toLocaleDateString("fr-FR")}
+                  .
+                </CardDescription>
+              )}
+            </Card>
+          ) : null}
         </aside>
       </div>
     </>

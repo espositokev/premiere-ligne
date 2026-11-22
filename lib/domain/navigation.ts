@@ -11,7 +11,8 @@ export type NavIcon =
   | "dojo"
   | "settings"
   | "coaching"
-  | "plan";
+  | "plan"
+  | "history";
 
 export type NavItem = {
   label: string;

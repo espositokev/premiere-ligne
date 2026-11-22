@@ -1,4 +1,12 @@
-import { ChevronRight, Grid3x3, UserRound, UsersRound, type LucideIcon } from "lucide-react";
+import {
+  ChevronRight,
+  Grid3x3,
+  History,
+  SlidersHorizontal,
+  UserRound,
+  UsersRound,
+  type LucideIcon,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -30,6 +38,18 @@ export default async function SettingsPage({ params }: PageProps<"/e/[slug]/para
       icon: Grid3x3,
       title: "Matrice de compétences",
       text: "Adapter les compétences au métier de l'entreprise.",
+    },
+    {
+      href: `${base}/entreprise`,
+      icon: SlidersHorizontal,
+      title: "Fonctionnement",
+      text: "Auto-évaluation, demandes de coaching, alerte « sans coaching ».",
+    },
+    {
+      href: `${base}/journal`,
+      icon: History,
+      title: "Journal d'activité",
+      text: "Qui a fait quoi, et quand.",
     },
   ];
 

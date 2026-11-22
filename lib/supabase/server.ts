@@ -1,40 +1,16 @@
 import "server-only";
 
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createPreviewClient, getActivePreview } from "@/lib/auth/preview";
 
-import { publicEnv } from "@/lib/env";
-
-import type { Database } from "./types";
+import { createSessionClient } from "./session";
 
 /**
- * Client Supabase côté serveur (Server Components, server actions, route handlers),
- * agissant avec la session de l'utilisateur connecté : la RLS s'applique.
+ * Client Supabase côté serveur (Server Components, server actions, route handlers).
+ * - Normalement : la session de l'utilisateur connecté, la RLS s'applique.
+ * - Pendant un « voir en tant que » : un client en lecture seule au nom de la personne regardée.
  */
 export async function createClient() {
-  // Lire les cookies en premier : la page devient dynamique (jamais pré-rendue au build).
-  const cookieStore = await cookies();
-  const env = publicEnv();
-
-  return createServerClient<Database>(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
-            );
-          } catch {
-            // Appelé depuis un Server Component, qui ne peut pas écrire de cookie :
-            // le proxy (étape 1) rafraîchit la session, on peut ignorer.
-          }
-        },
-      },
-    },
-  );
+  const preview = await getActivePreview();
+  if (preview) return createPreviewClient(preview.accessToken);
+  return createSessionClient();
 }

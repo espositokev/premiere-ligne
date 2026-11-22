@@ -12,6 +12,7 @@ import { getOrgContext } from "@/lib/auth/org-context";
 import { now as currentTime } from "@/lib/clock";
 import { listCoachingRequests, listCoachings, type CoachingSummary } from "@/lib/data/coachings";
 import { listDojoSessions } from "@/lib/data/dojo-sessions";
+import { getOrgSettings } from "@/lib/data/settings";
 import {
   groupCoachings,
   shiftDays,
@@ -40,12 +41,13 @@ export default async function CoachingsPage({
   const hrefFor = (c: CoachingSummary) => `${base}/${c.id}`;
 
   if (!isCoach(context.role)) {
-    const [coachings, requests, sessions] = await Promise.all([
+    const [coachings, requests, sessions, settings] = await Promise.all([
       listCoachings(orgId, { memberId: context.membershipId ?? undefined }),
       listCoachingRequests(orgId, { memberId: context.membershipId ?? undefined }),
       context.membershipId
         ? listDojoSessions(orgId, { memberId: context.membershipId })
         : Promise.resolve([]),
+      getOrgSettings(orgId),
     ]);
     const groups = groupCoachings(coachings, now);
     const upcoming = [...groups.upcoming, ...groups.toWrite];
@@ -54,11 +56,13 @@ export default async function CoachingsPage({
         <PageHeader
           title="Mes coachings"
           action={
-            <Button asChild variant="secondary" className="w-full sm:w-auto">
-              <Link href={`${base}/demander`}>
-                <MessageCirclePlus aria-hidden="true" /> Demander un coaching
-              </Link>
-            </Button>
+            settings.allowCoachingRequests ? (
+              <Button asChild variant="secondary" className="w-full sm:w-auto">
+                <Link href={`${base}/demander`}>
+                  <MessageCirclePlus aria-hidden="true" /> Demander un coaching
+                </Link>
+              </Button>
+            ) : undefined
           }
         />
         <div className="flex flex-col gap-8">
@@ -76,7 +80,11 @@ export default async function CoachingsPage({
               <EmptyState
                 icon={CalendarPlus}
                 title="Aucun coaching prévu"
-                text="Tu veux travailler un point précis ? Demande un coaching à ton manager."
+                text={
+                  settings.allowCoachingRequests
+                    ? "Tu veux travailler un point précis ? Demande un coaching à ton manager."
+                    : "Ton manager te proposera les prochains coachings."
+                }
               />
             )}
           </section>

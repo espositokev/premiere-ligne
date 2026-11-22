@@ -17,6 +17,11 @@ sql() { # sql <db> <query>
   if [ "$(id -u)" = "0" ]; then su postgres -c "psql -v ON_ERROR_STOP=1 -q -X -d '$1' -c \"$2\""; else psql -v ON_ERROR_STOP=1 -q -X -d "$1" -c "$2"; fi
 }
 
+# Redémarre le PostgreSQL local s'il s'est arrêté (conteneur relancé).
+if command -v pg_ctlcluster >/dev/null 2>&1 && [ "$(id -u)" = "0" ]; then
+  pg_ctlcluster 16 main status >/dev/null 2>&1 || pg_ctlcluster 16 main start >/dev/null 2>&1 || true
+fi
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TMP="$(mktemp -d)"; chmod 755 "$TMP"
 cp -r "$ROOT/supabase/migrations" "$ROOT/supabase/tests" "$ROOT/tests/db/supabase-shim.sql" "$TMP/"

@@ -58,12 +58,27 @@ async function deliver(input: {
  * L'écriture passe par le client de l'utilisateur : c'est la RLS qui décide s'il a le droit
  * d'inviter ce rôle dans cette équipe (§2.2, §8.3).
  */
+const INVITATIONS_PER_HOUR = 50;
+
 export async function createInvitation(
   supabase: Client,
   actor: CurrentUser,
   organization: { id: string; name: string },
   input: InvitationInput,
 ): Promise<InvitationOutcome> {
+  // Limitation de débit (§8.5) : au plus 50 invitations par personne et par heure.
+  const { count: recent } = await supabase
+    .from("invitations")
+    .select("id", { count: "exact", head: true })
+    .eq("invited_by", actor.id)
+    .gte("created_at", new Date(Date.now() - 3_600_000).toISOString());
+  if ((recent ?? 0) >= INVITATIONS_PER_HOUR) {
+    return {
+      ok: false,
+      error: "Trop d'invitations envoyées en une heure. Réessayez un peu plus tard.",
+    };
+  }
+
   // Déjà membre actif ?
   const { data: existingProfile } = await supabase
     .from("profiles")

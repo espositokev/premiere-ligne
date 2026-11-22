@@ -20,6 +20,11 @@ export async function seedTeam(id: string) {
     .select("id")
     .single();
 
+  const adminEmail = `admin.eval.${id}@test.local`;
+  const adminId = await createUser({ email: adminEmail, firstName: "Claire", lastName: "Martin" });
+  await client
+    .from("memberships")
+    .insert({ organization_id: org!.id, user_id: adminId, role: "org_admin" });
   const managerEmail = `manager.eval.${id}@test.local`;
   const repEmail = `rep.eval.${id}@test.local`;
   const managerId = await createUser({
@@ -42,5 +47,5 @@ export async function seedTeam(id: string) {
     .from("team_managers")
     .insert({ team_id: team!.id, membership_id: manager!.id, organization_id: org!.id });
 
-  return { orgId: org!.id, slug: org!.slug, managerEmail, repEmail, repId: rep!.id };
+  return { orgId: org!.id, slug: org!.slug, adminEmail, managerEmail, repEmail, repId: rep!.id };
 }

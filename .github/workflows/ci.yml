@@ -50,6 +50,8 @@ jobs:
             echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
             echo "MAILPIT_URL=${MAILPIT_URL:-${INBUCKET_URL:-http://127.0.0.1:54324}}"
             echo "APP_URL=http://localhost:3100"
+            echo "SUPABASE_JWT_SECRET=$JWT_SECRET"
+            echo "PREVIEW_COOKIE_SECRET=$(openssl rand -hex 32)"
           } >> "$GITHUB_ENV"
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
