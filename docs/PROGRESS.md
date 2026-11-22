@@ -38,6 +38,6 @@
 
 ### Reste à faire par le fondateur
 
-- Installer l'app GitHub de Claude sur le dépôt, pour que le code puisse être envoyé.
-- Créer le compte Vercel et importer le dépôt (instructions données dans la conversation).
+- ~~Installer l'app GitHub de Claude~~ : fait.
+- ~~Créer le compte Vercel et importer le dépôt~~ : fait le 22/11/2026 (plan Hobby, passage en Pro avant le premier client).
 - Remplir les zones `[À COMPLÉTER]` des pages légales (étape 7 au plus tard).
