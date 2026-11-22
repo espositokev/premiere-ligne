@@ -1,15 +1,15 @@
 # Avancement
 
-| Étape                                               | Statut                                               |
-| --------------------------------------------------- | ---------------------------------------------------- |
-| 0 — Socle                                           | ✅ Terminée (en attente de mise en ligne sur Vercel) |
-| 1 — Comptes, entreprises, rôles                     | À faire                                              |
-| 2 — Référentiels et Dojos                           | À faire                                              |
-| 3 — Évaluations et fiche commercial                 | À faire                                              |
-| 4 — Coachings                                       | À faire                                              |
-| 5 — Plan de progrès et vue commercial               | À faire                                              |
-| 6 — Tableaux de bord, « voir en tant que », journal | À faire                                              |
-| 7 — RGPD et mise en production                      | À faire                                              |
+| Étape                                               | Statut                                                                  |
+| --------------------------------------------------- | ----------------------------------------------------------------------- |
+| 0 — Socle                                           | ✅ En ligne sur premiere-ligne-two.vercel.app, en attente de validation |
+| 1 — Comptes, entreprises, rôles                     | À faire                                                                 |
+| 2 — Référentiels et Dojos                           | À faire                                                                 |
+| 3 — Évaluations et fiche commercial                 | À faire                                                                 |
+| 4 — Coachings                                       | À faire                                                                 |
+| 5 — Plan de progrès et vue commercial               | À faire                                                                 |
+| 6 — Tableaux de bord, « voir en tant que », journal | À faire                                                                 |
+| 7 — RGPD et mise en production                      | À faire                                                                 |
 
 ## Étape 0 — Socle
 
