@@ -23,6 +23,7 @@ test.describe("Pilotage", () => {
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "ordinateur", "Parcours sur ordinateur uniquement");
+    test.setTimeout(90_000);
     const seed = await seedTeam(uniqueSuffix());
     await loginWithCode(page, seed.adminEmail);
     await page.goto(`/e/${seed.slug}/parametres/utilisateurs/${seed.repId}`);

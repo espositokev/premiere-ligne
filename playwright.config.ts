@@ -17,6 +17,8 @@ export default defineConfig({
     locale: "fr-FR",
     timezoneId: "Europe/Paris",
     trace: "retain-on-failure",
+    // Une action bloquée échoue vite en nommant l'élément attendu.
+    actionTimeout: 15_000,
     ...(executablePath ? { launchOptions: { executablePath } } : {}),
   },
   projects: [

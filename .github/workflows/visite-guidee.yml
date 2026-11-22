@@ -1,0 +1,64 @@
+name: Visite guidée
+
+# Photographie tous les écrans avec les données de démonstration (téléphone + ordinateur)
+# et publie les captures sur la branche « visite-guidee ».
+on:
+  workflow_dispatch:
+  push:
+    branches: [etape-6-7-pilotage]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: visite-guidee
+  cancel-in-progress: true
+
+jobs:
+  captures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Démarrer Supabase en local
+        run: pnpm exec supabase start -x studio,imgproxy,vector,logflare,supavisor,edge-runtime,realtime,storage-api
+      - name: Clés locales
+        run: |
+          pnpm exec supabase status -o env > /tmp/supabase.env
+          set -a; source /tmp/supabase.env; set +a
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            echo "MAILPIT_URL=${MAILPIT_URL:-${INBUCKET_URL:-http://127.0.0.1:54324}}"
+            echo "APP_URL=http://localhost:3100"
+            echo "SUPABASE_JWT_SECRET=$JWT_SECRET"
+            echo "PREVIEW_COOKIE_SECRET=$(openssl rand -hex 32)"
+          } >> "$GITHUB_ENV"
+      - name: Données de démonstration
+        run: node scripts/seed-demo.mjs
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Construire et lancer l'application
+        run: |
+          pnpm build
+          (pnpm start --port 3100 > /tmp/app.log 2>&1 &)
+          for i in $(seq 1 60); do curl -sf http://localhost:3100 > /dev/null && break; sleep 2; done
+      - name: Photographier les écrans
+        run: node tests/visual/tour.mjs
+      - name: Journal de l'application (en cas de souci)
+        if: failure()
+        run: tail -100 /tmp/app.log
+      - name: Publier les captures
+        run: |
+          cd captures
+          git init -q -b visite-guidee
+          git config user.name "Première Ligne CI"
+          git config user.email "ci@premiereligne-app.fr"
+          git add -A
+          git commit -q -m "visite guidée du $(date -u +%F)"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" visite-guidee
