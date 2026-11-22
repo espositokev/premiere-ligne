@@ -13,7 +13,7 @@ import { OrganizationTable } from "./organization-table";
 export const metadata: Metadata = { title: "Administration" };
 
 export default async function AdminDashboardPage() {
-  const user = await requireSuperAdmin();
+  await requireSuperAdmin();
   const [{ organizations, activeUsers, pendingInvitations }, activity] = await Promise.all([
     getPlatformStats(),
     getOrganizationActivity(),
@@ -30,7 +30,7 @@ export default async function AdminDashboardPage() {
   return (
     <>
       <PageHeader
-        title={`Bonjour ${user.firstName}`}
+        title="Tableau de bord"
         description="Vue d'ensemble de la plateforme."
         action={
           <Button asChild>
@@ -44,7 +44,7 @@ export default async function AdminDashboardPage() {
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         {stats.map((stat) => (
           <Card key={stat.label}>
-            <p className="font-display text-4xl font-bold">{stat.value}</p>
+            <p className="font-display text-4xl font-semibold">{stat.value}</p>
             <p className="mt-1 text-sm text-muted">{stat.label}</p>
           </Card>
         ))}
@@ -66,7 +66,7 @@ export default async function AdminDashboardPage() {
           </SectionTitle>
           <div className="overflow-x-auto rounded-(--radius-card) border border-line bg-surface">
             <table className="w-full min-w-[36rem] text-left text-sm">
-              <thead className="border-b border-line bg-bone text-xs tracking-wide text-muted uppercase">
+              <thead className="border-b border-line bg-bone text-xs text-muted">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Entreprise</th>
                   <th className="px-4 py-3 font-semibold">Connectés 30 j</th>

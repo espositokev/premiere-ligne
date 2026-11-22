@@ -97,8 +97,8 @@ export default async function MyProgressPage({ params, searchParams }: PageProps
   return (
     <>
       <PageHeader
-        title={`Salut ${context.user.firstName} !`}
-        description={context.organization.name}
+        title="Ma progression"
+        description={`${context.user.firstName} ${context.user.lastName} · ${context.organization.name}`}
         action={
           progress.hasFramework && settings.allowSelfEvaluation ? (
             <form action={startEvaluation}>

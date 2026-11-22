@@ -26,7 +26,7 @@ export function StatTiles({ tiles, className }: { tiles: StatTile[]; className?:
           >
             <p
               className={cn(
-                "font-display text-3xl font-bold tabular-nums sm:text-4xl",
+                "font-display text-3xl font-semibold tabular-nums sm:text-4xl",
                 tile.alert && "text-danger",
               )}
             >

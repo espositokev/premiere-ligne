@@ -97,7 +97,7 @@ export function ActionPlan({
       {open.length === 0 && actions.length > 0 ? (
         <Card className="text-center">
           <p className="font-semibold">
-            {self ? "Tout est fait, bravo !" : "Toutes les actions sont terminées."}
+            {self ? "Toutes tes actions sont faites" : "Toutes les actions sont terminées."}
           </p>
         </Card>
       ) : null}

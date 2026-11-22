@@ -185,7 +185,7 @@ function Panel({
     <section className="rounded-(--radius-card) border border-line bg-surface p-4 shadow-(--shadow-card) sm:p-5">
       <h2 className="mb-4 flex items-center gap-3 text-lg font-semibold">
         {number ? (
-          <span className="flex size-8 items-center justify-center rounded-full bg-forest font-display text-sm font-bold text-fluo">
+          <span className="flex size-8 items-center justify-center rounded-full bg-forest font-display text-sm font-semibold text-fluo">
             {number}
           </span>
         ) : null}

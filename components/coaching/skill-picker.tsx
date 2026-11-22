@@ -74,9 +74,7 @@ export function SkillPicker({
       <div className="flex flex-col gap-4 rounded-(--radius-card) border border-line bg-surface p-2">
         {blocks.map((block) => (
           <div key={block.id}>
-            <p className="px-2 pt-1 pb-1 text-xs font-semibold tracking-wide text-muted uppercase">
-              {block.name}
-            </p>
+            <p className="px-2 pt-1 pb-1 text-xs font-semibold text-muted">{block.name}</p>
             {block.competencies.map((competency) => {
               const count = competency.skills.filter((s) => selected.includes(s.id)).length;
               return (
@@ -88,7 +86,7 @@ export function SkillPicker({
                   <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-(--radius-control) px-2 font-medium hover:bg-bone">
                     {competency.name}
                     {count > 0 ? (
-                      <span className="rounded-full bg-forest px-2 text-xs font-bold text-bone">
+                      <span className="rounded-full bg-forest px-2 text-xs font-semibold text-bone">
                         {count}
                       </span>
                     ) : null}

@@ -29,7 +29,7 @@ test.describe("Pilotage", () => {
     await page.goto(`/e/${seed.slug}/parametres/utilisateurs/${seed.repId}`);
     await page.getByRole("button", { name: "Voir en tant que Léo" }).click();
     await expect(page.getByText("Aperçu en tant que Léo Bernard — lecture seule")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Salut Léo !" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ma progression" })).toBeVisible();
 
     // Une tentative d'écriture est refusée.
     await page.goto(`/e/${seed.slug}/moi/plan`);

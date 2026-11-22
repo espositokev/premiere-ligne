@@ -123,12 +123,12 @@ export function coachingPlannedEmail(input: {
     ["Compétences", input.skills.join(", ") || null],
   ]);
   const html = layout(
-    `Salut ${input.firstName} !`,
+    `Bonjour ${input.firstName},`,
     `${paragraph(escapeHtml(intro))}${info.html}
      ${button(input.link, "Voir le coaching")}
      <p style="margin:0;font-size:13px;line-height:1.5;color:#5f635d;">L'invitation jointe s'ajoute à ton agenda en un clic.</p>`,
   );
-  const text = `Salut ${input.firstName} !
+  const text = `Bonjour ${input.firstName},
 
 ${intro}
 
@@ -148,11 +148,11 @@ export function coachingCancelledEmail(input: {
 }) {
   const subject = `Coaching du ${input.when} annulé`;
   const html = layout(
-    `Salut ${input.firstName},`,
+    `Bonjour ${input.firstName},`,
     `${paragraph(`${escapeHtml(input.coachName)} a annulé le coaching prévu le <strong>${escapeHtml(input.when)}</strong>.`)}
      ${paragraph(`Motif : ${escapeHtml(input.reason)}`)}`,
   );
-  const text = `Salut ${input.firstName},
+  const text = `Bonjour ${input.firstName},
 
 ${input.coachName} a annulé le coaching prévu le ${input.when}.
 Motif : ${input.reason}
@@ -174,13 +174,13 @@ export function coachingReportEmail(input: {
       ? `${input.actionCount} action${input.actionCount > 1 ? "s ont été ajoutées" : " a été ajoutée"} à ton plan de progrès.`
       : "";
   const html = layout(
-    `Salut ${input.firstName} !`,
+    `Bonjour ${input.firstName},`,
     `${paragraph(`${escapeHtml(input.coachName)} a rédigé le compte rendu de votre coaching du ${escapeHtml(input.when)} : points forts, axes de progrès et prochaines étapes.`)}
      ${actions ? paragraph(escapeHtml(actions)) : ""}
      ${button(input.link, "Lire le compte rendu")}
      <p style="margin:0;font-size:13px;line-height:1.5;color:#5f635d;">Tu peux y ajouter ton commentaire.</p>`,
   );
-  const text = `Salut ${input.firstName} !
+  const text = `Bonjour ${input.firstName},
 
 ${input.coachName} a rédigé le compte rendu de votre coaching du ${input.when}.
 ${actions}
@@ -227,12 +227,12 @@ export function requestDeclinedEmail(input: {
 }) {
   const subject = "Réponse à ta demande de coaching";
   const html = layout(
-    `Salut ${input.firstName},`,
+    `Bonjour ${input.firstName},`,
     `${paragraph(`${escapeHtml(input.managerName)} a répondu à ta demande de coaching :`)}
      <blockquote style="margin:0 0 12px;padding:12px 16px;background:#f4f2ee;border-radius:8px;font-size:15px;line-height:1.5;">${escapeHtml(input.answer)}</blockquote>
      ${button(input.link, "Voir mes coachings")}`,
   );
-  const text = `Salut ${input.firstName},
+  const text = `Bonjour ${input.firstName},
 
 ${input.managerName} a répondu à ta demande de coaching :
 « ${input.answer} »

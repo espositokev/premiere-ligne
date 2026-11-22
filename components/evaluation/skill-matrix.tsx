@@ -31,7 +31,7 @@ function LevelLadder({
   const next = current === null ? 0 : current < 4 ? current + 1 : null;
   return (
     <div className="border-t border-line bg-bone/60 px-4 py-3">
-      {statement ? <p className="mb-2 text-sm italic">{statement}</p> : null}
+      {statement ? <p className="mb-2 text-sm">{statement}</p> : null}
       <ol className="flex flex-col gap-1.5">
         {SCORE_VALUES.map((level) => (
           <li
@@ -42,7 +42,7 @@ function LevelLadder({
               level === next && "border border-dashed border-forest",
             )}
           >
-            <span className="w-4 shrink-0 font-display font-bold tabular-nums">{level}</span>
+            <span className="w-4 shrink-0 font-display font-semibold tabular-nums">{level}</span>
             <span>
               {levels[level] ?? fr.levels[level]}
               {level === current ? " · niveau actuel" : level === next ? " · prochaine marche" : ""}
@@ -111,10 +111,10 @@ export function SkillMatrix({
                         </div>
                         <span
                           className={cn(
-                            "rounded-full px-2.5 py-1 font-display text-sm font-bold tabular-nums",
+                            "rounded-full px-2.5 py-1 font-display text-sm font-semibold tabular-nums",
                             average.value === null
                               ? "bg-level-none/25 text-muted"
-                              : "bg-fluo text-forest-deep",
+                              : "bg-forest/8 text-forest-deep",
                           )}
                           aria-label={`Moyenne ${formatAverage(average.value)} sur 4`}
                         >

@@ -30,7 +30,7 @@ export function ScoreBadge({ score, size = "md", className }: ScoreBadgeProps) {
       title={label}
       aria-label={label}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full font-display font-bold tabular-nums",
+        "inline-flex shrink-0 items-center justify-center rounded-full font-display font-semibold tabular-nums",
         size === "md" ? "size-8 text-sm" : "size-6 text-xs",
         toneClasses[tone],
         className,

@@ -73,8 +73,8 @@ export default async function OrgHomePage({ params }: PageProps<"/e/[slug]">) {
   return (
     <>
       <PageHeader
-        title={`Bonjour ${context.user.firstName}`}
-        description={context.organization.name}
+        title={context.organization.name}
+        description={admin ? "Pilotage de l'entreprise" : "Votre équipe"}
         action={
           data.rows.length ? (
             <Button asChild variant="outline" size="sm">
@@ -185,7 +185,7 @@ export default async function OrgHomePage({ params }: PageProps<"/e/[slug]">) {
               hrefFor={hrefCoaching}
             />
           ) : (
-            <p className="text-muted">Rien en retard, bravo.</p>
+            <p className="text-muted">Aucun compte rendu en retard</p>
           )}
         </section>
         <section>
@@ -251,7 +251,7 @@ export default async function OrgHomePage({ params }: PageProps<"/e/[slug]">) {
           </SectionTitle>
           <div className="overflow-x-auto rounded-(--radius-card) border border-line bg-surface">
             <table className="w-full min-w-[36rem] text-left text-sm">
-              <thead className="border-b border-line bg-bone text-xs tracking-wide text-muted uppercase">
+              <thead className="border-b border-line bg-bone text-xs text-muted">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Équipe</th>
                   <th className="px-4 py-3 font-semibold">Commerciaux</th>

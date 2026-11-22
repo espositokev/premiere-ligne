@@ -33,7 +33,7 @@ export function LegalDocument({
       <Link href="/" className="text-sm font-semibold text-forest-light hover:underline">
         ← {fr.legal.backHome}
       </Link>
-      <h1 className="mt-4 text-3xl font-bold">{title}</h1>
+      <h1 className="mt-4 text-3xl font-semibold">{title}</h1>
       <p className="mt-2 text-sm text-muted">
         Dernière mise à jour : {highlightPlaceholders(updatedAt)}
       </p>

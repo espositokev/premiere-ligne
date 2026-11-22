@@ -49,7 +49,7 @@ export default async function InvitationPage({ params }: PageProps<"/invitation/
       <div className="mx-auto max-w-md px-4 py-12 sm:py-16">
         <Card className="text-center">
           <CircleAlert aria-hidden="true" className="mx-auto mb-3 size-10 text-warning" />
-          <h1 className="text-2xl font-bold">Invitation indisponible</h1>
+          <h1 className="text-2xl font-semibold">Invitation indisponible</h1>
           <p className="mt-2 text-muted">{message}</p>
           <Button asChild variant="secondary" className="mt-6">
             <Link href="/connexion">Aller à la connexion</Link>
@@ -63,7 +63,7 @@ export default async function InvitationPage({ params }: PageProps<"/invitation/
     <div className="mx-auto max-w-md px-4 py-12 sm:py-16">
       <Card>
         <Logo kind="mark" className="mb-4 h-9" />
-        <h1 className="text-2xl font-bold">Bienvenue {invitation.first_name} !</h1>
+        <h1 className="text-2xl font-semibold">Bienvenue {invitation.first_name}</h1>
         <p className="mt-2 text-muted">
           Vous êtes invité à rejoindre l&apos;espace{" "}
           <strong className="text-forest-deep">{invitation.organizations.name}</strong> en tant que{" "}

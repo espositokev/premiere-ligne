@@ -24,7 +24,7 @@ export function MemberList({
             <span
               aria-hidden="true"
               className={cn(
-                "flex size-10 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold",
+                "flex size-10 shrink-0 items-center justify-center rounded-full font-display text-sm font-semibold",
                 member.active ? "bg-forest text-bone" : "bg-line text-muted",
               )}
             >

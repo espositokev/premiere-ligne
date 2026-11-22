@@ -330,7 +330,7 @@ function CompetencyItem({
   return (
     <details className="group rounded-(--radius-card) border border-line bg-bone/50">
       <summary className="flex min-h-14 cursor-pointer list-none items-start gap-3 p-3 [&::-webkit-details-marker]:hidden">
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-forest font-display text-xs font-bold text-bone">
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-forest font-display text-xs font-semibold text-bone">
           {index + 1}
         </span>
         <span className="min-w-0 flex-1">

@@ -119,7 +119,7 @@ export function AppShell({
           </div>
           <details className="relative">
             <summary
-              className="flex size-11 cursor-pointer list-none items-center justify-center rounded-full bg-forest font-display text-sm font-bold text-bone [&::-webkit-details-marker]:hidden"
+              className="flex size-11 cursor-pointer list-none items-center justify-center rounded-full bg-forest font-display text-sm font-semibold text-bone [&::-webkit-details-marker]:hidden"
               aria-label="Menu du compte"
             >
               {initials(userName)}

@@ -105,3 +105,14 @@ Choix faits en l'absence d'information dans `docs/SPEC.md`, ou validés avec le 
 - **Supabase local** : Docker n'est pas disponible dans l'environnement de développement de Claude. Les tests RLS tournent dans la CI GitHub Actions (`supabase start` puis `supabase test db`). Un premier test vérifie que toutes les tables du schéma public ont la RLS activée.
 - **Tests de bout en bout** : Playwright avec deux projets, « ordinateur » et « mobile » (iPhone 13, moteur Chromium). La variable `PLAYWRIGHT_CHROME_PATH` permet d'utiliser un Chrome déjà installé.
 - **Adresse de contact** de la page d'accueil : `contact@premiereligne-app.fr`, à créer ou à remplacer (`lib/i18n/fr.ts`).
+
+## Passe de finition « unslop » (22 novembre 2026)
+
+Le skill unslop (Damir Sokolovsky, CC BY 4.0) est installé dans `.claude/skills/unslop` comme skill du projet. Audit : écran déjà conçu, quelques signes seulement, donc mode « polish » qui garde la charte (forêt, fluo, os, Sora et Inter) :
+
+- graisses limitées à 600 (plus de 700 à 900), sauf le logo ;
+- étiquettes en capitales espacées remises en casse normale (en-têtes de tableaux, résumés, Dojos) ;
+- plus de titres « Bonjour Kevin » ni « Salut Léo ! » : le titre nomme la page (« Ma progression », « Tableau de bord », nom de l'entreprise) ;
+- plus de points d'exclamation dans l'interface et les emails (« Bonjour Léo, ») ;
+- plus d'italique d'emphase ;
+- le fluo est réservé à l'action principale, à la sélection et aux graphiques : les moyennes de compétence et les icônes de la page d'accueil passent en neutre.

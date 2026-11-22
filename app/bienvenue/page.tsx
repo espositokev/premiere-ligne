@@ -18,7 +18,7 @@ export default async function WelcomePage() {
     <div className="mx-auto max-w-md px-4 py-12 sm:py-16">
       <Card>
         <Logo kind="mark" className="mb-4 h-9" />
-        <h1 className="text-2xl font-bold">Bienvenue {user.firstName} !</h1>
+        <h1 className="text-2xl font-semibold">Bienvenue {user.firstName}</h1>
         <p className="mt-2 mb-6 text-muted">
           Avant de commencer, merci d&apos;accepter les conditions d&apos;utilisation de la
           plateforme.

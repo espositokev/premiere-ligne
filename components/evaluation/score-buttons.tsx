@@ -45,7 +45,7 @@ export function ScoreButtons({
             title={fr.levels[score]}
             onClick={() => onChange(selected ? null : score)}
             className={cn(
-              "min-h-12 rounded-(--radius-control) border-2 font-display text-lg font-bold tabular-nums transition-colors focus-visible:ring-3 focus-visible:ring-forest/25 focus-visible:outline-none",
+              "min-h-12 rounded-(--radius-control) border-2 font-display text-lg font-semibold tabular-nums transition-colors focus-visible:ring-3 focus-visible:ring-forest/25 focus-visible:outline-none",
               selected
                 ? selectedTone[levelTone(score)]
                 : "border-line bg-surface text-forest-deep hover:border-forest",

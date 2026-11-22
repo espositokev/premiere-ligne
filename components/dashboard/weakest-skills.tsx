@@ -31,7 +31,7 @@ export function WeakestSkills({
             <li key={s.skillId}>
               <div className="flex items-baseline justify-between gap-3">
                 <p className="text-sm font-medium">{s.name}</p>
-                <p className="text-sm font-bold tabular-nums">{formatAverage(s.average)}</p>
+                <p className="text-sm font-semibold tabular-nums">{formatAverage(s.average)}</p>
               </div>
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-line" aria-hidden="true">
                 <div

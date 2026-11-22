@@ -37,9 +37,7 @@ function FreeSection({ section }: { section: Section }) {
               {item.description ? (
                 <p className="mt-1 text-forest-deep/90">{item.description}</p>
               ) : null}
-              {item.example ? (
-                <p className="mt-2 text-sm text-muted italic">{item.example}</p>
-              ) : null}
+              {item.example ? <p className="mt-2 text-sm text-muted">{item.example}</p> : null}
             </Card>
           ))}
         </div>
@@ -76,7 +74,7 @@ function Theory({ content }: { content: DojoContent }) {
               <li key={index}>
                 <Card className="p-4">
                   <div className="flex items-start gap-3">
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-forest font-display text-sm font-bold text-bone">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-forest font-display text-sm font-semibold text-bone">
                       {index + 1}
                     </span>
                     <div className="min-w-0">
@@ -185,9 +183,7 @@ function Scenario({ scenario }: { scenario: DojoScenario }) {
           <dl className="grid gap-3 sm:grid-cols-2">
             {scenario.persona.map((item, index) => (
               <div key={index}>
-                <dt className="text-xs font-semibold tracking-wide text-muted uppercase">
-                  {item.label}
-                </dt>
+                <dt className="text-xs font-semibold text-muted">{item.label}</dt>
                 <dd className="mt-0.5 leading-relaxed">{item.text}</dd>
               </div>
             ))}
@@ -195,7 +191,7 @@ function Scenario({ scenario }: { scenario: DojoScenario }) {
         ) : null}
         {scenario.context ? (
           <div>
-            <p className="text-xs font-semibold tracking-wide text-muted uppercase">Contexte</p>
+            <p className="text-xs font-semibold text-muted">Contexte</p>
             <p className="mt-0.5 leading-relaxed">{scenario.context}</p>
             {scenario.stakes ? (
               <p className="mt-2 leading-relaxed text-forest-deep/90">{scenario.stakes}</p>
@@ -204,7 +200,7 @@ function Scenario({ scenario }: { scenario: DojoScenario }) {
         ) : null}
         {scenario.observe.length ? (
           <div>
-            <p className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wide text-muted uppercase">
+            <p className="mb-2 flex items-center gap-2 text-xs font-semibold text-muted">
               <Eye aria-hidden="true" className="size-4" />
               Ce que le manager observe
             </p>
@@ -236,7 +232,7 @@ function Offline({ content }: { content: DojoContent }) {
           <ol className="flex flex-col gap-3">
             {offline.guide.map((step, index) => (
               <li key={index} className="flex gap-3">
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-fluo font-display text-sm font-bold">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-fluo font-display text-sm font-semibold">
                   {index + 1}
                 </span>
                 <div>
@@ -332,7 +328,7 @@ function Online({ content }: { content: DojoContent }) {
                     {index + 1}. {step.title}
                   </p>
                   {step.prompt ? (
-                    <p className="mt-1 leading-relaxed text-forest-deep/90 italic">{step.prompt}</p>
+                    <p className="mt-1 leading-relaxed text-forest-deep/90">{step.prompt}</p>
                   ) : null}
                 </Card>
               </li>
@@ -361,9 +357,7 @@ export function DojoView({
     <div>
       {content.objective ? (
         <Card className="mb-6 border-forest bg-forest text-bone">
-          <p className="text-xs font-semibold tracking-wide text-fluo uppercase">
-            Objectif pédagogique
-          </p>
+          <p className="text-xs font-semibold text-fluo">Objectif pédagogique</p>
           <p className="mt-1 text-lg leading-snug">{content.objective}</p>
           {content.duration ? (
             <p className="mt-2 text-sm text-bone/75">Durée : {content.duration}</p>
@@ -393,7 +387,7 @@ export function DojoView({
                 >
                   <span
                     className={cn(
-                      "font-display text-xs font-bold",
+                      "font-display text-xs font-semibold",
                       active ? "text-fluo" : "text-muted",
                     )}
                   >

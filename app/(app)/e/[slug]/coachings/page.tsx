@@ -173,7 +173,7 @@ export default async function CoachingsPage({
             {groups.toWrite.length ? (
               <CoachingList coachings={groups.toWrite} now={now} hrefFor={hrefFor} />
             ) : (
-              <p className="text-muted">Rien en retard, bravo.</p>
+              <p className="text-muted">Aucun compte rendu en retard</p>
             )}
           </section>
           {pending.length ? (

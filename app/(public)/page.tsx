@@ -23,11 +23,11 @@ export default function HomePage() {
       <section className="bg-forest text-bone">
         <div className="mx-auto grid max-w-5xl items-center gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.1fr_1fr] md:py-20">
           <div>
-            <p className="mb-4 inline-flex items-center gap-2 text-sm font-semibold tracking-wide text-fluo uppercase">
+            <p className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-fluo">
               <span aria-hidden="true" className="h-1 w-6 bg-fluo" />
               {fr.brand.tagline}
             </p>
-            <h1 className="text-3xl leading-tight font-bold sm:text-4xl md:text-5xl">
+            <h1 className="text-3xl leading-tight font-semibold sm:text-4xl md:text-5xl">
               {fr.home.title}
             </h1>
             <p className="mt-5 max-w-prose text-lg text-bone/80">{fr.home.lead}</p>
@@ -52,7 +52,7 @@ export default function HomePage() {
                 <p className="font-display font-semibold">Léo, vendeur</p>
                 <p className="text-sm text-muted">Dernière évaluation il y a 12 jours</p>
               </div>
-              <p className="font-display text-3xl font-bold">
+              <p className="font-display text-3xl font-semibold">
                 40<span className="text-lg">%</span>
               </p>
             </div>
@@ -79,7 +79,7 @@ export default function HomePage() {
             const Icon = pillarIcons[index] ?? ClipboardCheck;
             return (
               <Card key={pillar.title}>
-                <span className="mb-4 inline-flex size-11 items-center justify-center rounded-(--radius-control) bg-fluo text-forest-deep">
+                <span className="mb-4 inline-flex text-forest-light">
                   <Icon aria-hidden="true" className="size-5" />
                 </span>
                 <CardTitle>{pillar.title}</CardTitle>

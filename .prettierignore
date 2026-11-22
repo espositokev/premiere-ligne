@@ -6,3 +6,4 @@ lib/supabase/types.ts
 playwright-report
 test-results
 docs/SPEC.md
+.claude/

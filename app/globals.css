@@ -79,6 +79,10 @@
   h2,
   h3 {
     font-family: var(--font-display);
+    font-weight: 600;
+  }
+
+  h1 {
     letter-spacing: -0.01em;
   }
 

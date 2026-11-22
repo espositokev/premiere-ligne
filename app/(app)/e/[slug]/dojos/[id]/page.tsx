@@ -63,7 +63,7 @@ export default async function DojoPage({
         <p className="text-sm font-semibold text-muted">
           {dojo.skill.competencyName} · {dojo.skill.name}
         </p>
-        <h1 className="mt-1 text-2xl font-bold sm:text-3xl">{dojo.title}</h1>
+        <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">{dojo.title}</h1>
         {dojo.tagline ? <p className="mt-1 text-muted">{dojo.tagline}</p> : null}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Badge tone={STATUS_TONES[dojo.status]}>{DOJO_STATUS_LABELS[dojo.status]}</Badge>

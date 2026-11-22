@@ -10,8 +10,8 @@ export function ProgressSummary({
     <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       {items.map((item) => (
         <Card key={item.label} className="p-4">
-          <dt className="text-xs font-semibold tracking-wide text-muted uppercase">{item.label}</dt>
-          <dd className="mt-1 font-display text-xl font-bold tabular-nums sm:text-2xl">
+          <dt className="text-xs font-semibold text-muted">{item.label}</dt>
+          <dd className="mt-1 font-display text-xl font-semibold tabular-nums sm:text-2xl">
             {item.value}
           </dd>
           {item.hint ? <dd className="text-xs text-muted">{item.hint}</dd> : null}

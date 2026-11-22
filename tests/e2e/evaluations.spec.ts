@@ -55,7 +55,7 @@ test.describe("Évaluations", () => {
     const repPage = await repContext.newPage();
     await loginWithCode(repPage, seed.repEmail);
     await repPage.goto(`/e/${seed.slug}/moi`);
-    await expect(repPage.getByRole("heading", { name: "Salut Léo !" })).toBeVisible();
+    await expect(repPage.getByRole("heading", { name: "Ma progression" })).toBeVisible();
     await expect(repPage.getByText("3 %")).toBeVisible();
     await repPage.getByRole("link", { name: "Historique" }).click();
     await expect(repPage.getByText("Évaluation par Julien Petit")).toBeVisible();
@@ -66,7 +66,7 @@ test.describe("Évaluations", () => {
     await skillRow(repPage, "Accueil en moins de 20s").getByRole("radio", { name: /^4 :/ }).click();
     await repPage.getByRole("button", { name: "Valider mon auto-évaluation" }).click();
     await repPage.getByRole("button", { name: "Confirmer la validation" }).click();
-    await expect(repPage.getByRole("heading", { name: "Salut Léo !" })).toBeVisible();
+    await expect(repPage.getByRole("heading", { name: "Ma progression" })).toBeVisible();
     await expect(repPage.getByText(/Moi : 4/)).toBeVisible();
     await repContext.close();
   });

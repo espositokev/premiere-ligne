@@ -23,7 +23,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/connexion"
     <div className="mx-auto flex max-w-md flex-col px-4 py-12 sm:py-16">
       <Card className="w-full">
         <Logo kind="mark" className="mb-4 h-9" />
-        <h1 className="text-2xl font-bold">Connexion</h1>
+        <h1 className="text-2xl font-semibold">Connexion</h1>
         <p className="mt-1 mb-6 text-muted">Accédez à votre espace Première Ligne.</p>
         <LoginForm next={next} />
       </Card>

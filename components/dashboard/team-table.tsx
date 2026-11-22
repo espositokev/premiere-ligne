@@ -74,7 +74,7 @@ export function TeamTable({
       </ul>
       <div className="hidden overflow-hidden rounded-(--radius-card) border border-line bg-surface md:block">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-line bg-bone text-xs tracking-wide text-muted uppercase">
+          <thead className="border-b border-line bg-bone text-xs text-muted">
             <tr>
               <th className="px-4 py-3 font-semibold">Commercial</th>
               {showTeam ? <th className="px-4 py-3 font-semibold">Équipe</th> : null}

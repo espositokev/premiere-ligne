@@ -204,7 +204,7 @@ export function EvaluationEditor(props: Props) {
           </p>
           <div className="mt-1 h-1.5 w-28 overflow-hidden rounded-full bg-line" aria-hidden="true">
             <div
-              className="h-full rounded-full bg-forest transition-all"
+              className="h-full rounded-full bg-forest transition-[width]"
               style={{ width: `${allSkills.length ? (rated / allSkills.length) * 100 : 0}%` }}
             />
           </div>

@@ -27,7 +27,7 @@ test.describe("Comptes, entreprises et invitations", () => {
 
     await loginWithCode(page, email);
     await expect(page).toHaveURL(/\/admin$/);
-    await expect(page.getByRole("heading", { name: "Bonjour Kevin" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Tableau de bord" })).toBeVisible();
 
     await page.getByRole("link", { name: "Nouvelle entreprise" }).first().click();
     await page.getByLabel("Nom de l'entreprise").fill(`Garage Test ${id}`);
@@ -63,7 +63,7 @@ test.describe("Comptes, entreprises et invitations", () => {
     });
 
     await page.goto(`/invitation/${token}`);
-    await expect(page.getByRole("heading", { name: "Bienvenue Sarah !" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Bienvenue Sarah" })).toBeVisible();
     await page.getByRole("button", { name: "Rejoindre l'espace" }).click();
     // Sans case cochée, le navigateur bloque l'envoi : on coche puis on valide.
     await page.getByRole("checkbox").check();
@@ -119,7 +119,7 @@ test.describe("Comptes, entreprises et invitations", () => {
     await page.getByRole("checkbox").check();
     await page.getByRole("button", { name: "Rejoindre l'espace" }).click();
     await expect(page).toHaveURL(new RegExp(`/e/agence-${id}/moi$`));
-    await expect(page.getByRole("heading", { name: "Salut Inès !" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ma progression" })).toBeVisible();
 
     // Un commercial n'accède pas aux pages de gestion.
     await page.goto(`/e/agence-${id}/parametres/utilisateurs`);
