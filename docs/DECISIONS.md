@@ -2,6 +2,10 @@
 
 Choix faits en l'absence d'information dans `docs/SPEC.md`, ou validés avec le fondateur quand ils s'en écartent. Le plus récent en haut.
 
+## 22/11/2026 — Les managers font évoluer la matrice
+
+- Demande du fondateur : après l'audit, Première Ligne crée l'entreprise et sa matrice sur mesure ; ensuite le responsable **et les managers** peuvent la faire évoluer (ajouter, renommer, désactiver, réordonner). Appliqué par la base (`can_edit_framework`). Mettre en place une matrice (choisir le modèle) reste réservé au super admin. Les managers y accèdent par « Matrice » dans leur menu.
+
 ## 22/11/2026 — Étapes 6 et 7 (pilotage, RGPD, démonstration)
 
 - **Tableaux de bord** sur la page d'accueil de l'espace : manager (son équipe) et responsable (toute l'entreprise, par équipe, coachings clôturés par mois et par manager, CR sous 48 h, couverture à 90 jours). Radar d'équipe par compétence (comme le radar individuel). Exports CSV au format Excel français (« ; », UTF-8), journalisés.

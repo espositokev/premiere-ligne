@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { FrameworkEditor } from "@/components/framework/framework-editor";
 import { Card } from "@/components/ui/card";
 import { EmptyState, PageHeader } from "@/components/ui/page";
-import { requireOrgAdmin } from "@/lib/auth/require-org";
+import { requireCoach } from "@/lib/auth/require-org";
 import { listTemplates, loadOrganizationTree } from "@/lib/data/framework";
 import { countTree } from "@/lib/domain/framework";
 
@@ -19,7 +19,8 @@ export default async function FrameworkPage({
 }: PageProps<"/e/[slug]/parametres/referentiel">) {
   const { slug } = await params;
   const { desactives } = await searchParams;
-  const context = await requireOrgAdmin(slug);
+  // Responsable et managers font évoluer la matrice ; la mettre en place reste au super admin.
+  const context = await requireCoach(slug);
   const loaded = await loadOrganizationTree(context.organization.id);
   const path = `/e/${slug}/parametres/referentiel`;
 

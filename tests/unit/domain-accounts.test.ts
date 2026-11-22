@@ -62,7 +62,7 @@ describe("navigation", () => {
   it("met les 4 entrées principales en tête (barre d'onglets mobile), les autres vont au menu", () => {
     for (const role of ["super_admin", "org_admin", "manager", "sales_rep"] as const) {
       const labels = orgNavigation("acme", role).map((i) => i.label);
-      expect(labels.length).toBeLessThanOrEqual(5);
+      expect(labels.length).toBeLessThanOrEqual(6);
       expect(labels.slice(0, 4)).toContain("Coachings");
     }
   });

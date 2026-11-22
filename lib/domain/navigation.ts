@@ -50,6 +50,10 @@ export function orgNavigation(slug: string, role: SpaceRole): NavItem[] {
 
   items.push({ label: "Coachings", href: `${base}/coachings`, icon: "coaching" });
   items.push({ label: "Dojos", href: `${base}/dojos`, icon: "dojo" });
+  if (!canAdministerOrg(role)) {
+    // Les managers font aussi évoluer la matrice (le responsable y accède par Paramètres).
+    items.push({ label: "Matrice", href: `${base}/parametres/referentiel`, icon: "matrix" });
+  }
 
   if (canAdministerOrg(role)) {
     items.push({ label: "Paramètres", href: `${base}/parametres`, icon: "settings" });
