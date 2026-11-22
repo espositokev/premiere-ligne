@@ -57,7 +57,9 @@ test.describe("Coachings", () => {
       .click();
     await page.getByLabel("Points forts").fill("Très bon sourire, contact facile");
     await page.getByRole("button", { name: "Ajouter une action" }).click();
-    await page.getByLabel("Action 1").fill("Saluer chaque client en moins de 20 secondes");
+    await page
+      .getByLabel("Action 1", { exact: true })
+      .fill("Saluer chaque client en moins de 20 secondes");
     await expect(page.getByText(/Brouillon enregistré à/)).toBeVisible({ timeout: 10_000 });
 
     // 4. Clôture en deux temps.
