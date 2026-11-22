@@ -98,6 +98,19 @@ $$;
 -- Lecture d'une évaluation (§8.3) :
 --  - qui encadre le commercial voit les évaluations manager (brouillons compris) et les auto-évaluations validées ;
 --  - le commercial voit ses auto-évaluations (brouillon compris) et les évaluations manager validées.
+create or replace function public.can_view_evaluation_row(subject uuid, kind text, status text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select
+    (public.can_manage_member(subject) and (kind = 'manager' or status = 'validee'))
+    or (public.is_my_membership(subject) and (kind = 'self' or status = 'validee'));
+$$;
+
+-- Même règle, à partir de l'identifiant (pour les notes d'une évaluation).
 create or replace function public.can_view_evaluation(evaluation uuid)
 returns boolean
 language sql
@@ -109,10 +122,7 @@ as $$
     select 1
     from public.evaluations e
     where e.id = evaluation
-      and (
-        (public.can_manage_member(e.subject_membership_id) and (e.kind = 'manager' or e.status = 'validee'))
-        or (public.is_my_membership(e.subject_membership_id) and (e.kind = 'self' or e.status = 'validee'))
-      )
+      and public.can_view_evaluation_row(e.subject_membership_id, e.kind, e.status)
   );
 $$;
 
@@ -297,8 +307,10 @@ grant all on public.evaluations, public.evaluation_scores, public.manager_notes 
 grant select on public.v_latest_skill_scores to service_role;
 
 revoke execute on function public.is_my_membership(uuid), public.can_view_evaluation(uuid),
+  public.can_view_evaluation_row(uuid, text, text),
   public.can_edit_evaluation(uuid), public.mastery_percent(uuid) from public, anon;
 grant execute on function public.is_my_membership(uuid), public.can_view_evaluation(uuid),
+  public.can_view_evaluation_row(uuid, text, text),
   public.can_edit_evaluation(uuid), public.mastery_percent(uuid) to authenticated, service_role;
 
 alter table public.evaluations enable row level security;
@@ -307,7 +319,7 @@ alter table public.manager_notes enable row level security;
 
 -- Évaluations
 create policy evaluations_select on public.evaluations for select to authenticated
-  using (public.can_view_evaluation(id));
+  using (public.can_view_evaluation_row(subject_membership_id, kind, status));
 
 create policy evaluations_insert on public.evaluations for insert to authenticated
   with check (

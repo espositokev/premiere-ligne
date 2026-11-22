@@ -65,8 +65,9 @@ select pg_temp.login('00000000-0000-0000-0000-0000000000a2');
 select lives_ok(
   $$ insert into public.evaluations (id, organization_id, subject_membership_id, framework_id, kind)
      values ('e0000000-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000000',
-             'a0000000-0000-0000-0000-0000000000a3', (select id from ids where name = 'framework'), 'manager') $$,
-  'un manager évalue un commercial de son équipe');
+             'a0000000-0000-0000-0000-0000000000a3', (select id from ids where name = 'framework'), 'manager')
+     returning id $$,
+  'un manager évalue un commercial de son équipe (et relit l''évaluation créée)');
 select is((select author_membership_id from public.evaluations where id = 'e0000000-0000-0000-0000-000000000001'),
   'a0000000-0000-0000-0000-0000000000a2'::uuid, 'l''auteur est renseigné par la base');
 select lives_ok(
