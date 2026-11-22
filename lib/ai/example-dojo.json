@@ -1,0 +1,246 @@
+{
+  "title": "L'accueil personnalisé",
+  "content": {
+    "version": 1,
+    "tagline": "Créer un premier impact et favoriser la création de lien",
+    "objective": "Le commercial sait aller vers le client en moins de 20 secondes, adapter son accueil au signal non-verbal perçu, proposer la boisson et amorcer une conversation sur le client avant de parler voiture.",
+    "duration": "20-30 min",
+    "theory": {
+      "intro": "Les 7 premières secondes créent une impression qui durera toute la relation commerciale. L'accueil n'est pas une politesse — c'est le premier acte de vente. Il pose la confiance, crée le lien, et ouvre la découverte.",
+      "standardTitle": "Le standard : l'accueil en 4 gestes clés",
+      "standard": [
+        {
+          "label": "< 20 SEC",
+          "title": "Aller vers le client",
+          "description": "Se lever, quitter son bureau ou poste, aller physiquement à la rencontre du client. Ne pas attendre qu'il s'approche. Sourire déclenché avant le contact visuel.",
+          "why": "Le client qui n'est pas accueilli en moins de 20 secondes se sent ignoré. L'initiative du commercial installe immédiatement qui est aux commandes."
+        },
+        {
+          "label": "SOURIRE + REGARD",
+          "title": "Créer le premier contact",
+          "description": "Contact visuel direct, sourire franc (pas commercial). Poignée de main ferme si le client tend la main, sinon ne pas forcer. Se présenter par son prénom : \"Bonjour, je m'appelle [prénom].\"",
+          "why": "Le prénom crée une relation humaine immédiate. Le contact visuel signale l'engagement. L'absence de sourire sincère se détecte en 50 millisecondes."
+        },
+        {
+          "label": "LA BOISSON",
+          "title": "Proposer une boisson",
+          "description": "\"Je vous propose quelque chose à boire — un café, une eau ?\" Accompagner le client jusqu'à l'espace d'accueil. Ce déplacement crée un temps de transition qui détend et humanise.",
+          "why": "La boisson n'est pas un gadget — c'est un rituel d'hospitalité universel. Elle ralentit la conversation, crée un cadre chaleureux, et positionne le commercial en hôte, pas en vendeur."
+        },
+        {
+          "label": "L'AMORCE",
+          "title": "Amorcer la conversation par le client",
+          "description": "Avant de parler voiture : une phrase d'ouverture sur le client lui-même. \"Vous venez de loin ? / Vous avez trouvé facilement ?\" Écouter vraiment la réponse et rebondir naturellement.",
+          "why": "La première minute de conversation doit créer du lien, pas qualifier le projet. Le client qui parle de lui avant de parler de son besoin s'ouvre davantage ensuite."
+        }
+      ],
+      "criteria": [
+        {
+          "title": "Il lit les signaux non-verbaux dès l'entrée",
+          "description": "Un client qui entre rapidement, les bras croisés, regard fuyant — il est en mode défensif. Un client qui regarde autour de lui avec curiosité — il est ouvert. L'accueil s'adapte à ce que le commercial voit, pas à un script."
+        },
+        {
+          "title": "Il ne parle pas voiture avant 2 minutes",
+          "description": "Les 2 premières minutes appartiennent à l'humain, pas au projet. Le commercial qui demande \"vous cherchez quoi comme véhicule ?\" avant même de s'être présenté grille la relation avant qu'elle commence."
+        },
+        {
+          "title": "Il personnalise l'amorce",
+          "description": "\"Vous avez trouvé facilement ?\" vaut mieux que \"bienvenue chez nous\". Une question sur le client — même banale — est une invitation à exister. C'est ça qui crée le lien, pas la formule de politesse."
+        },
+        {
+          "title": "Son énergie est constante quel que soit le profil",
+          "description": "Le 12ème client de la journée mérite le même accueil que le premier. La fatigue se voit, l'enthousiasme se joue. Un commercial qui arrive avant le client — sourire déclenché avant le contact — installe l'énergie."
+        },
+        {
+          "title": "Il accompagne, il ne précède pas",
+          "description": "Il marche avec le client jusqu'à l'espace d'accueil — pas devant lui. Ce geste crée une coprésence immédiate. Le client qui suit un commercial qu'il ne connaît pas se sent comme un numéro."
+        }
+      ],
+      "mistakes": [
+        {
+          "title": "Erreur 1 — Accueillir depuis son bureau",
+          "description": "Le commercial qui lève la tête et dit \"j'arrive !\" en restant assis envoie un message clair : le client peut attendre. Cette posture installe une hiérarchie inversée dès le départ. Le client se sent en visite, pas en rendez-vous."
+        },
+        {
+          "title": "Erreur 2 — Démarrer par le projet avant le lien",
+          "description": "\"Bonjour, vous cherchez quel type de véhicule ?\" — c'est la question d'un formulaire, pas d'un commercial. Le client passe immédiatement en mode réponse/défense. Le lien humain n'a jamais eu le temps de se créer."
+        },
+        {
+          "title": "Erreur 3 — Un accueil identique pour tout le monde",
+          "description": "Le script \"bonjour, bienvenue, je vous propose un café\" appliqué mécaniquement se ressent. L'accueil qui crée du lien est celui qui s'adapte — au profil, à l'énergie, au contexte. Un client pressé et un client détendu n'ont pas besoin du même accueil."
+        }
+      ],
+      "sections": []
+    },
+    "offline": {
+      "guide": [
+        {
+          "title": "Préparer la séance",
+          "description": "Choisir 1 scénario. Briefer le commercial sur le persona : \"Je vais jouer un client qui entre dans la concession. Tu m'accueilles exactement comme si c'était un vrai client. Je n'aiderai pas.\" Durée : 3-4 minutes max pour l'accueil seul."
+        },
+        {
+          "title": "Lancer le scénario",
+          "description": "Entrer dans la concession (ou simuler l'entrée dans une salle). Jouer le persona fidèlement — comportement, langage non-verbal, rythme. Ne pas sourire si le persona est fermé. Ne pas aider si le commercial est en difficulté."
+        },
+        {
+          "title": "Débriefer",
+          "description": "\"En combien de secondes tu es venu vers moi ? Qu'est-ce que tu as observé sur moi quand je suis entré ? Est-ce que tu as parlé voiture dans les 2 premières minutes ? Qu'est-ce que tu as fait pour créer du lien ?\""
+        },
+        {
+          "title": "Fixer la prochaine étape",
+          "description": "\"Sur ton prochain client, tu t'engages à aller vers lui avant 20 secondes et à ne pas parler voiture dans la première minute. Tu me fais un retour vendredi : comment tu as adapté ton accueil à ce client-là.\""
+        }
+      ],
+      "scenarios": [
+        {
+          "level": "debutant",
+          "title": "Le client ouvert et curieux",
+          "objective": "Appliquer les 4 gestes dans l'ordre : aller vers le client avant 20 sec, créer le contact, proposer la boisson, amorcer par une question sur le client. Ne pas parler voiture dans la première minute.",
+          "duration": "20 min",
+          "persona": [
+            {
+              "label": "Profil",
+              "text": "Homme, 34 ans, graphiste indépendant, décontracté, sourit en entrant. Premier achat dans cette concession."
+            },
+            {
+              "label": "Comportement à l'entrée",
+              "text": "Entre calmement, regarde les véhicules exposés avec curiosité. S'arrête près d'un modèle, le touche. Disponible, pas pressé."
+            },
+            {
+              "label": "Signal non-verbal",
+              "text": "Posture ouverte, regard qui explore, léger sourire. Facile à accueillir — le contexte est favorable."
+            },
+            {
+              "label": "Motivation d'achat probable",
+              "text": "Envie de changer, curiosité pour les nouvelles motorisations. Budget flexible."
+            },
+            {
+              "label": "Frein / tension probable",
+              "text": "Aucun frein particulier — c'est un client idéal pour pratiquer les fondamentaux sans pression."
+            }
+          ],
+          "context": "Samedi matin, concession peu fréquentée. Le commercial est disponible et au poste. Le client entre seul, sans rendez-vous, juste \"pour voir\". Il n'a pas été contacté en amont.",
+          "stakes": "Condition idéale pour travailler les 4 gestes dans l'ordre sans contrainte externe. Le manager observe si le commercial prend l'initiative du contact ou attend.",
+          "observe": [
+            "Va-t-il vers le client avant 20 secondes ?",
+            "Crée-t-il le contact avec un prénom et un sourire franc ?",
+            "Propose-t-il la boisson et accompagne-t-il le client ?",
+            "Amorce-t-il la conversation sur le client avant de parler voiture ?"
+          ]
+        },
+        {
+          "level": "intermediaire",
+          "title": "Le client pressé qui veut aller vite",
+          "objective": "Adapter l'accueil au rythme imposé par le client sans sauter les étapes clés. Créer le lien en 45 secondes au lieu de 2 minutes. Proposer la boisson sans imposer une pause si le client résiste.",
+          "duration": "25 min",
+          "persona": [
+            {
+              "label": "Profil",
+              "text": "Femme, 43 ans, directrice commerciale, habituée à être efficace. A rendez-vous dans 1h en dehors de la concession."
+            },
+            {
+              "label": "Comportement à l'entrée",
+              "text": "Entre rapidement, regarde directement les vendeurs, cherche visuellement quelqu'un à qui parler. Pose sa question avant même d'être à portée normale de conversation."
+            },
+            {
+              "label": "Signal non-verbal",
+              "text": "Pas croissant rapide, regard direct et intense, sac en bandoulière qu'elle ne pose pas. Signaux clairs d'efficacité et d'impatience."
+            },
+            {
+              "label": "Motivation d'achat probable",
+              "text": "Renouveler son véhicule de fonction rapidement. A fait ses recherches en ligne, sait ce qu'elle veut. Ne veut pas perdre de temps."
+            },
+            {
+              "label": "Frein / tension probable",
+              "text": "\"J'ai pas beaucoup de temps.\" — phrase qu'elle va dire dans les 10 premières secondes."
+            }
+          ],
+          "context": "Jeudi à 12h30, heure de déjeuner. Concession active. La cliente entre directement et interpelle visuellement. Elle a déjà dit au téléphone qu'elle passait \"juste pour voir\" le modèle.",
+          "stakes": "Le commercial doit créer du lien rapidement sans ignorer les signaux d'impatience, et gérer le \"j'ai pas le temps\" sans abandonner l'étape d'accueil.",
+          "observe": [
+            "Capte-t-il le signal \"pressée\" et adapte-t-il son rythme d'accueil ?",
+            "Crée-t-il quand même un mini-lien humain avant de parler voiture ?",
+            "Gère-t-il le refus de la boisson sans abandonner la chaleur de l'accueil ?",
+            "Évite-t-il de basculer directement en mode \"qualification\" face à l'impatience ?"
+          ]
+        },
+        {
+          "level": "avance",
+          "title": "Le couple avec tension non-verbale",
+          "objective": "Lire les signaux non-verbaux de deux interlocuteurs aux énergies différentes, inclure les deux dans l'accueil, créer le lien avec celui qui est fermé sans ignorer celui qui est ouvert.",
+          "duration": "30 min",
+          "persona": [
+            {
+              "label": "Profil",
+              "text": "Couple, 38 ans / 41 ans. Elle a initié le projet — enthousiaste. Lui est venu par devoir — sceptique sur la nécessité de changer de véhicule."
+            },
+            {
+              "label": "Comportement à l'entrée",
+              "text": "Elle entre avec de l'énergie et regarde autour d'elle. Lui suit légèrement en retrait, les mains dans les poches, regard neutre. Ils ne se parlent pas en entrant."
+            },
+            {
+              "label": "Signal non-verbal",
+              "text": "Elle : posture ouverte, sourire anticipé. Lui : épaules légèrement rentrées, contact visuel minimal, position en retrait de 30 cm par rapport à elle."
+            },
+            {
+              "label": "Motivation d'achat probable",
+              "text": "Elle veut un SUV plus grand pour les vacances. Lui veut garder la voiture actuelle \"qui marche très bien\"."
+            },
+            {
+              "label": "Frein / tension probable",
+              "text": "Désaccord latent sur la nécessité du changement. Le mari peut devenir un frein si le commercial ne l'inclut pas dès l'accueil."
+            }
+          ],
+          "context": "Samedi après-midi, affluence modérée. Le couple entre sans rendez-vous. Le commercial risque naturellement de s'adresser à la personne la plus engagée (elle) et d'ignorer l'autre.",
+          "stakes": "L'enjeu : inclure les deux dans les 30 premières secondes, créer un lien avec le mari sans braquer la femme, et détecter la tension latente sans la nommer.",
+          "observe": [
+            "Adresse-t-il son accueil aux deux personnes simultanément dès le départ ?",
+            "Détecte-t-il les signaux non-verbaux de retrait du mari ?",
+            "Crée-t-il une amorce qui inclut le mari (question qui le concerne aussi) ?",
+            "Évite-t-il de parler uniquement à la personne la plus engagée ?"
+          ]
+        }
+      ]
+    },
+    "online": {
+      "focus": "l'accueil et la prise de contact",
+      "attentionPoints": [
+        "Va-t-il vers le client avant 20 secondes ?",
+        "Lit-il et adapte-t-il l'accueil aux signaux non-verbaux ?",
+        "Propose-t-il la boisson et accompagne-t-il le client ?",
+        "Parle-t-il d'abord du client avant de parler voiture ?"
+      ],
+      "grid": [
+        "Vers le client < 20 sec",
+        "Accueil adapté au non-verbal",
+        "Boisson + accompagnement",
+        "Lien humain avant voiture"
+      ],
+      "debrief": [
+        {
+          "title": "Auto-évaluation",
+          "prompt": "\"En combien de secondes tu es allé vers le client ? Qu'est-ce que tu as vu sur lui quand il est entré — et est-ce que tu en as tenu compte ? Quand est-ce que tu as parlé voiture pour la première fois ?\""
+        },
+        {
+          "title": "Retour du coach — les réussites",
+          "prompt": "\"J'ai observé que quand [client] est entré, tu as [action précise observée]. Le client a [réaction : souri / s'est détendu / s'est ouvert]. C'est exactement ce geste qui crée le lien dès les premières secondes.\""
+        },
+        {
+          "title": "Axe de travail prioritaire",
+          "prompt": "\"Un seul point : [ex: tu as parlé voiture au bout de 40 secondes — avant même d'avoir créé le lien]. La prochaine fois, pose une question sur le client avant de poser une question sur le projet. Une seule suffit.\""
+        },
+        {
+          "title": "Engagement & prochaine étape",
+          "prompt": "\"Sur ton prochain client, tu t'engages à aller vers lui avant 20 secondes et à ne pas parler voiture dans la première minute. Viens me voir vendredi — dis-moi comment tu as adapté ton accueil à ce client-là.\""
+        }
+      ],
+      "sections": []
+    },
+    "takeaways": {
+      "theory": "Les 4 gestes clés sont connus — aller vers, contact, boisson, amorce sur le client",
+      "offline": "Le geste a été travaillé sur 3 profils différents — la lecture du non-verbal est ancrée",
+      "online": "Le coach a observé et débriefé l'accueil en situation réelle avec précision",
+      "next": "Prochaine étape : retour terrain — date de suivi à planifier avec le manager"
+    }
+  }
+}

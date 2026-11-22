@@ -2,6 +2,21 @@
 
 Choix faits en l'absence d'information dans `docs/SPEC.md`, ou validés avec le fondateur quand ils s'en écartent. Le plus récent en haut.
 
+## 22/11/2026 — Étape 2 (matrices et Dojos)
+
+- **Matrice à 3 niveaux**, celle de la méthode Première Ligne : Bloc (« Tunnel de vente », « Compétences transversales ») → Compétence (ex. « Accueil ») → Sous-compétence notée de 0 à 4. Dans le code, la sous-compétence notée garde le nom `skills` de la spec ; le niveau intermédiaire s'appelle `competencies`.
+- **Échelle 0 à 4** (validé par le fondateur) : les 4 niveaux de sa matrice plus « 4 — Expert, capable de transmettre ».
+- **Deux modèles fournis** (validé) : « Vente automobile » (la matrice du kit, mot pour mot, typo « sourIs » corrigée) et « Vente — socle général » (version tous secteurs rédigée à partir de la première, à relire par le fondateur). Les descriptifs de niveau par sous-compétence sont facultatifs et laissés vides pour l'instant : les libellés généraux des niveaux s'affichent à la place.
+- **Un seul référentiel actif par entreprise** en V1, appliqué à tous ses commerciaux (pas de table de rattachement commercial ↔ référentiel pour l'instant).
+- **Copie, pas lien** : à la création d'un client, le modèle choisi est copié. Modifier la matrice d'un client ne touche ni le modèle ni les autres clients, et inversement.
+- **Suppression** : seulement si l'élément n'a jamais servi (fonction `is_skill_used`, complétée à chaque étape qui ajoute une référence, et déclencheur qui revérifie toute suppression). Pour l'instant, rien ne « sert » encore : tout est supprimable.
+- **Dojos (nouvelle fonctionnalité, absente de la spec)** : exercice en 3 phases, toujours rattaché à une sous-compétence. Contenu structuré en JSON suivant le standard « Créer un Dojo » du kit (objectif, standard, critères d'excellence, erreurs, notice manager, 3 scénarios, fiche d'écoute, grille, débriefing, à retenir).
+- **Bibliothèque** : les 42 Dojos PowerPoint du kit ont été transcrits automatiquement dans ce format et rattachés aux sous-compétences du modèle automobile (21 d'entre eux aussi au socle général). Les mises en page hors standard (Connaissance produit, Posture, Introduction aux objections) sont conservées en sections libres. 7 Dojos sont des modèles avec des zones à compléter (ex. `[MODÈLE_1]`), signalés dans l'interface. Les fichiers PowerPoint seront déposés dans le stockage Supabase à la mise en ligne.
+- **Droits sur les Dojos** : le responsable modifie tout ; un manager crée des Dojos et ne modifie que les siens (il copie un Dojo de la bibliothèque pour l'adapter) ; un commercial ne voit que les Dojos validés. Cycle : brouillon → à tester → validé → archivé.
+- **Génération de Dojos** par l'API Anthropic, avec la méthode du fondateur et un Dojo de référence dans la consigne. Désactivée tant que `ANTHROPIC_API_KEY` n'est pas renseignée (le bouton l'indique).
+- **Suivi des séances de Dojo** (scénario joué, axe prioritaire, engagement) : reporté à l'étape 4 avec les coachings.
+- **Navigation** : responsable = Accueil, Commerciaux, Dojos, Paramètres (Utilisateurs, Équipes, Matrice) ; manager = Accueil, Mon équipe, Dojos, Profil ; commercial = Ma progression, Dojos, Profil.
+
 ## 22/11/2026 — Étape 1
 
 - **Cache Components désactivé** (`cacheComponents: false`) : presque toutes les pages dépendent de l'utilisateur connecté ; le rendu dynamique classique est plus simple et évite les pièges de mise en cache de données personnelles.

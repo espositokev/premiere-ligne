@@ -107,4 +107,6 @@ export async function loginWithCode(page: Page, email: string) {
   const code = await latestLoginCode(email);
   await page.getByLabel("Code reçu par email").fill(code);
   await page.getByRole("button", { name: "Me connecter" }).click();
+  // Attendre la fin de la connexion (la session est posée par la redirection qui suit).
+  await expect(page).not.toHaveURL(/\/connexion/, { timeout: 15_000 });
 }

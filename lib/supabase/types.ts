@@ -198,6 +198,33 @@ type SkillRow = LevelDescriptors & {
   updated_at: string | null;
 };
 
+
+type LibraryDojoRow = {
+  id: string;
+  title: string;
+  content: Json;
+  pptx_path: string | null;
+  created_at: string;
+  updated_at: string | null;
+};
+
+type LibraryDojoSkillRow = { library_dojo_id: string; template_skill_id: string };
+
+type DojoRow = {
+  id: string;
+  organization_id: string;
+  skill_id: string;
+  title: string;
+  content: Json;
+  status: "brouillon" | "a_tester" | "valide" | "archive";
+  source: "bibliotheque" | "ia" | "manuel";
+  library_dojo_id: string | null;
+  pptx_path: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string | null;
+};
+
 /** Champs générés par la base : facultatifs à l'insertion. */
 type Generated = "id" | "created_at" | "updated_at";
 type InsertOf<Row, Optional extends keyof Row> = Omit<Row, Optional> & Partial<Pick<Row, Optional>>;
@@ -390,6 +417,36 @@ export type Database = {
             "competencies",
             ["id", "organization_id"]
           >,
+        ];
+      };
+      library_dojos: {
+        Row: LibraryDojoRow;
+        Insert: InsertOf<LibraryDojoRow, Generated | "pptx_path">;
+        Update: Partial<LibraryDojoRow>;
+        Relationships: [];
+      };
+      library_dojo_skills: {
+        Row: LibraryDojoSkillRow;
+        Insert: LibraryDojoSkillRow;
+        Update: Partial<LibraryDojoSkillRow>;
+        Relationships: [
+          Rel<"library_dojo_skills_library_dojo_id_fkey", ["library_dojo_id"], "library_dojos", ["id"]>,
+          Rel<"library_dojo_skills_template_skill_id_fkey", ["template_skill_id"], "template_skills", ["id"]>,
+        ];
+      };
+      dojos: {
+        Row: DojoRow;
+        Insert: InsertOf<DojoRow, Generated | "status" | "source" | "library_dojo_id" | "pptx_path" | "created_by">;
+        Update: Partial<DojoRow>;
+        Relationships: [
+          Rel<
+            "dojos_skill_id_organization_id_fkey",
+            ["skill_id", "organization_id"],
+            "skills",
+            ["id", "organization_id"]
+          >,
+          Rel<"dojos_created_by_fkey", ["created_by"], "profiles", ["id"]>,
+          Rel<"dojos_organization_id_fkey", ["organization_id"], "organizations", ["id"]>,
         ];
       };
     };

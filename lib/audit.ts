@@ -22,7 +22,9 @@ export type AuditAction =
   | "profile.updated"
   | "template.created"
   | "template.deleted"
-  | "framework.created";
+  | "framework.created"
+  | "dojo.status_changed"
+  | "dojo.deleted";
 
 /**
  * Journal d'activité (§4.12). Écrit avec la clé serveur : les utilisateurs ne peuvent pas
