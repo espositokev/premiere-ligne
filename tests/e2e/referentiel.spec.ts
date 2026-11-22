@@ -32,7 +32,10 @@ test.describe("Matrices de compétences", () => {
     await page.getByText("Je sais créer un accueil personnalisé avec mon client").click();
     await page.getByText("Ajouter une sous-compétence").first().click();
     await page.getByLabel("Nom court").filter({ visible: true }).fill("Accueil atelier");
-    await page.getByRole("button", { name: "Ajouter une sous-compétence" }).filter({ visible: true }).click();
+    await page
+      .getByRole("button", { name: "Ajouter une sous-compétence" })
+      .filter({ visible: true })
+      .click();
     await expect(page.getByText("Accueil atelier ajouté")).toBeVisible();
     await expect(page.getByText("Accueil atelier", { exact: true })).toBeVisible();
     await expect(page.getByText("12 compétences · 41 sous-compétences")).toBeVisible();

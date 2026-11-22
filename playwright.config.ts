@@ -11,7 +11,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? "github" : "list",
+  reporter: process.env.CI ? [["github"], ["list"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: `http://localhost:${PORT}`,
     locale: "fr-FR",
@@ -28,6 +28,9 @@ export default defineConfig({
     command: `pnpm build && pnpm start --port ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
+    // En CI, les journaux du serveur apparaissent dans la sortie : utile pour comprendre un échec.
+    stdout: process.env.CI ? "pipe" : "ignore",
+    stderr: "pipe",
     timeout: 240_000,
   },
 });
