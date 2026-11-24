@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { redirect } from "next/navigation";
 
 import { audit } from "@/lib/audit";
@@ -91,4 +92,38 @@ export async function setOrganizationStatus(
   revalidatePath("/admin", "layout");
   const labels = { actif: "réactivée", suspendu: "suspendue", archive: "archivée" } as const;
   return formSuccess(`Entreprise ${labels[status.data]}`);
+}
+
+const aiPlanSchema = z.enum(["aucune", "dojos", "pack_ia"]);
+
+/** Active ou retire une option IA (super admin, en attendant le paiement en ligne). */
+export async function setOrganizationAiPlan(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const user = await requireSuperAdmin();
+  const id = uuidSchema.safeParse(formData.get("organization_id"));
+  const plan = aiPlanSchema.safeParse(formData.get("ai_plan"));
+  if (!id.success || !plan.success) return formError("Demande invalide.");
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("organizations")
+    .update({ ai_plan: plan.data })
+    .eq("id", id.data);
+  if (error) {
+    console.error("[entreprise] option IA", error.message);
+    return formError(UNEXPECTED_ERROR);
+  }
+  await audit({
+    action: "organization.ai_plan_changed",
+    actorUserId: user.id,
+    organizationId: id.data,
+    targetType: "organization",
+    targetId: id.data,
+    details: { ai_plan: plan.data },
+  });
+  revalidatePath("/admin", "layout");
+  revalidatePath("/e", "layout");
+  return formSuccess("Option IA enregistrée");
 }

@@ -15,13 +15,14 @@ export function NewDojoForm({
   organizationId,
   options,
   defaultSkillId,
-  generationAvailable,
+  generation,
 }: {
   organizationId: string;
   options: Option[];
   defaultSkillId?: string;
-  generationAvailable: boolean;
+  generation: { available: boolean; text: string };
 }) {
+  const generationAvailable = generation.available;
   const [state, action] = useActionState(createDojo, initialFormState);
   const [mode, setMode] = useState<"ia" | "manuel">(generationAvailable ? "ia" : "manuel");
   const errors = state.fieldErrors ?? {};
@@ -31,9 +32,7 @@ export function NewDojoForm({
       value: "ia" as const,
       icon: Sparkles,
       title: "Générer selon la méthode",
-      text: generationAvailable
-        ? "Décrivez le sujet : le Dojo complet est rédigé en suivant la structure Première Ligne. Vous le relisez ensuite."
-        : "Bientôt disponible sur votre espace.",
+      text: generation.text,
       disabled: !generationAvailable,
     },
     {

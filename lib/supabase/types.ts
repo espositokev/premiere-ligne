@@ -8,6 +8,8 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 export type OrgRole = "org_admin" | "manager" | "sales_rep";
 export type OrgStatus = "actif" | "suspendu" | "archive";
+export type AiPlan = "aucune" | "dojos" | "pack_ia";
+export type AiUsageKind = "dojo" | "analyse_appel";
 
 type ProfileRow = {
   id: string;
@@ -31,9 +33,19 @@ type OrganizationRow = {
   status: OrgStatus;
   settings: Json;
   archived_at: string | null;
+  ai_plan: AiPlan;
+  ai_plan_updated_at: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string | null;
+};
+
+type AiUsageRow = {
+  id: string;
+  organization_id: string;
+  kind: AiUsageKind;
+  user_id: string | null;
+  created_at: string;
 };
 
 type TeamRow = {
@@ -396,10 +408,25 @@ export type Database = {
         Row: OrganizationRow;
         Insert: InsertOf<
           OrganizationRow,
-          Generated | "logo_url" | "status" | "settings" | "created_by" | "archived_at"
+          | Generated
+          | "logo_url"
+          | "status"
+          | "settings"
+          | "created_by"
+          | "archived_at"
+          | "ai_plan"
+          | "ai_plan_updated_at"
         >;
         Update: Partial<OrganizationRow>;
         Relationships: [];
+      };
+      ai_usage: {
+        Row: AiUsageRow;
+        Insert: InsertOf<AiUsageRow, "id" | "created_at" | "user_id">;
+        Update: Partial<AiUsageRow>;
+        Relationships: [
+          Rel<"ai_usage_organization_id_fkey", ["organization_id"], "organizations", ["id"]>,
+        ];
       };
       teams: {
         Row: TeamRow;

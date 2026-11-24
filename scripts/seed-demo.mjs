@@ -321,6 +321,24 @@ for (const [login, first, last, team, level, title] of repsSpec) {
 }
 console.log("→ Concession Démo : 11 personnes");
 
+// Pack IA actif, avec un peu d'usage ce mois-ci.
+await must(db.from("organizations").update({ ai_plan: "pack_ia" }).eq("id", org.id), "option IA");
+await must(
+  db.from("ai_usage").insert([
+    ...Array.from({ length: 4 }, () => ({
+      organization_id: org.id,
+      kind: "dojo",
+      user_id: julienId,
+    })),
+    ...Array.from({ length: 7 }, () => ({
+      organization_id: org.id,
+      kind: "analyse_appel",
+      user_id: sarahId,
+    })),
+  ]),
+  "usage IA",
+);
+
 // Évaluations sur 3 mois, avec progression (et quelques reculs).
 const skillIds = org.skills.map((s) => s.id);
 const weakness = skillIds.map(() => rand() * 1.6 - 0.8);

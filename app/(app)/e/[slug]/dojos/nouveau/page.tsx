@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page";
 import { generationAvailable } from "@/lib/ai/dojo-generator";
 import { getOrgContext } from "@/lib/auth/org-context";
+import { loadAiAccess } from "@/lib/data/ai-usage";
 import { loadOrganizationTree } from "@/lib/data/framework";
 import { canCreateDojo } from "@/lib/domain/dojo";
 
@@ -21,7 +22,18 @@ export default async function NewDojoPage({
   const { competence } = await searchParams;
   const context = await getOrgContext(slug);
   if (!canCreateDojo(context.role)) redirect(`/e/${slug}/dojos`);
-  const framework = await loadOrganizationTree(context.organization.id);
+  const [framework, access] = await Promise.all([
+    loadOrganizationTree(context.organization.id),
+    loadAiAccess(context.organization.id, "dojo"),
+  ]);
+  const generation = !generationAvailable()
+    ? { available: false, text: "Bientôt disponible sur votre espace." }
+    : access.allowed
+      ? {
+          available: true,
+          text: `Décrivez le sujet : le Dojo complet est rédigé en suivant la structure Première Ligne. Vous le relisez ensuite. Encore ${access.remaining} ce mois-ci.`,
+        }
+      : { available: false, text: access.message };
 
   const options = (framework?.tree.blocks ?? [])
     .filter((b) => b.active)
@@ -55,7 +67,7 @@ export default async function NewDojoPage({
             organizationId={context.organization.id}
             options={options}
             defaultSkillId={typeof competence === "string" ? competence : undefined}
-            generationAvailable={generationAvailable()}
+            generation={generation}
           />
         )}
       </Card>

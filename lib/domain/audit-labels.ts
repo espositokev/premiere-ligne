@@ -5,6 +5,7 @@ export const AUDIT_LABELS: Record<string, string> = {
   "organization.created": "Entreprise créée",
   "organization.updated": "Entreprise modifiée",
   "organization.status_changed": "Statut de l'entreprise changé",
+  "organization.ai_plan_changed": "Option IA changée",
   "organization.purged": "Entreprise supprimée définitivement",
   "invitation.created": "Invitation envoyée",
   "invitation.resent": "Invitation renvoyée",

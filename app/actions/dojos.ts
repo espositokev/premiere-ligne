@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { audit } from "@/lib/audit";
 import { generateDojo } from "@/lib/ai/dojo-generator";
+import { loadAiAccess, recordAiUsage } from "@/lib/data/ai-usage";
 import { requireUser } from "@/lib/auth/current-user";
 import { dojoContentSchema, emptyDojoContent, type DojoContent } from "@/lib/domain/dojo";
 import { formError, formSuccess, UNEXPECTED_ERROR, type FormState } from "@/lib/forms";
@@ -74,6 +75,8 @@ export async function createDojo(_prev: FormState, formData: FormData): Promise<
   let title = input.title;
   let content = emptyDojoContent();
   if (input.mode === "ia") {
+    const access = await loadAiAccess(organization.id, "dojo");
+    if (!access.allowed) return formError(access.message);
     const result = await generateDojo({
       subject: input.subject,
       skillName: skill.name,
@@ -82,6 +85,7 @@ export async function createDojo(_prev: FormState, formData: FormData): Promise<
       organizationName: organization.name,
     });
     if (!result.ok) return formError(result.error);
+    await recordAiUsage(organization.id, "dojo");
     title = result.title;
     content = result.content;
   }

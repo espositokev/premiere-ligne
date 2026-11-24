@@ -21,6 +21,9 @@ import { uuidSchema } from "@/lib/validation/schemas";
 import { createClient } from "@/lib/supabase/server";
 
 import { ApplyTemplateForm } from "@/components/framework/apply-template-form";
+import { AiPlanForm } from "@/components/ai/ai-plan-form";
+import { AiUsageSummary } from "@/components/ai/ai-usage-summary";
+import { loadAiOverview } from "@/lib/data/ai-usage";
 import { now as currentTime } from "@/lib/clock";
 
 import { STATUS_LABELS } from "../../organization-table";
@@ -45,12 +48,13 @@ export default async function OrganizationDetailPage({
     .maybeSingle();
   if (!organization) notFound();
 
-  const [members, invitations, teams, framework, templates] = await Promise.all([
+  const [members, invitations, teams, framework, templates, aiOverview] = await Promise.all([
     listMembers(organization.id),
     listInvitations(organization.id),
     listTeams(organization.id),
     loadOrganizationTree(organization.id),
     listTemplates({ publishedOnly: true }),
+    loadAiOverview(organization.id),
   ]);
   const frameworkCounts = framework ? countTree(framework.tree) : null;
   const leaders = members.filter((m) => m.role !== "sales_rep");
@@ -125,6 +129,13 @@ export default async function OrganizationDetailPage({
         </div>
 
         <aside className="flex flex-col gap-4">
+          <Card>
+            <CardTitle>Options IA</CardTitle>
+            <div className="mt-3 flex flex-col gap-5">
+              <AiUsageSummary overview={aiOverview} />
+              <AiPlanForm organizationId={organization.id} plan={aiOverview.plan} />
+            </div>
+          </Card>
           <Card>
             <CardTitle>Matrice de compétences</CardTitle>
             {framework && frameworkCounts ? (

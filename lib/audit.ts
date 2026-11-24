@@ -9,6 +9,7 @@ export type AuditAction =
   | "organization.created"
   | "organization.updated"
   | "organization.status_changed"
+  | "organization.ai_plan_changed"
   | "invitation.created"
   | "invitation.resent"
   | "invitation.revoked"

@@ -125,7 +125,7 @@ Direction validée par Kevin : direct, terrain, exigeant ; univers de la fiche d
 
 La plateforme reste offerte. Deux options payantes, par entreprise :
 
-- **Dojos à la demande** seuls : 19 € HT par mois.
+- **Dojos à la demande** seuls : 19 € HT par mois, 30 Dojos générés par mois (limite de bon usage, aussi comprise dans le Pack IA).
 - **Pack IA** : 45 € HT par mois. Il comprend l'analyse d'appels et les Dojos à la demande. Il inclut 20 analyses d'appels par mois (décidé le 24 novembre 2026), puis environ 1,50 € HT par analyse supplémentaire.
 
 Coût estimé : moins d'1 € par appel analysé (transcription de 30 minutes, bilan et 3 Dojos), environ 0,05 € par Dojo.
@@ -139,3 +139,10 @@ Coût estimé : moins d'1 € par appel analysé (transcription de 30 minutes, b
 3. Le manager valide ou corrige chaque note avant qu'elle compte.
 4. Le vendeur peut contester, compétence par compétence : il propose sa note avec une explication, le manager est prévenu et tranche. L'échange reste dans l'historique.
 5. L'analyse porte uniquement sur les compétences de la matrice. Pas d'émotion, d'humeur ni de ton déduits de la voix (reconnaissance des émotions interdite au travail par l'IA Act).
+
+### Options IA, partie 1 construite (24 novembre 2026)
+
+- Colonne `organizations.ai_plan` (« aucune », « dojos », « pack_ia ») : seul le super admin la change, depuis la fiche entreprise (règle dans la base). Le paiement en ligne viendra plus tard.
+- Table `ai_usage` : une ligne par Dojo généré ou appel analysé, comptée par mois à l'heure de Paris. Réservée au responsable et aux managers, impossible sans option active.
+- La génération de Dojos par l'IA vérifie l'option et le compteur avant d'appeler l'IA, puis note l'usage.
+- Le responsable voit son option et ses compteurs dans Paramètres › Fonctionnement.

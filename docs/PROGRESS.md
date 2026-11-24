@@ -178,3 +178,10 @@
 - ~~Installer l'app GitHub de Claude~~ : fait.
 - ~~Créer le compte Vercel et importer le dépôt~~ : fait le 22/11/2026 (plan Hobby, passage en Pro avant le premier client).
 - Remplir les zones `[À COMPLÉTER]` des pages légales (étape 7 au plus tard).
+
+## Options IA payantes (en cours, branche options-ia)
+
+- ✅ Partie 1 : activation des options par le super admin, compteurs du mois, génération de Dojos réservée aux entreprises avec une option.
+- ⏳ Partie 2 : analyse d'appels (audio, case « client informé », transcription, bilan 3 forces / 3 axes, notes proposées validées par le manager, un Dojo par axe).
+- ⏳ Partie 3 : contestation d'une note par le commercial, arbitrée par le manager.
+- ⏳ Plus tard : paiement en ligne des options.
