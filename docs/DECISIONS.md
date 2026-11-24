@@ -126,7 +126,7 @@ Direction validée par Kevin : direct, terrain, exigeant ; univers de la fiche d
 La plateforme reste offerte. Deux options payantes, par entreprise :
 
 - **Dojos à la demande** seuls : 19 € HT par mois.
-- **Pack IA** : 45 € HT par mois. Il comprend l'analyse d'appels et les Dojos à la demande. Le nombre d'analyses incluses (piste : 20 par mois, puis environ 1,50 € l'analyse) reste à confirmer.
+- **Pack IA** : 45 € HT par mois. Il comprend l'analyse d'appels et les Dojos à la demande. Il inclut 20 analyses d'appels par mois (décidé le 24 novembre 2026), puis environ 1,50 € HT par analyse supplémentaire.
 
 Coût estimé : moins d'1 € par appel analysé (transcription de 30 minutes, bilan et 3 Dojos), environ 0,05 € par Dojo.
 
