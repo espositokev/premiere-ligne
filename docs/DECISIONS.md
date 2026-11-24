@@ -120,3 +120,22 @@ Le skill unslop (Damir Sokolovsky, CC BY 4.0) est installé dans `.claude/skills
 ## Page d'accueil refaite avec unslop (22 novembre 2026)
 
 Direction validée par Kevin : direct, terrain, exigeant ; univers de la fiche de coaching et de la grille 0 à 4 ; charte inchangée. Bouton principal « Nous contacter » (la page sert à convaincre des prospects), « Se connecter » devient un lien discret. L'aperçu est une fiche vendeur dont la maîtrise monte en marches, comme le logo. Les trois cartes deviennent « Une méthode en trois temps ». Le fluo ne marque que l'action principale, le dernier mois et le surlignage de « là où ça se joue ».
+
+## Options IA payantes (décidé le 24 novembre 2026, à développer)
+
+La plateforme reste offerte. Deux options payantes, par entreprise :
+
+- **Dojos à la demande** seuls : 19 € HT par mois.
+- **Pack IA** : 45 € HT par mois. Il comprend l'analyse d'appels et les Dojos à la demande. Le nombre d'analyses incluses (piste : 20 par mois, puis environ 1,50 € l'analyse) reste à confirmer.
+
+Coût estimé : moins d'1 € par appel analysé (transcription de 30 minutes, bilan et 3 Dojos), environ 0,05 € par Dojo.
+
+**Parcours de l'analyse d'appel** : le manager envoie l'audio, l'IA le transcrit et l'analyse selon la matrice de l'entreprise, puis produit un bilan avec 3 points forts et 3 axes de travail. Chaque axe propose de générer un Dojo personnalisé.
+
+**Règles (IA Act et RGPD, à faire valider par un juriste avant la mise en vente)** :
+
+1. Avant l'envoi d'un audio, une case obligatoire : « Le client a été informé de l'enregistrement ».
+2. L'IA ne fait que proposer. Le bilan et les notes suggérées sont marqués « Proposition IA » et n'entrent jamais seuls dans la matrice.
+3. Le manager valide ou corrige chaque note avant qu'elle compte.
+4. Le vendeur peut contester, compétence par compétence : il propose sa note avec une explication, le manager est prévenu et tranche. L'échange reste dans l'historique.
+5. L'analyse porte uniquement sur les compétences de la matrice. Pas d'émotion, d'humeur ni de ton déduits de la voix (reconnaissance des émotions interdite au travail par l'IA Act).
