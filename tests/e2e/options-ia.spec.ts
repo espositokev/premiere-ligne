@@ -24,7 +24,7 @@ test.describe("Options IA", () => {
     await createUser({ email, firstName: "Kevin", lastName: "Fondateur", superAdmin: true });
     await loginWithCode(page, email);
     await page.goto(`/admin/entreprises/${seed.orgId}`);
-    await expect(page.getByText("Aucune option")).toBeVisible();
+    await expect(page.getByLabel("Option active")).toHaveValue("aucune");
     await page.getByLabel("Option active").selectOption("pack_ia");
     await page.getByRole("button", { name: "Enregistrer" }).click();
     await expect(page.getByText("Option IA enregistrée").first()).toBeVisible();
