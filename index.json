@@ -1,0 +1,218 @@
+[
+  {
+    "who": "Toi (super admin)",
+    "title": "Ton tableau de bord",
+    "text": "Toutes les entreprises clientes et leur activité du mois.",
+    "path": "/admin",
+    "mobile": "00-admin-mobile.jpg",
+    "desktop": "00-admin-ordinateur.jpg"
+  },
+  {
+    "who": "Toi (super admin)",
+    "title": "Une entreprise cliente",
+    "text": "Sa matrice, ses utilisateurs, son statut, l'export et la suppression RGPD.",
+    "path": "/admin/entreprises/77e11908-3ac4-402a-814f-ba0167208abd",
+    "mobile": "01-admin-entreprise-mobile.jpg",
+    "desktop": "01-admin-entreprise-ordinateur.jpg"
+  },
+  {
+    "who": "Toi (super admin)",
+    "title": "Les modèles de matrice",
+    "text": "Tes deux modèles, copiés chez chaque nouveau client.",
+    "path": "/admin/modeles",
+    "mobile": "02-admin-modeles-mobile.jpg",
+    "desktop": "02-admin-modeles-ordinateur.jpg"
+  },
+  {
+    "who": "Toi (super admin)",
+    "title": "Le journal d'activité",
+    "text": "Qui a fait quoi, dans toutes les entreprises.",
+    "path": "/admin/journal",
+    "mobile": "03-admin-journal-mobile.jpg",
+    "desktop": "03-admin-journal-ordinateur.jpg"
+  },
+  {
+    "who": "Claire, responsable de la concession",
+    "title": "Tableau de bord du responsable",
+    "text": "Indicateurs de toute la concession, par équipe, coachings par manager.",
+    "path": "/e/concession-demo",
+    "mobile": "04-responsable-accueil-mobile.jpg",
+    "desktop": "04-responsable-accueil-ordinateur.jpg"
+  },
+  {
+    "who": "Claire, responsable de la concession",
+    "title": "Les commerciaux",
+    "text": "Tous les commerciaux, regroupés par équipe.",
+    "path": "/e/concession-demo/equipe",
+    "mobile": "05-responsable-commerciaux-mobile.jpg",
+    "desktop": "05-responsable-commerciaux-ordinateur.jpg"
+  },
+  {
+    "who": "Claire, responsable de la concession",
+    "title": "Paramètres",
+    "text": "Utilisateurs, équipes, matrice, fonctionnement, journal.",
+    "path": "/e/concession-demo/parametres",
+    "mobile": "06-responsable-parametres-mobile.jpg",
+    "desktop": "06-responsable-parametres-ordinateur.jpg"
+  },
+  {
+    "who": "Claire, responsable de la concession",
+    "title": "Fonctionnement de l'entreprise",
+    "text": "Auto-évaluation, demandes de coaching, alerte « sans coaching ».",
+    "path": "/e/concession-demo/parametres/entreprise",
+    "mobile": "07-responsable-fonctionnement-mobile.jpg",
+    "desktop": "07-responsable-fonctionnement-ordinateur.jpg"
+  },
+  {
+    "who": "Claire, responsable de la concession",
+    "title": "La matrice de la concession",
+    "text": "Adaptable sur le terrain : ajouter, renommer, désactiver.",
+    "path": "/e/concession-demo/parametres/referentiel",
+    "mobile": "08-responsable-matrice-mobile.jpg",
+    "desktop": "08-responsable-matrice-ordinateur.jpg"
+  },
+  {
+    "who": "Claire, responsable de la concession",
+    "title": "Fiche utilisateur",
+    "text": "Rôle, équipe, « voir en tant que », export RGPD, désactivation.",
+    "path": "/e/concession-demo/parametres/utilisateurs/4ee20492-3e5e-40e6-aa90-0e0b2cb9bcc4",
+    "mobile": "09-responsable-utilisateur-mobile.jpg",
+    "desktop": "09-responsable-utilisateur-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Tableau de bord du manager",
+    "text": "Comptes rendus à rédiger, commerciaux à suivre, radar et points faibles de l'équipe.",
+    "path": "/e/concession-demo",
+    "mobile": "10-manager-accueil-mobile.jpg",
+    "desktop": "10-manager-accueil-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Les coachings",
+    "text": "À rédiger, demandes, à venir.",
+    "path": "/e/concession-demo/coachings",
+    "mobile": "11-manager-coachings-mobile.jpg",
+    "desktop": "11-manager-coachings-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "La semaine",
+    "text": "Les coachings jour par jour.",
+    "path": "/e/concession-demo/coachings?vue=semaine",
+    "mobile": "12-manager-semaine-mobile.jpg",
+    "desktop": "12-manager-semaine-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Planifier un coaching",
+    "text": "Date, format, lieu, objectif, 1 à 3 compétences.",
+    "path": "/e/concession-demo/coachings/nouveau?commercial=4ee20492-3e5e-40e6-aa90-0e0b2cb9bcc4",
+    "mobile": "13-manager-planifier-mobile.jpg",
+    "desktop": "13-manager-planifier-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Rédiger un compte rendu",
+    "text": "Enregistré automatiquement, clôture en deux temps.",
+    "path": "/e/concession-demo/coachings/e51d3c30-5fcb-4b58-a141-c31091fa3aac",
+    "mobile": "14-manager-compte-rendu-mobile.jpg",
+    "desktop": "14-manager-compte-rendu-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Un compte rendu clôturé",
+    "text": "Observations, points forts, axes de progrès, commentaire du commercial.",
+    "path": "/e/concession-demo/coachings/ecb525d6-66ce-4374-8651-5bc4e59eea69",
+    "mobile": "15-manager-cr-cloture-mobile.jpg",
+    "desktop": "15-manager-cr-cloture-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Fiche d'un commercial",
+    "text": "Maîtrise, radar, matrice avec évolution.",
+    "path": "/e/concession-demo/equipe/4ee20492-3e5e-40e6-aa90-0e0b2cb9bcc4",
+    "mobile": "16-manager-fiche-mobile.jpg",
+    "desktop": "16-manager-fiche-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Son plan de progrès",
+    "text": "Les actions, en retard en tête.",
+    "path": "/e/concession-demo/equipe/4ee20492-3e5e-40e6-aa90-0e0b2cb9bcc4?vue=plan",
+    "mobile": "17-manager-fiche-plan-mobile.jpg",
+    "desktop": "17-manager-fiche-plan-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Évaluer un commercial",
+    "text": "Notes de 0 à 4 en gros boutons, au pouce.",
+    "path": "/e/concession-demo/equipe/38d4c959-bffa-4f88-bf32-6ad8ac28cd28/evaluations/dea90f16-1d2f-480c-9bfd-4d1513c66a4c",
+    "mobile": "18-manager-evaluation-mobile.jpg",
+    "desktop": "18-manager-evaluation-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Actions de l'équipe",
+    "text": "Filtrables par commercial, compétence, retard.",
+    "path": "/e/concession-demo/equipe/actions",
+    "mobile": "19-manager-actions-mobile.jpg",
+    "desktop": "19-manager-actions-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Les Dojos",
+    "text": "Ta bibliothèque, rangée par compétence.",
+    "path": "/e/concession-demo/dojos",
+    "mobile": "20-manager-dojos-mobile.jpg",
+    "desktop": "20-manager-dojos-ordinateur.jpg"
+  },
+  {
+    "who": "Julien, manager de l'équipe Nord",
+    "title": "Un Dojo",
+    "text": "Théorie, pratique, mise en situation, et les séances notées.",
+    "path": "/e/concession-demo/dojos/db364b84-0bbd-4b3d-a4b3-b87a6d92fe64",
+    "mobile": "21-manager-dojo-mobile.jpg",
+    "desktop": "21-manager-dojo-ordinateur.jpg"
+  },
+  {
+    "who": "Léo, commercial",
+    "title": "Ma progression",
+    "text": "« À faire pour toi », radar, matrice avec les niveaux.",
+    "path": "/e/concession-demo/moi",
+    "mobile": "22-commercial-progression-mobile.jpg",
+    "desktop": "22-commercial-progression-ordinateur.jpg"
+  },
+  {
+    "who": "Léo, commercial",
+    "title": "Mon plan",
+    "text": "Ses actions, un tap pour avancer.",
+    "path": "/e/concession-demo/moi/plan",
+    "mobile": "23-commercial-plan-mobile.jpg",
+    "desktop": "23-commercial-plan-ordinateur.jpg"
+  },
+  {
+    "who": "Léo, commercial",
+    "title": "Mes coachings",
+    "text": "À venir, demandes, comptes rendus, séances de Dojo.",
+    "path": "/e/concession-demo/coachings",
+    "mobile": "24-commercial-coachings-mobile.jpg",
+    "desktop": "24-commercial-coachings-ordinateur.jpg"
+  },
+  {
+    "who": "Léo, commercial",
+    "title": "Un compte rendu reçu",
+    "text": "Il le lit et ajoute son commentaire.",
+    "path": "/e/concession-demo/coachings/ecb525d6-66ce-4374-8651-5bc4e59eea69",
+    "mobile": "25-commercial-cr-mobile.jpg",
+    "desktop": "25-commercial-cr-ordinateur.jpg"
+  },
+  {
+    "who": "Léo, commercial",
+    "title": "Demander un coaching",
+    "text": "Il choisit ce qu'il veut travailler.",
+    "path": "/e/concession-demo/coachings/demander",
+    "mobile": "26-commercial-demande-mobile.jpg",
+    "desktop": "26-commercial-demande-ordinateur.jpg"
+  }
+]
